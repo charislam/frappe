@@ -1,0 +1,18 @@
+{
+  "name": "@charismaticalli/skate",
+  "private": true,
+  "type": "module",
+  "scripts": {
+	"dev": "pnpm dev:frappe",
+    "dev:frappe": "pnpm --filter @charismaticalli/frappe dev",
+	"fmt": "pnpm fmt:frappe",
+    "fmt:frappe": "pnpm --filter @charismaticalli/frappe fmt",
+	"lint": "pnpm lint:frappe",
+    "lint:frappe": "pnpm --filter @charismaticalli/frappe lint",
+	"test": "pnpm test:frappe",
+    "test:frappe": "pnpm --filter @charismaticalli/frappe test",
+	"typecheck": "pnpm typecheck:frappe",
+    "typecheck:frappe": "pnpm --filter @charismaticalli/frappe typecheck"
+  },
+  "packageManager": "pnpm@11.27.1+sha512.a81d4c21b9b09a4b0aebf90ef5e527d4262bdda322d26082978cb549023ac6d9cafc98b19fffaa5c71db438a65f70224edb78d7311187861ff96480d1cdca23c"
+}

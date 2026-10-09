@@ -1,0 +1,22 @@
+blockExoticSubdeps: true
+
+catalog:
+  '@effect/tsgo': ^0.45.0
+  '@effect/vitest': 4.0.0-rc.115
+  '@types/node': ^24 
+  effect: 4.0.0-rc.115
+  happy-dom: ^20.14.5
+  oxfmt: ^0.68.0
+  oxlint: 1.82.0
+  oxlint-tsgolint: ^7.0.2001
+  typescript: ^7
+  vite: ^8.0.3
+  vitest: ^5.0.1
+
+engineStrict: true
+
+packages:
+  - apps/*
+  - packages/*
+
+minimumReleaseAge: 10080
