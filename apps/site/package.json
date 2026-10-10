@@ -7,7 +7,7 @@
     "build": "tsc --noEmit && vite build",
     "preview": "vite preview",
     "fmt": "oxfmt",
-    "lint": "oxlint src",
+    "lint": "oxlint src && oxfmt --check src",
     "typecheck": "tsc --noEmit",
     "test": "vitest run"
   },

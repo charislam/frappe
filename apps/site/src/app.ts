@@ -1,5 +1,13 @@
 import { Sync, branch, cases, component } from "@charismaticalli/frappe";
-import { type Destination, History, type ParseResult, link, navigator, route, router } from "@charismaticalli/frappe/router";
+import {
+  type Destination,
+  History,
+  type ParseResult,
+  link,
+  navigator,
+  route,
+  router,
+} from "@charismaticalli/frappe/router";
 import { Effect, Match, Option } from "effect";
 import { RoutingDemo } from "~/routing-demo/app";
 import { Examples } from "./examples";

@@ -1,4 +1,10 @@
-import { type ElementOutput, Sync, component, nativeNode, occurrenceId } from "@charismaticalli/frappe";
+import {
+  type ElementOutput,
+  Sync,
+  component,
+  nativeNode,
+  occurrenceId,
+} from "@charismaticalli/frappe";
 import { Effect, Match, Option } from "effect";
 
 const names = ["Overview", "Details", "Settings"] as const;

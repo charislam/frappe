@@ -9,7 +9,7 @@
   },
   "scripts": {
     "fmt": "oxfmt",
-    "lint": "oxlint src",
+    "lint": "oxlint src && oxfmt --check src",
     "prepare": "effect-tsgo patch --no-typescript --oxlint",
     "typecheck": "tsc --noEmit",
     "test": "vitest run"
