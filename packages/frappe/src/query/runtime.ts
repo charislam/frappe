@@ -1,26 +1,26 @@
 import { Effect, Equal, Match, Option, Result, type Scope } from "effect";
-import type { Structural } from "~/requirements";
-import { resourceEnvironment } from "~/resource-runtime";
 import {
-  calculateSync,
-  requireValid,
-  type ReactiveError,
   type CommitCoordinator,
+  type ReactiveError,
   type ReactiveRuntime,
   type Transaction,
+  calculateSync,
+  requireValid,
 } from "~/reactive/runtime";
-import { readSync, signalData, type Signal } from "~/reactive/signal";
+import { type Signal, readSync, signalData } from "~/reactive/signal";
+import type { Structural } from "~/requirements";
+import { resourceEnvironment } from "~/resource-runtime";
 import type { Configure } from "./api";
 import type { Definition } from "./definition";
-import { snapshot, type Key } from "./key";
 import {
-  notify,
-  PartitionChanged,
   type AnyDefinition,
   type FrameworkError,
+  PartitionChanged,
   type Store,
+  notify,
 } from "./entry";
 import { consume, invalidate } from "./execution";
+import { type Key, snapshot } from "./key";
 import { retire } from "./policy";
 import { createStore } from "./store";
 

@@ -1,6 +1,6 @@
 import { Deferred, Effect, Option, Schema } from "effect";
 import { describe, expect, it } from "vitest";
-import { component, nativeNode, type ElementOutput } from "./framework";
+import { type ElementOutput, component, nativeNode } from "./framework";
 import type { Navigator } from "./navigation";
 import { link } from "./router-link";
 import { parameter, route, router } from "./routes";

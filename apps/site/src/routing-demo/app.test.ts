@@ -1,8 +1,8 @@
+import { component, mounting } from "@charismaticalli/frappe";
+import { Sync } from "@charismaticalli/frappe";
+import { History, memoryHistory } from "@charismaticalli/frappe/router";
 import { Deferred, Effect, Exit, Layer, Match, Option, Result, Scope } from "effect";
 import { afterEach, describe, expect, it } from "vitest";
-import { component, mounting } from "@charismaticalli/frappe";
-import { History, memoryHistory } from "@charismaticalli/frappe/router";
-import * as Sync from "@charismaticalli/frappe";
 import { rendered } from "~/test-helpers";
 import { RoutingDemo } from "./app";
 import { MockAuth, MockProjects, mockResources } from "./resources";

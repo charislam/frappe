@@ -1,7 +1,7 @@
 import { Effect, Match, Option, Result } from "effect";
+import { CurrentTransaction, ReactiveError, navigationWrites } from "~/reactive/runtime";
 import type { HistoryAdapter } from "./history";
 import type { HistoryIntent, NavigationError } from "./navigation-types";
-import { CurrentTransaction, navigationWrites, ReactiveError } from "~/reactive/runtime";
 
 /** Progress remains private until the reactive commit succeeds. */
 export interface NavigationProgress {

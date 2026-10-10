@@ -1,6 +1,6 @@
 import { Effect, Match, Option, Result } from "effect";
-import { activeInTransaction, calculateSync, reportFailure, type ReactiveRuntime } from "./runtime";
-import { readSync, signalData, type Signal } from "./signal";
+import { type ReactiveRuntime, activeInTransaction, calculateSync, reportFailure } from "./runtime";
+import { type Signal, readSync, signalData } from "./signal";
 
 export interface WatchOptions<A> {
   readonly signal: Signal<A>;

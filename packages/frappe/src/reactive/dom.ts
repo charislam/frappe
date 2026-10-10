@@ -3,15 +3,15 @@ import { managedNodes } from "~/output";
 import { lazy } from "~/synchronous";
 import { destination } from "./destinations";
 import {
+  type ComponentLifetime,
+  ReactiveError,
+  type ReactiveRuntime,
   accessibleSync,
   activeInTransaction,
   calculateSync,
-  ReactiveError,
   requireValidSync,
-  type ComponentLifetime,
-  type ReactiveRuntime,
 } from "./runtime";
-import { isSignal, readSync, signalData, type DomSink, type Signal } from "./signal";
+import { type DomSink, type Signal, isSignal, readSync, signalData } from "./signal";
 
 export type AttributeValue = Option.Option<true | string>;
 export type BindingKind = "text" | "attribute" | "property" | "selection" | "list";

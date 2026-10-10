@@ -1,6 +1,6 @@
 import { Data, Duration, Effect, Match, Option, type Schedule, type Scope } from "effect";
 import type { Identifier } from "~/resource";
-import { snapshot, type Key } from "./key";
+import { type Key, snapshot } from "./key";
 
 export type Retry<E, R = never> = Data.TaggedEnum<{
   Inherit: {};

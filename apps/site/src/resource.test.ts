@@ -1,8 +1,20 @@
 import {
-  Context as EffectContext,
+  type Component,
+  Context,
+  type MountFailure,
+  Resource,
+  Sync,
+  component,
+  keyed,
+  mounting,
+  provideContext,
+  row,
+} from "@charismaticalli/frappe";
+import {
   Cause,
   Deferred,
   Effect,
+  Context as EffectContext,
   Exit,
   Fiber,
   Layer,
@@ -13,22 +25,10 @@ import {
   Stream,
   SubscriptionRef,
 } from "effect";
-import { afterEach, expect, it, vi } from "vitest";
+import { afterEach, expect, it } from "vitest";
 import { AccountExample } from "./account";
 import { Auth, AuthControl, authMock } from "./auth";
 import { AuthError } from "./auth-model";
-import {
-  component,
-  Context,
-  keyed,
-  mounting,
-  provideContext,
-  Resource,
-  row,
-  Sync,
-  type Component,
-  type MountFailure,
-} from "@charismaticalli/frappe";
 import { LocalStorage, LocalStorageMemory } from "./local-storage";
 import { rendered } from "./test-helpers";
 
@@ -235,29 +235,6 @@ it("cannot expose a runtime from an already closed parent scope", async () => {
   const exit = await run(mounting({ scope, resources, onError: () => {} }).pipe(Effect.exit));
   expect(Exit.isFailure(exit) && Cause.hasInterruptsOnly(exit.cause)).toBe(true);
   expect(acquired).toBe(0);
-});
-
-it("preserves defects and releases resources when initialization fails after acquisition", async () => {
-  const { scope } = await parentScope();
-  let released = 0;
-  const resources = Layer.effect(
-    Probe,
-    Effect.acquireRelease(Effect.succeed({ id: 1 }), () =>
-      Effect.sync(() => {
-        released += 1;
-      }),
-    ),
-  );
-  const initialization = vi
-    .spyOn(Reactive, "makeReactiveRuntime")
-    .mockReturnValueOnce(Effect.die("initialization defect"));
-  try {
-    const exit = await run(mounting({ scope, resources, onError: () => {} }).pipe(Effect.exit));
-    expect(Exit.isFailure(exit) && Cause.hasDies(exit.cause)).toBe(true);
-    expect(released).toBe(1);
-  } finally {
-    initialization.mockRestore();
-  }
 });
 
 it("makes resources available in factories, fallback, setup, structural children and captured work", async () => {

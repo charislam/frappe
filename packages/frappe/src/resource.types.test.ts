@@ -1,16 +1,16 @@
-import { Context as EffectContext, Effect, Layer, Scope, Stream } from "effect";
+import { Effect, Context as EffectContext, Layer, Scope, Stream } from "effect";
 import { expectTypeOf, it } from "vitest";
 import {
-  component,
-  Context,
-  mounting,
-  provideContext,
-  Resource,
-  Sync,
   type ApplicationContext,
   type Component,
+  Context,
   type ReactiveError,
+  Resource,
   type Signal,
+  Sync,
+  component,
+  mounting,
+  provideContext,
 } from "./framework";
 import type { Structural } from "./requirements";
 

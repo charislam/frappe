@@ -1,6 +1,6 @@
 import { Match, Option } from "effect";
 import type { ReactiveRuntime, SignalCommit, Transaction } from "~/reactive/runtime";
-import { signalData, type Signal } from "~/reactive/signal";
+import { type Signal, signalData } from "~/reactive/signal";
 
 /** Invalidate projections in the existing transaction without starting requests in preparation. */
 export const trackInputs = (options: {

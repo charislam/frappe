@@ -1,9 +1,9 @@
-import { Effect, Result, Match, Option, Queue } from "effect";
+import { Effect, Match, Option, Queue, Result } from "effect";
 import { lazy } from "~/synchronous";
 import { claimDestinationSync, registerBindingSync, validateElementOwnerSync } from "./dom";
 import { writePropertySync } from "./properties";
-import { accessibleSync, requireValidSync, runBatch, type ReactiveRuntime } from "./runtime";
-import { readSync, signalData, type WritableSignal } from "./signal";
+import { type ReactiveRuntime, accessibleSync, requireValidSync, runBatch } from "./runtime";
+import { type WritableSignal, readSync, signalData } from "./signal";
 
 const textTypes = new Set(["text", "search", "tel", "url", "email", "password"]);
 

@@ -1,23 +1,23 @@
 import { DateTime, Effect, Equal, Match, Option, Result, type Scope } from "effect";
 import * as AsyncResult from "effect/unstable/reactivity/AsyncResult";
 import {
+  type ReactiveError,
+  type ReactiveRuntime,
   accessibleSync,
   activeInTransaction,
   calculateSync,
   requireValidSync,
-  type ReactiveError,
-  type ReactiveRuntime,
 } from "~/reactive/runtime";
+import { type Signal, makeCell, readonlySignal, signalData } from "~/reactive/signal";
 import type { Structural } from "~/requirements";
-import { makeCell, readonlySignal, signalData, type Signal } from "~/reactive/signal";
 import type { Observe, ObserveOptions } from "./api";
 import { duration } from "./definition";
-import { notify, type Entry } from "./entry";
+import { type Entry, notify } from "./entry";
 import { fetch } from "./execution";
 import { trackInputs } from "./inputs";
 import type { Key } from "./key";
 import { activate, freshness, stale, unused } from "./policy";
-import { binding, erase, equalPartition, partitionKey } from "./runtime";
+import { binding, equalPartition, erase, partitionKey } from "./runtime";
 import * as State from "./state";
 
 export const observe =

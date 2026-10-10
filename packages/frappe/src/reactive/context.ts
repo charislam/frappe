@@ -1,48 +1,48 @@
-import { Context, Effect, Result, Option, Stream, type Scope } from "effect";
+import { Context, Effect, Option, Result, type Scope, Stream } from "effect";
 import { capturedWork } from "~/deferred-context";
-import { nativeNode, type ElementOutput } from "~/output";
-import { fromResultLazy, withContext, runResult, gen as syncGen, type Sync } from "~/sync";
+import { type ElementOutput, nativeNode } from "~/output";
+import { type Sync, fromResultLazy, runResult, gen as syncGen, withContext } from "~/sync";
 import { lazy } from "~/synchronous";
+import { type ElementBinding, bindElementSync } from "./bind";
 import {
+  type DomEvent,
+  type DomEventMap,
+  type DomEventOptions,
+  type DomEventTarget,
+  type EventSource,
+  type EventStream,
   checkEventsSync,
   createSource,
   domEventsSync,
   eventData,
   eventStreamSync,
   nativeEventTarget,
-  type DomEventTarget,
-  type DomEventMap,
-  type DomEvent,
-  type DomEventOptions,
-  type EventSource,
-  type EventStream,
 } from "./events";
-import { bindElementSync, type ElementBinding } from "./bind";
-import { watchSync, type WatchOptions } from "./watch";
 import { bindValueSync } from "./input";
 import { registerOwner } from "./owner";
 import {
-  synchronousTransactions,
   CurrentTransaction,
+  ReactiveError,
+  type ReactiveRuntime,
   reportFailure,
   requireValid,
   requireValidSync,
   runBatch,
-  ReactiveError,
-  type ReactiveRuntime,
+  synchronousTransactions,
 } from "./runtime";
 import {
+  type Equality,
+  type Signal,
+  type SignalOptions,
+  type Sources,
+  type Values,
+  type WritableSignal,
   deriveSync,
   makeCell,
   readSync,
   readonlySignal,
-  type Signal,
-  type WritableSignal,
-  type SignalOptions,
-  type Sources,
-  type Values,
-  type Equality,
 } from "./signal";
+import { type WatchOptions, watchSync } from "./watch";
 
 const resultReactive = (runtime: ReactiveRuntime) => {
   const valid = () =>

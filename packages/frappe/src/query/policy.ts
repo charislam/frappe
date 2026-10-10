@@ -1,13 +1,13 @@
 import { Deferred, Effect, Match, Option } from "effect";
 import * as AsyncResult from "effect/unstable/reactivity/AsyncResult";
 import {
-  cancel,
-  consumers,
-  launch,
   type AnyDefinition,
   type Entry,
   type FrameworkError,
   type Store,
+  cancel,
+  consumers,
+  launch,
 } from "./entry";
 
 export const freshness = (store: Store, definition: AnyDefinition) =>

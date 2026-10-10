@@ -1,8 +1,8 @@
-import { Result, Match } from "effect";
+import { Match, Result } from "effect";
 import { elementOutput, managedNodes } from "~/output";
 import { lazy } from "~/synchronous";
 import { registerBindingSync } from "./dom";
-import { calculateSync, ReactiveError, type ReactiveRuntime } from "./runtime";
+import { ReactiveError, type ReactiveRuntime, calculateSync } from "./runtime";
 import { type Signal } from "./signal";
 
 const validateText = (value: unknown) =>

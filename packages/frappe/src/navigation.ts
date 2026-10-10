@@ -1,9 +1,9 @@
 import { Effect } from "effect";
-import { makeNavigationExecution } from "./navigation-execution";
-import { makeNavigationIngress } from "./navigation-ingress";
-import type { Navigator, NavigationOptions } from "./navigation-types";
 import { ownerRuntime } from "~/reactive/owner";
 import { readSync } from "~/reactive/signal";
+import { makeNavigationExecution } from "./navigation-execution";
+import { makeNavigationIngress } from "./navigation-ingress";
+import type { NavigationOptions, Navigator } from "./navigation-types";
 import type { Route } from "./routes";
 
 export {

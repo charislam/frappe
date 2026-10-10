@@ -2,10 +2,6 @@ import { Effect, Option, Scope } from "effect";
 import { expectTypeOf, it } from "vitest";
 import * as frappeContext from "./context";
 import {
-  Sync,
-  component,
-  nativeNode,
-  provideContext,
   type ApplicationContext,
   type Component,
   type ComponentContext,
@@ -14,7 +10,11 @@ import {
   type EventStream,
   type Output,
   type ReactiveError,
+  Sync,
   type SynchronousContext,
+  component,
+  nativeNode,
+  provideContext,
 } from "./framework";
 
 class User extends frappeContext.Service<User, string>()("frappe/output/User") {}

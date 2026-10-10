@@ -1,4 +1,4 @@
-import { Context, Effect, Option, Schema, type Clock, type Deferred, type Fiber } from "effect";
+import { type Clock, Context, type Deferred, Effect, type Fiber, Option, Schema } from "effect";
 import type * as AsyncResult from "effect/unstable/reactivity/AsyncResult";
 import { CurrentTransaction, type ReactiveRuntime } from "~/reactive/runtime";
 import type { WritableSignal } from "~/reactive/signal";

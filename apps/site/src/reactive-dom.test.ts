@@ -1,19 +1,19 @@
-import { Deferred, Effect, Exit, Layer, Fiber, Match, Scope } from "effect";
-import { afterEach, describe, expect, it } from "vitest";
-import { AuthLive } from "./auth";
-import { Counter } from "./counter";
 import {
-  component,
-  mounting,
   type ComponentContext,
   type MountFailure,
   type Signal,
   type WritableSignal,
+  component,
+  mounting,
 } from "@charismaticalli/frappe";
+import { nativeNode } from "@charismaticalli/frappe";
+import { Sync } from "@charismaticalli/frappe";
+import { Deferred, Effect, Exit, Fiber, Layer, Match, Scope } from "effect";
+import { afterEach, describe, expect, it } from "vitest";
+import { AuthLive } from "./auth";
+import { Counter } from "./counter";
 import { Examples } from "./examples";
 import { LocalStorageMemory } from "./local-storage";
-import { nativeNode } from "@charismaticalli/frappe";
-import * as Sync from "@charismaticalli/frappe";
 
 const run = Effect.runPromise;
 const cleanups: Array<() => Promise<void>> = [];

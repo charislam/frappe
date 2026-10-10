@@ -1,12 +1,12 @@
 import { Effect, Match, Option, Result } from "effect";
-import { planBranch, sameBranch, unchangedBranch, type Cases } from "./branch";
-import { component, type Component } from "./component";
-import type { Region } from "./construction";
 import { makeLens } from "~/reactive/lens";
 import type { ReactiveError, ReactiveRuntime } from "~/reactive/runtime";
 import { makeCell, readonlySignal, signalData } from "~/reactive/signal";
-import { lazy } from "./synchronous";
+import { type Cases, planBranch, sameBranch, unchangedBranch } from "./branch";
+import { type Component, component } from "./component";
+import type { Region } from "./construction";
 import * as Sync from "./sync";
+import { lazy } from "./synchronous";
 
 interface BranchOwner {
   readonly active: boolean;

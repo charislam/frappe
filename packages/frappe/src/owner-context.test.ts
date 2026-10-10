@@ -1,15 +1,15 @@
 import { Context, Deferred, Effect, Exit, Layer, Scope } from "effect";
 import { describe, expect, expectTypeOf, it } from "vitest";
-import {
-  component,
-  mounting,
-  Resource,
-  type ApplicationContext,
-  type ComponentContext,
-  type SynchronousContext,
-} from "./framework";
 import { ownerRuntime } from "~/reactive/owner";
 import { ReactiveError } from "~/reactive/runtime";
+import {
+  type ApplicationContext,
+  type ComponentContext,
+  Resource,
+  type SynchronousContext,
+  component,
+  mounting,
+} from "./framework";
 import * as Sync from "./sync";
 import { harness } from "./test-helpers";
 

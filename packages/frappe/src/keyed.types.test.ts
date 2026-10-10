@@ -1,9 +1,6 @@
 import { Effect } from "effect";
 import { expectTypeOf, it } from "vitest";
 import {
-  component,
-  keyed,
-  row,
   type ComponentContext,
   type KeyedList,
   type Lifecycle,
@@ -11,6 +8,9 @@ import {
   type Row,
   type RowInputs,
   type Signal,
+  component,
+  keyed,
+  row,
 } from "./framework";
 import { testText } from "./output-test-helpers";
 import * as Sync from "./sync-public";

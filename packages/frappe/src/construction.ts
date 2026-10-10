@@ -1,31 +1,31 @@
-import { Effect, Result, Match, Option, Schema } from "effect";
-import { isCases, planBranch, type Cases } from "./branch";
-import { isComponent, type Component } from "./component";
-import { isKeyedList, planKeyed, type KeyedList } from "./keyed";
+import { Effect, Match, Option, Result, Schema } from "effect";
 import {
+  type AttributeValue,
+  attributeNameValid,
+  bindEntrySync,
+  markElementOwner,
+  registerBindingSync,
+  validateAttributeSync,
+  validateReactiveNodeSync,
+  writeAttributeSync,
+} from "~/reactive/dom";
+import { propertyValidatorSync, writePropertySync } from "~/reactive/properties";
+import { readSync } from "~/reactive/signal";
+import { reactiveTextSync as reactiveText } from "~/reactive/text";
+import { type Cases, isCases, planBranch } from "./branch";
+import { type Component, isComponent } from "./component";
+import { type KeyedList, isKeyedList, planKeyed } from "./keyed";
+import {
+  type ElementOutput,
   elementOutput,
   isElementOutput,
   managedNodes,
   nativeNode,
-  type ElementOutput,
 } from "./output";
-import { isSignal, type Signal, type ReactiveRuntime, ReactiveError } from "./reactive";
-import { readSync } from "~/reactive/signal";
-import { reactiveTextSync as reactiveText } from "~/reactive/text";
+import { ReactiveError, type ReactiveRuntime, type Signal, isSignal } from "./reactive";
 import type { OutputRequirements } from "./requirements";
-import { fromResultLazy, type Sync } from "./sync";
+import { type Sync, fromResultLazy } from "./sync";
 import { lazy } from "./synchronous";
-import {
-  attributeNameValid,
-  bindEntrySync,
-  registerBindingSync,
-  markElementOwner,
-  validateAttributeSync,
-  validateReactiveNodeSync,
-  writeAttributeSync,
-  type AttributeValue,
-} from "~/reactive/dom";
-import { propertyValidatorSync, writePropertySync } from "~/reactive/properties";
 
 export type MountItem<R = never> =
   | Component<R>

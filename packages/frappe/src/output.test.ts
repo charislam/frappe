@@ -1,7 +1,7 @@
 import { Deferred, Effect, Option } from "effect";
 import { expect, it } from "vitest";
-import { component, nativeNode, Sync } from "./framework";
 import { importNativeSync } from "./construction";
+import { Sync, component, nativeNode } from "./framework";
 import { toEffect } from "./sync";
 import { harness, rendered } from "./test-helpers";
 

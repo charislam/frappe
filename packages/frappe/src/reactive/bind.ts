@@ -1,18 +1,18 @@
 import { Match, Option, Result } from "effect";
 import type { NativeProperties } from "~/construction";
-import { nativeNode, type ElementOutput } from "~/output";
+import { type ElementOutput, nativeNode } from "~/output";
 import {
+  type AttributeValue,
   attributeNameValid,
   bindEntrySync,
   validateAttributeSync,
-  validateElementOwnerSync,
   validateDestinationsSync,
+  validateElementOwnerSync,
   writeAttributeSync,
-  type AttributeValue,
 } from "./dom";
 import { propertyValidatorSync, writePropertySync } from "./properties";
-import { requireValidSync, type ReactiveRuntime, type ReactiveError } from "./runtime";
-import { isSignal, readSync, type Signal } from "./signal";
+import { type ReactiveError, type ReactiveRuntime, requireValidSync } from "./runtime";
+import { type Signal, isSignal, readSync } from "./signal";
 
 export interface ElementBinding<N extends HTMLElement> {
   readonly element: ElementOutput<N, unknown>;

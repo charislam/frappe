@@ -39,7 +39,7 @@ Use an EffectContext import alias internally wherever the two Context APIs coexi
 
 ```ts
 import { Effect, Option, Stream } from "effect";
-import { Context, Resource, type Signal } from "./framework";
+import { Context, Resource, type Signal } from "@charismaticalli/frappe";
 import type { AuthError, Credentials, User } from "./auth-model";
 
 export class Auth extends Resource.Service<

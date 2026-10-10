@@ -1,16 +1,16 @@
 import { Cause, Deferred, Effect, Exit, Fiber, Match, Option, Queue, Scope, Stream } from "effect";
 import { afterEach, describe, expect, it, vi } from "vitest";
+import { signalData } from "~/reactive/signal";
 import { importTestNode } from "./output-test-helpers";
 import {
+  type ReactiveFailure,
+  type ReactiveRuntime,
   makeReactiveRuntime,
   mapEvents,
   mergeEvents,
   reactive,
   stopReactiveRuntime,
-  type ReactiveFailure,
-  type ReactiveRuntime,
 } from "./reactive";
-import { signalData } from "~/reactive/signal";
 
 const run = Effect.runPromise;
 const closes: Array<() => Promise<void>> = [];

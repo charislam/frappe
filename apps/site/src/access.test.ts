@@ -5,8 +5,8 @@ import { harness, rendered } from "./test-helpers";
 
 describe("access example", () => {
   it("demonstrates all access states and preserves reachable controls", async () => {
-    const { ctx, parent } = await harness();
-    Effect.runSync(ctx.h(parent, AccessExample));
+    const { h, parent } = await harness();
+    Effect.runSync(h(parent, AccessExample));
     await rendered({ parent, check: () => parent.querySelectorAll("button").length === 3 });
     const controls = Array.from(
       parent.querySelectorAll<HTMLButtonElement>(".access-controls > button"),

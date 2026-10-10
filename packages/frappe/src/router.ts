@@ -26,6 +26,7 @@ export {
   type ParseResult,
   type Prefix,
   type Router,
+  type UrlIssue,
   UrlBuildError,
 } from "./routes";
 export { link } from "./router-link";

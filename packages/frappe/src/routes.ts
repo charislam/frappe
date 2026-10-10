@@ -1,6 +1,6 @@
 import { Match, Option, Result, Schema } from "effect";
-import { type Route, type Router, UrlBuildError } from "./route-definition";
 import { buildUrl } from "./route-builder";
+import { type Route, type Router, UrlBuildError } from "./route-definition";
 import { parseUrl } from "./route-parser";
 
 export {

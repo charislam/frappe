@@ -1,6 +1,6 @@
 import { Effect, Option, Scope } from "effect";
 import { expect, it } from "vitest";
-import { checkStructure, construct, ConstructionError, inspect, reserve } from "./construction";
+import { ConstructionError, checkStructure, construct, inspect, reserve } from "./construction";
 import { nativeNode } from "./output";
 import { importTestNode } from "./output-test-helpers";
 import { makeReactiveRuntime, reactive, stopReactiveRuntime } from "./reactive";

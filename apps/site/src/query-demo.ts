@@ -1,14 +1,14 @@
-import { Cause, Effect, Layer, Match, Option, Ref, Schedule, Schema } from "effect";
 import {
-  component,
   Context,
   Query,
   QueryState,
   Resource,
-  Sync,
   type Signal,
+  Sync,
   type WritableSignal,
+  component,
 } from "@charismaticalli/frappe";
+import { Cause, Effect, Layer, Match, Option, Ref, Schedule, Schema } from "effect";
 
 export class QueryDemoSession extends Context.Service<
   QueryDemoSession,

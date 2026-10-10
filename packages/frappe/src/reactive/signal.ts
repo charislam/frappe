@@ -1,21 +1,21 @@
-import { Effect, Match, Option, Result, Queue, Stream } from "effect";
+import { Effect, Match, Option, Queue, Result, Stream } from "effect";
 import { lazy } from "~/synchronous";
 import {
+  CurrentTransaction,
+  ReactiveError,
+  type ReactiveRuntime,
+  type SignalCommit,
+  type Transaction,
+  TransactionPhase,
   accessibleSync,
   calculate,
   calculateSync,
-  CurrentTransaction,
   poison,
   requireValid,
   requireValidSync,
   runBatch,
   synchronousTransactions,
   transactionFor,
-  type ReactiveRuntime,
-  type SignalCommit,
-  type Transaction,
-  ReactiveError,
-  TransactionPhase,
 } from "./runtime";
 
 export interface DomSink {

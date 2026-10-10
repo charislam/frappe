@@ -1,13 +1,13 @@
-import { Effect, Option } from "effect";
-import { AccountExample } from "./account";
-import { AccessExample } from "./access";
-import { Counter } from "./counter";
 import { component } from "@charismaticalli/frappe";
+import { Sync } from "@charismaticalli/frappe";
+import { Effect, Option } from "effect";
+import { AccessExample } from "./access";
+import { AccountExample } from "./account";
+import { Counter } from "./counter";
 import { LoadingExample } from "./loading";
 import { Tabs } from "./tabs";
 import { TextInput } from "./text-input";
 import { Todos } from "./todos";
-import * as Sync from "@charismaticalli/frappe";
 
 export const Examples = component(() =>
   Sync.succeed({

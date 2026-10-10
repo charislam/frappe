@@ -1,6 +1,6 @@
+import { type Component, type ElementOutput, component } from "@charismaticalli/frappe";
+import { Sync } from "@charismaticalli/frappe";
 import { Effect, Match, Option } from "effect";
-import { component, type Component, type ElementOutput } from "@charismaticalli/frappe";
-import * as Sync from "@charismaticalli/frappe";
 
 export const AccessWarning = component(() =>
   Sync.succeed({

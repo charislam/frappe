@@ -1,7 +1,7 @@
 import { Effect, Schema } from "effect";
-import type { HistoryAdapter } from "./history";
 import type { ReactiveOwner } from "~/reactive/owner";
 import type { WritableSignal } from "~/reactive/signal";
+import type { HistoryAdapter } from "./history";
 import type { Destination, ParseResult, Route, Router } from "./routes";
 
 export type NavigationMode = "push" | "replace";

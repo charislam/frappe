@@ -1,7 +1,7 @@
-import { Result, Match, Option } from "effect";
+import { Match, Option, Result } from "effect";
 import { lazy } from "~/synchronous";
 import { propertyDescriptor } from "./destinations";
-import { calculateSync, requireValidSync, ReactiveError } from "./runtime";
+import { ReactiveError, calculateSync, requireValidSync } from "./runtime";
 
 const forbidden = new Set([
   "innerHTML",

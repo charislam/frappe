@@ -1,9 +1,9 @@
-import { Effect, Option } from "effect";
 import type { SynchronousContext } from "@charismaticalli/frappe";
+import { Sync } from "@charismaticalli/frappe";
 import { link } from "@charismaticalli/frappe/router";
-import * as Sync from "@charismaticalli/frappe";
+import { Effect, Option } from "effect";
 import { Navigation } from "./context";
-import { urls, type Destination } from "./routes";
+import { type Destination, urls } from "./routes";
 
 export const button = <A, E, R>(
   context: SynchronousContext,

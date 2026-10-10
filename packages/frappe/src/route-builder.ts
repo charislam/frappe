@@ -1,9 +1,9 @@
 import { Match, Option, Result, Schema } from "effect";
 import {
-  type UntypedDestination,
-  type UrlCodec,
   type Route,
+  type UntypedDestination,
   UrlBuildError,
+  type UrlCodec,
 } from "./route-definition";
 
 const codecEncode = (options: {

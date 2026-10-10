@@ -1,17 +1,17 @@
 import { Effect } from "effect";
-import { it, expectTypeOf } from "vitest";
+import { expectTypeOf, it } from "vitest";
 import {
-  branch,
-  cases,
-  focus,
-  component,
-  Context,
-  Resource,
   type ApplicationContext,
   type Cases,
+  Context,
+  Resource,
   type Signal,
   type SynchronousContext,
   type WritableSignal,
+  branch,
+  cases,
+  component,
+  focus,
 } from "./framework";
 import * as Sync from "./sync-public";
 

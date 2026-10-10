@@ -1,5 +1,5 @@
 import { Effect, Match, Result } from "effect";
-import { HistoryError, type HistoryAdapter } from "./history";
+import { type HistoryAdapter, HistoryError } from "./history";
 
 const controllers = new WeakSet<Window>();
 /** One acquired navigation transport per document; push/replace never synthesize traversal. */

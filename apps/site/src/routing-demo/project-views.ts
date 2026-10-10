@@ -1,8 +1,8 @@
-import { Effect, Option } from "effect";
 import { branch, cases } from "@charismaticalli/frappe";
 import { component, provideContext } from "@charismaticalli/frappe";
 import { focus } from "@charismaticalli/frappe";
-import * as Sync from "@charismaticalli/frappe";
+import { Sync } from "@charismaticalli/frappe";
+import { Effect, Option } from "effect";
 import { CurrentProject, Navigation, ProjectIdentity, SessionIdentity } from "./context";
 import type { ProjectPage, ProjectState, ProjectsPage } from "./model";
 import { MockProjects } from "./resources";

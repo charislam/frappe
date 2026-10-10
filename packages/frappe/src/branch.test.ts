@@ -1,16 +1,16 @@
 import { Cause, Deferred, Effect, Exit, Fiber, Match, Option, Result } from "effect";
 import { describe, expect, it } from "vitest";
+import { ReactiveError } from "~/reactive/runtime";
+import { signalData } from "~/reactive/signal";
 import {
+  type Signal,
+  type WritableSignal,
   branch,
   cases,
   component,
   focus,
   readonlySignal,
-  type Signal,
-  type WritableSignal,
 } from "./framework";
-import { ReactiveError } from "~/reactive/runtime";
-import { signalData } from "~/reactive/signal";
 import * as Sync from "./sync";
 import { harness, rendered } from "./test-helpers";
 

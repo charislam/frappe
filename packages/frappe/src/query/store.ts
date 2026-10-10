@@ -2,8 +2,8 @@ import { Clock, Context, Match, MutableHashMap, Option } from "effect";
 import * as AsyncResult from "effect/unstable/reactivity/AsyncResult";
 import type { ReactiveRuntime } from "~/reactive/runtime";
 import { makeCell } from "~/reactive/signal";
-import { duration, disabled } from "./definition";
-import { Disposed, type AnyDefinition, type Entry, type Store, type StoreOptions } from "./entry";
+import { disabled, duration } from "./definition";
+import { type AnyDefinition, Disposed, type Entry, type Store, type StoreOptions } from "./entry";
 import type { Key } from "./key";
 import { retire } from "./policy";
 
