@@ -1,3 +1,5 @@
 {
-  "sortImports": false
+  "sortImports": {
+    "newlinesBetween": false
+  }
 }

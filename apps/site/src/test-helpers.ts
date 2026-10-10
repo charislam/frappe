@@ -2,9 +2,10 @@ import {
   type ComponentContext,
   type ElementOutput,
   type MountFailure,
+  Sync,
   component,
   mounting,
-  nativeNode,Sync
+  nativeNode,
 } from "@charismaticalli/frappe";
 import { Deferred, Effect, Exit, Match, Scope } from "effect";
 import { afterEach } from "vitest";

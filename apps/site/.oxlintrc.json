@@ -18,7 +18,7 @@
     "sort-imports": [
       "error",
       {
-        "ignoreDeclarationSort": false,
+        "ignoreDeclarationSort": true,
         "ignoreMemberSort": false
       }
     ]

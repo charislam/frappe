@@ -2,9 +2,11 @@ import {
   type ComponentContext,
   type MountFailure,
   type Signal,
+  Sync,
   type WritableSignal,
   component,
-  mounting,nativeNode,Sync
+  mounting,
+  nativeNode,
 } from "@charismaticalli/frappe";
 import { Deferred, Effect, Exit, Fiber, Layer, Match, Scope } from "effect";
 import { afterEach, describe, expect, it } from "vitest";
