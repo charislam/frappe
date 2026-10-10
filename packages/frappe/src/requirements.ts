@@ -3,7 +3,7 @@ import type { Cases } from "./branch";
 import type { Component } from "./component";
 import type { KeyedList } from "./keyed";
 import type { ElementOutput } from "./output";
-import type { Signal } from "./reactive/signal";
+import type { Signal } from "~/reactive/signal";
 
 /** This marker is bookkeeping in a computation's R channel, never a service token. */
 declare const StructuralTypeId: unique symbol;

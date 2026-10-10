@@ -9,11 +9,11 @@ import {
   type MountFailure,
   type Signal,
   type WritableSignal,
-} from "@charismaticalli/frappe/framework";
+} from "@charismaticalli/frappe";
 import { Examples } from "./examples";
 import { LocalStorageMemory } from "./local-storage";
-import { nativeNode } from "@charismaticalli/frappe/output";
-import * as Sync from "@charismaticalli/frappe/sync-public";
+import { nativeNode } from "@charismaticalli/frappe";
+import * as Sync from "@charismaticalli/frappe";
 
 const run = Effect.runPromise;
 const cleanups: Array<() => Promise<void>> = [];

@@ -8,7 +8,7 @@ import {
   type Stream,
 } from "effect";
 import { AuthError, type Credentials, type User } from "./auth-model";
-import { Resource } from "@charismaticalli/frappe/framework";
+import { Resource } from "@charismaticalli/frappe";
 
 export class Auth extends Resource.Service<
   Auth,

@@ -8,8 +8,8 @@ import {
   type ComponentContext,
   type SynchronousContext,
 } from "./framework";
-import { ownerRuntime } from "./reactive/owner";
-import { ReactiveError } from "./reactive/runtime";
+import { ownerRuntime } from "~/reactive/owner";
+import { ReactiveError } from "~/reactive/runtime";
 import * as Sync from "./sync";
 import { harness } from "./test-helpers";
 

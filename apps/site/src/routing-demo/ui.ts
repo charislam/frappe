@@ -1,7 +1,7 @@
 import { Effect, Option } from "effect";
-import type { SynchronousContext } from "@charismaticalli/frappe/framework";
-import { link } from "@charismaticalli/frappe/router-link";
-import * as Sync from "@charismaticalli/frappe/sync";
+import type { SynchronousContext } from "@charismaticalli/frappe";
+import { link } from "@charismaticalli/frappe/router";
+import * as Sync from "@charismaticalli/frappe";
 import { Navigation } from "./context";
 import { urls, type Destination } from "./routes";
 

@@ -5,7 +5,7 @@ import {
   router,
   type Destination as InferredDestination,
   type ParseResult,
-} from "@charismaticalli/frappe/routes";
+} from "@charismaticalli/frappe/router";
 
 export const ProjectId = Schema.NumberFromString.pipe(
   Schema.check(Schema.isInt(), Schema.isGreaterThan(0)),

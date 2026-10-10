@@ -2,9 +2,9 @@ import { Effect, Match, Option, Result } from "effect";
 import { planBranch, sameBranch, unchangedBranch, type Cases } from "./branch";
 import { component, type Component } from "./component";
 import type { Region } from "./construction";
-import { makeLens } from "./reactive/lens";
-import type { ReactiveError, ReactiveRuntime } from "./reactive/runtime";
-import { makeCell, readonlySignal, signalData } from "./reactive/signal";
+import { makeLens } from "~/reactive/lens";
+import type { ReactiveError, ReactiveRuntime } from "~/reactive/runtime";
+import { makeCell, readonlySignal, signalData } from "~/reactive/signal";
 import { lazy } from "./synchronous";
 import * as Sync from "./sync";
 

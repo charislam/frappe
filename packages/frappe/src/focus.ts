@@ -1,8 +1,8 @@
 import { Result } from "effect";
-import { makeLens } from "./reactive/lens";
-import { ownerRuntime, type ReactiveOwner } from "./reactive/owner";
-import { requireValidSync, type ReactiveError } from "./reactive/runtime";
-import { type Signal, type WritableSignal } from "./reactive/signal";
+import { makeLens } from "~/reactive/lens";
+import { ownerRuntime, type ReactiveOwner } from "~/reactive/owner";
+import { requireValidSync, type ReactiveError } from "~/reactive/runtime";
+import { type Signal, type WritableSignal } from "~/reactive/signal";
 import { fromResultLazy, type Sync } from "./sync";
 
 type Field<A> = Exclude<keyof A, "_tag">;

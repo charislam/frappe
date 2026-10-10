@@ -2,12 +2,12 @@ import { Effect, Option } from "effect";
 import { AccountExample } from "./account";
 import { AccessExample } from "./access";
 import { Counter } from "./counter";
-import { component } from "@charismaticalli/frappe/framework";
+import { component } from "@charismaticalli/frappe";
 import { LoadingExample } from "./loading";
 import { Tabs } from "./tabs";
 import { TextInput } from "./text-input";
 import { Todos } from "./todos";
-import * as Sync from "@charismaticalli/frappe/sync-public";
+import * as Sync from "@charismaticalli/frappe";
 
 export const Examples = component(() =>
   Sync.succeed({

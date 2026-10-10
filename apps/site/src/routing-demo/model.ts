@@ -1,5 +1,5 @@
 import { Data, Option } from "effect";
-import type { UrlIssue } from "@charismaticalli/frappe/routes";
+import type { UrlIssue } from "@charismaticalli/frappe/router";
 import type { NavigationTarget, ProjectId } from "./routes";
 
 export interface User {

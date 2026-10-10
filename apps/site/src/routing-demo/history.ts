@@ -1,5 +1,5 @@
 import { Effect, Option, Result } from "effect";
-import { HistoryError, type HistoryAdapter } from "@charismaticalli/frappe/history";
+import { HistoryError, type HistoryAdapter } from "@charismaticalli/frappe/router";
 
 /** Deterministic demo failure injection; the resource still owns the transport. */
 export const controlledHistory = (history: HistoryAdapter) => {

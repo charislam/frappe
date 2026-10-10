@@ -1,7 +1,7 @@
 import { Effect, Match, Option } from "effect";
-import { component, nativeNode, type ElementOutput } from "@charismaticalli/frappe/framework";
-import { occurrenceId } from "@charismaticalli/frappe/occurrence";
-import * as Sync from "@charismaticalli/frappe/sync-public";
+import { component, nativeNode, type ElementOutput } from "@charismaticalli/frappe";
+import { occurrenceId } from "@charismaticalli/frappe";
+import * as Sync from "@charismaticalli/frappe";
 
 const names = ["Overview", "Details", "Settings"] as const;
 const navigation = new Set(["ArrowLeft", "ArrowRight", "Home", "End"]);

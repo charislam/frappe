@@ -1,3 +1,25 @@
 {
-  "$schema": "./node_modules/oxlint/configuration_schema.json"
+  "$schema": "./node_modules/oxlint/configuration_schema.json",
+  "plugins": ["import"],
+  "rules": {
+    "import/no-relative-parent-imports": "error",
+    "no-restricted-imports": [
+      "error",
+      {
+        "patterns": [
+          {
+            "group": ["./*/**"],
+            "message": "Use the ~ root alias for non-sibling imports."
+          }
+        ]
+      }
+    ],
+    "sort-imports": [
+      "error",
+      {
+        "ignoreDeclarationSort": false,
+        "ignoreMemberSort": false
+      }
+    ]
+  }
 }

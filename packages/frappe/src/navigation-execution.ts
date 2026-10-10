@@ -6,9 +6,9 @@ import {
   type NavigationEvent,
   type NavigationOptions,
 } from "./navigation-types";
-import { ReactiveError, runBatch, requireValid } from "./reactive/runtime";
-import { ownerRuntime } from "./reactive/owner";
-import { signalData } from "./reactive/signal";
+import { ReactiveError, runBatch, requireValid } from "~/reactive/runtime";
+import { ownerRuntime } from "~/reactive/owner";
+import { signalData } from "~/reactive/signal";
 import type { Destination, Route } from "./routes";
 
 const observedLocation = <T extends ReadonlyArray<Route>, E>(event: NavigationEvent<T, E>) =>

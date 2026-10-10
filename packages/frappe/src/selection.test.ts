@@ -1,6 +1,5 @@
 import { Cause, Deferred, Effect, Exit, Fiber, Match, Option, Scope, Result } from "effect";
 import { afterEach, describe, expect, it } from "vitest";
-import { AccessExample } from "./access";
 import {
   component,
   mounting,
@@ -8,12 +7,12 @@ import {
   type ComponentContext,
   type MountFailure,
   type WritableSignal,
-} from "@charismaticalli/frappe/framework";
-import { nativeNode } from "@charismaticalli/frappe/output";
-import { importTestNode, testText } from "@charismaticalli/frappe/output-test-helpers";
-import { signalData } from "@charismaticalli/frappe/reactive/signal";
-import * as Sync from "@charismaticalli/frappe/sync-public";
-import { rendered } from "@charismaticalli/frappe/test-helpers";
+} from "@charismaticalli/frappe";
+import { nativeNode } from "@charismaticalli/frappe";
+import { importTestNode, testText } from "./output-test-helpers";
+import { signalData } from "~/reactive/signal";
+import * as Sync from "@charismaticalli/frappe";
+import { rendered } from "./test-helpers";
 
 const run = Effect.runPromise;
 const gates: Array<Deferred.Deferred<void>> = [];
@@ -350,36 +349,6 @@ describe("signal-selected subtrees", () => {
     expect(parent.childNodes.length).toBe(0);
   });
 
-  it("demonstrates all access states and preserves reachable controls", async () => {
-    const { app, parent } = await harness();
-    Effect.runSync(app.h(parent, AccessExample));
-    await rendered({ parent, check: () => parent.querySelectorAll("button").length === 3 });
-    const controls = Array.from(
-      parent.querySelectorAll<HTMLButtonElement>(".access-controls > button"),
-    );
-    expect(controls.map((button) => button.textContent)).toEqual(["Unknown", "Denied", "Allowed"]);
-    const click = (label: string) =>
-      Array.from(parent.querySelectorAll("button"))
-        .find((button) => button.textContent === label)
-        ?.click();
-    expect(parent.querySelector("article")).toBeNull();
-    click("Denied");
-    await rendered({ parent, check: () => parent.querySelector('[role="alert"]') !== null });
-    click("Allowed");
-    await rendered({ parent, check: () => parent.querySelector("output")?.textContent === "0" });
-    click("Increment page counter");
-    await rendered({ parent, check: () => parent.querySelector("output")?.textContent === "1" });
-    const article = parent.querySelector("article");
-    click("Allowed");
-    expect(parent.querySelector("article")).toBe(article);
-    click("Unknown");
-    await rendered({ parent, check: () => parent.querySelector("article") === null });
-    click("Allowed");
-    await rendered({ parent, check: () => parent.querySelector("output")?.textContent === "0" });
-    expect(Array.from(parent.querySelectorAll('.access-controls > button[type="button"]'))).toEqual(
-      controls,
-    );
-  });
 });
 
 describe("application reactive ownership", () => {

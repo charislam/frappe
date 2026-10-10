@@ -1,9 +1,8 @@
 import { Effect, Exit, Option, Queue } from "effect";
 import { describe, expect, it } from "vitest";
-import { type WritableSignal } from "@charismaticalli/frappe/framework";
-import { nativeNode, type ElementOutput } from "@charismaticalli/frappe/output";
-import { importTestNode } from "@charismaticalli/frappe/output-test-helpers";
-import { harness, rendered } from "@charismaticalli/frappe/test-helpers";
+import { type WritableSignal } from "@charismaticalli/frappe";
+import { nativeNode, type ElementOutput } from "@charismaticalli/frappe";
+import { harness, rendered } from "./test-helpers";
 import { TextInput } from "./text-input";
 
 const run = Effect.runPromise;
@@ -57,7 +56,7 @@ describe("two-way text input", () => {
         await run(
           ctx
             .bindValue({
-              element: await run(importTestNode(document.createElement("input"))),
+              element: await run(foreign.ctx.importNative(document.createElement("input"))),
               signal,
             })
             .pipe(Effect.exit),

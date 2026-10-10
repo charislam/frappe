@@ -1,5 +1,5 @@
 import { Option, type Clock, type Context } from "effect";
-import type { CommitCoordinator, ReactiveRuntime } from "./reactive/runtime";
+import type { CommitCoordinator, ReactiveRuntime } from "~/reactive/runtime";
 
 interface Environment {
   readonly environment: Context.Context<never>;

@@ -8,7 +8,7 @@ import {
   readonlySignal,
   Sync,
   type Signal,
-} from "@charismaticalli/frappe/framework";
+} from "@charismaticalli/frappe";
 import { LocalStorage } from "./local-storage";
 
 export class CurrentUser extends Context.Service<CurrentUser, Signal<Option.Option<User>>>()(

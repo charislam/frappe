@@ -1,6 +1,6 @@
-import * as Context from "@charismaticalli/frappe/context";
-import type { Navigator } from "@charismaticalli/frappe/navigation";
-import type { Signal } from "@charismaticalli/frappe/reactive/signal";
+import * as Context from "@charismaticalli/frappe";
+import type { Navigator } from "@charismaticalli/frappe/router";
+import type { Signal } from "@charismaticalli/frappe";
 import type { AppEvent, Project, User } from "./model";
 import type { urls } from "./routes";
 
