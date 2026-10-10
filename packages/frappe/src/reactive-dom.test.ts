@@ -5,59 +5,22 @@ import {
   Sync,
   type WritableSignal,
   component,
-  mounting,
+  mapEvents,
+  mergeEvents,
   nativeNode,
 } from "@charismaticalli/frappe";
-import { Deferred, Effect, Exit, Fiber, Layer, Match, Scope } from "effect";
-import { afterEach, describe, expect, it } from "vitest";
-import { AuthLive } from "./auth";
-import { Counter } from "./counter";
-import { Examples } from "./examples";
-import { LocalStorageMemory } from "./local-storage";
+import { Deferred, Effect, Exit, Fiber, Match, Option } from "effect";
+import { describe, expect, it } from "vitest";
+import { harness as packageHarness, rendered } from "./test-helpers";
 
 const run = Effect.runPromise;
-const cleanups: Array<() => Promise<void>> = [];
-afterEach(async () => {
-  for (const close of cleanups.splice(0)) await close();
-});
+type Action = "increment" | "decrement" | "reset";
 
-const harness = async () => {
-  const scope = await run(Scope.make());
-  const failures: MountFailure[] = [];
+const harness = async (parent = document.createElement("div")) => {
   const errors = Deferred.makeUnsafe<MountFailure>();
-  const { h } = await run(
-    mounting({
-      scope,
-      resources: Layer.mergeAll(AuthLive, LocalStorageMemory),
-      onError: (failure) => {
-        failures.push(failure);
-        Effect.runSync(Deferred.succeed(errors, failure));
-      },
-    }),
-  );
-  const close = () => run(Scope.close(scope, Exit.void));
-  cleanups.push(close);
-  return { h, failures, errors, close, scope };
-};
-
-const rendered = (options: { parent: Element; check: () => boolean }): Promise<void> =>
-  new Promise((resolve) => {
-    const check = () =>
-      Match.value(options.check()).pipe(
-        Match.when(true, () => {
-          observer.disconnect();
-          resolve();
-        }),
-        Match.orElse(() => {}),
-      );
-    const observer = new MutationObserver(check);
-    observer.observe(options.parent, { childList: true, characterData: true, subtree: true });
-    check();
+  const h = await packageHarness({
+    onError: (failure) => Effect.runSync(Deferred.succeed(errors, failure)),
   });
-
-const mounted = async () => {
-  const h = await harness();
-  const parent = document.createElement("div");
   const context = Deferred.makeUnsafe<ComponentContext>();
   Effect.runSync(
     h.h(
@@ -71,14 +34,69 @@ const mounted = async () => {
   );
   const ctx = await run(Deferred.await(context));
   await rendered({ parent, check: () => parent.querySelector("main") !== null });
-  return { ...h, parent, ctx };
+  return { ...h, errors, ctx, parent };
 };
+
+const Counter = component(() =>
+  Sync.succeed({
+    setup: ({ he, events, fold, derive }) =>
+      Effect.gen(function* () {
+        const increment = yield* he("button", {
+          props: { type: "button" },
+          children: ["Increment"],
+        });
+        const decrement = yield* he("button", {
+          props: { type: "button" },
+          children: ["Decrement"],
+        });
+        const reset = yield* he("button", { props: { type: "button" }, children: ["Reset"] });
+        const actions = mergeEvents<Action>([
+          mapEvents(yield* events(increment, "click"), () => "increment"),
+          mapEvents(yield* events(decrement, "click"), () => "decrement"),
+          mapEvents(yield* events(reset, "click"), () => "reset"),
+        ]);
+        const count = yield* fold({
+          events: actions,
+          initial: 0,
+          reducer: ({ state, event: action }) =>
+            Match.value(action).pipe(
+              Match.when("increment", () => state + 1),
+              Match.when("decrement", () => state - 1),
+              Match.when("reset", () => 0),
+              Match.exhaustive,
+            ),
+        });
+        const label = yield* derive({ sources: { count }, compute: ({ count }) => String(count) });
+        return yield* he("section", {
+          attrs: { class: Option.some("counter") },
+          children: [yield* he("output", { children: [label] }), increment, decrement, reset],
+        });
+      }),
+  }),
+);
+
+const Examples = component(() =>
+  Sync.succeed({
+    setup: ({ he }) =>
+      Effect.gen(function* () {
+        return yield* he("main", {
+          children: [
+            yield* he("h1", { children: ["Examples"] }),
+            yield* he("p", { children: ["Reactive framework components."] }),
+            yield* he("div", { children: [Counter, Counter] }),
+          ],
+        });
+      }),
+  }),
+);
+
+const mounted = () => harness();
 
 describe("reactive DOM and ownership", () => {
   it("renders independent counters, negative values, reset, and stable DOM identities", async () => {
     const { h, close } = await harness();
     const parent = document.createElement("div");
-    Effect.runSync(h(parent, [Examples, Counter]));
+    Effect.runSync(h(parent, Examples));
     await rendered({
       parent,
       check: () => parent.querySelectorAll(".counter output").length === 2,
@@ -104,9 +122,7 @@ describe("reactive DOM and ownership", () => {
       Array.from(counter.querySelectorAll("button")).every((button) => button.type === "button"),
     ).toBe(true);
     expect(parent.querySelector("h1")?.textContent).toBe("Examples");
-    expect(parent.querySelector("p")?.textContent).toBe(
-      "Small, interactive examples of reactive state and scoped components.",
-    );
+    expect(parent.querySelector("p")?.textContent).toBe("Reactive framework components.");
     await close();
     increment?.click();
     expect(parent.childNodes.length).toBe(0);
