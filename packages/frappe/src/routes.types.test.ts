@@ -1,7 +1,7 @@
-import { Context as EffectContext, Effect, Option, Schema, SchemaTransformation } from "effect";
-import { it, expectTypeOf } from "vitest";
+import { Effect, Context as EffectContext, Option, Schema, SchemaTransformation } from "effect";
+import { expectTypeOf, it } from "vitest";
 import type { Route, UntypedDestination } from "./route-definition";
-import { optionalQuery, parameter, route, router, type Destination } from "./routes";
+import { type Destination, optionalQuery, parameter, route, router } from "./routes";
 
 it("infers destination and prefix alternatives from nested definitions", () => {
   const Id = Schema.String.pipe(Schema.brand("Id"));

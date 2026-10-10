@@ -1,13 +1,13 @@
 import { Cause, Deferred, Effect, Exit, Option, Queue, Result, Scope, Stream } from "effect";
 import { afterEach, expect, it } from "vitest";
 import {
-  component,
-  mounting,
   type Component,
   type MountFailure,
   type Signal,
   type SynchronousContext,
   type WritableSignal,
+  component,
+  mounting,
 } from "./framework";
 import { nativeNode } from "./output";
 import { testText } from "./output-test-helpers";

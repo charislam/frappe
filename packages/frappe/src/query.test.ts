@@ -5,10 +5,10 @@ import {
   Deferred,
   Effect,
   Equal,
-  Hash,
-  Layer,
   Exit,
   Fiber,
+  Hash,
+  Layer,
   Match,
   Option,
   Queue,
@@ -19,8 +19,8 @@ import {
 } from "effect";
 import { TestClock } from "effect/testing";
 import { afterEach, describe, expect, it } from "vitest";
-import { component, mounting, Query, QueryState, Resource, Sync, type Signal } from "./framework";
 import { snapshot } from "~/query/key";
+import { Query, QueryState, Resource, type Signal, Sync, component, mounting } from "./framework";
 
 const run = Effect.runPromise;
 const cleanups: Array<() => Promise<void>> = [];

@@ -1,6 +1,6 @@
 import { Deferred, Effect, Exit } from "effect";
 import { expect, it } from "vitest";
-import { component, focus, type WritableSignal } from "./framework";
+import { type WritableSignal, component, focus } from "./framework";
 import * as Sync from "./sync";
 import { harness, rendered } from "./test-helpers";
 

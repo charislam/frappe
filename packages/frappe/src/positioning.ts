@@ -1,10 +1,10 @@
 import { Effect, Match, Option } from "effect";
 import {
-  nativeNode,
-  Sync,
   type ElementOutput,
   type Signal,
+  Sync,
   type SynchronousContext,
+  nativeNode,
 } from "./framework";
 
 export interface Options {

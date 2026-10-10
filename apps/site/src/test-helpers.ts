@@ -1,14 +1,14 @@
-import { Deferred, Effect, Exit, Match, Scope } from "effect";
-import { afterEach } from "vitest";
 import {
-  component,
-  mounting,
-  nativeNode,
   type ComponentContext,
   type ElementOutput,
   type MountFailure,
+  component,
+  mounting,
+  nativeNode,
 } from "@charismaticalli/frappe";
-import * as Sync from "@charismaticalli/frappe";
+import { Sync } from "@charismaticalli/frappe";
+import { Deferred, Effect, Exit, Match, Scope } from "effect";
+import { afterEach } from "vitest";
 
 const run = Effect.runPromise;
 const cleanups: Array<() => Promise<void>> = [];

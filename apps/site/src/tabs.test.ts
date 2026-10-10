@@ -1,5 +1,5 @@
-import { describe, expect, it } from "vitest";
 import { Effect } from "effect";
+import { describe, expect, it } from "vitest";
 import { Tabs } from "./tabs";
 import { harness, rendered } from "./test-helpers";
 

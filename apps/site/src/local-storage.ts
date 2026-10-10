@@ -1,5 +1,5 @@
-import { Effect, Layer, Option } from "effect";
 import { Resource } from "@charismaticalli/frappe";
+import { Effect, Layer, Option } from "effect";
 
 export class LocalStorage extends Resource.Service<
   LocalStorage,

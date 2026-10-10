@@ -1,6 +1,7 @@
 import { Effect, Match, Option, Result, Schema, SchemaTransformation } from "effect";
 import { describe, expect, it } from "vitest";
 import {
+  type Destination,
   arrayQuery,
   defaultQuery,
   optionalQuery,
@@ -9,7 +10,6 @@ import {
   requiredQuery,
   route,
   router,
-  type Destination,
 } from "./routes";
 
 const ProjectId = Schema.NumberFromString.pipe(

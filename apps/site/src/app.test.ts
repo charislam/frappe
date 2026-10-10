@@ -1,12 +1,12 @@
+import { Query, mounting, provideContext } from "@charismaticalli/frappe";
+import { History, memoryHistory } from "@charismaticalli/frappe/router";
 import { Effect, Exit, Layer, Option, Result, Scope } from "effect";
 import { expect, it } from "vitest";
+import { mockResources } from "~/routing-demo/resources";
 import { App } from "./app";
 import { AuthLive } from "./auth";
-import { mounting, provideContext, Query } from "@charismaticalli/frappe";
-import { History, memoryHistory } from "@charismaticalli/frappe/router";
 import { LocalStorageMemory } from "./local-storage";
 import { QueryDemoSession, queryDemoResources } from "./query-demo";
-import { mockResources } from "~/routing-demo/resources";
 import { rendered } from "./test-helpers";
 
 it("routes between the home, examples, routing, and queries pages and traverses browser history", async () => {

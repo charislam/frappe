@@ -1,10 +1,10 @@
 import { Cause, Effect, Exit, Match, Option, Queue } from "effect";
 import { describe, expect, it } from "vitest";
-import { construct, type ConstructionError } from "./construction";
+import { attributeNameValid, claimDestination, validateAttribute } from "~/reactive/dom";
+import { type ConstructionError, construct } from "./construction";
 import { component } from "./framework";
 import type { ElementOutput } from "./output";
 import { nativeNode } from "./output";
-import { attributeNameValid, claimDestination, validateAttribute } from "~/reactive/dom";
 import * as Sync from "./sync-public";
 import { harness, rendered } from "./test-helpers";
 

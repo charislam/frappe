@@ -1,15 +1,15 @@
-import { Effect, Match, Option } from "effect";
 import { branch, cases } from "@charismaticalli/frappe";
 import { component } from "@charismaticalli/frappe";
-import { Examples } from "./examples";
+import { Sync } from "@charismaticalli/frappe";
 import { History } from "@charismaticalli/frappe/router";
-import { Home } from "./home";
 import { navigator } from "@charismaticalli/frappe/router";
-import { QueryExample } from "./query-demo";
 import { link } from "@charismaticalli/frappe/router";
-import { route, router, type Destination, type ParseResult } from "@charismaticalli/frappe/router";
+import { type Destination, type ParseResult, route, router } from "@charismaticalli/frappe/router";
+import { Effect, Match, Option } from "effect";
 import { RoutingDemo } from "~/routing-demo/app";
-import * as Sync from "@charismaticalli/frappe";
+import { Examples } from "./examples";
+import { Home } from "./home";
+import { QueryExample } from "./query-demo";
 
 const urls = router([
   route({ tag: "Home", path: [] }),

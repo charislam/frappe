@@ -1,7 +1,11 @@
-import { Effect, Match, Option, Predicate, Queue, Result, Stream, type Scope } from "effect";
-import { isElementOutput, nativeNode, type ElementOutput } from "~/output";
+import { Effect, Match, Option, Predicate, Queue, Result, type Scope, Stream } from "effect";
+import { type ElementOutput, isElementOutput, nativeNode } from "~/output";
 import { lazy } from "~/synchronous";
 import {
+  CurrentTransaction,
+  ReactiveError,
+  type ReactiveRuntime,
+  type Transaction,
   accessibleSync,
   calculate,
   calculateSync,
@@ -10,10 +14,6 @@ import {
   requireValidSync,
   runBatch,
   transactionFor,
-  ReactiveError,
-  type ReactiveRuntime,
-  type Transaction,
-  CurrentTransaction,
 } from "./runtime";
 
 type Delivery<A> = (value: A, transaction: Transaction) => Effect.Effect<void, ReactiveError>;

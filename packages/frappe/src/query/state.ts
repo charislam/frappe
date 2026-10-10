@@ -1,6 +1,6 @@
 import { Cause, Data, DateTime, Match, Option } from "effect";
 import { dual } from "effect/Function";
-import { pipeArguments, type Pipeable } from "effect/Pipeable";
+import { type Pipeable, pipeArguments } from "effect/Pipeable";
 
 export type PreviousSuccess<I, A> = Data.TaggedEnum<{
   SameKey: { readonly previousData: A };

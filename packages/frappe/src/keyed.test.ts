@@ -1,20 +1,20 @@
 import { Deferred, Effect, Exit, Match, Option, Result, Scope, Stream } from "effect";
 import { afterEach, describe, expect, it } from "vitest";
+import { signalData } from "~/reactive/signal";
 import {
-  component,
-  keyed,
-  mounting,
-  row,
   type ComponentContext,
   type Key,
   type MountFailure,
   type RowInputs,
   type Signal,
+  component,
+  keyed,
+  mounting,
+  row,
 } from "./framework";
 import { planKeyed } from "./keyed";
 import { nativeNode } from "./output";
 import { testText } from "./output-test-helpers";
-import { signalData } from "~/reactive/signal";
 import * as Sync from "./sync-public";
 import { rendered } from "./test-helpers";
 

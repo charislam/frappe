@@ -1,18 +1,18 @@
 import { Effect, Match, Option, Result } from "effect";
-import { component, type Component } from "./component";
-import { makeRegion, type Region } from "./construction";
+import type { ReactiveRuntime } from "~/reactive/runtime";
+import { deriveSync, makeCell, readonlySignal, signalData } from "~/reactive/signal";
+import { type Component, component } from "./component";
+import { type Region, makeRegion } from "./construction";
 import {
-  planKeyed,
-  sameRow,
-  unchangedPlan,
   type Key,
   type KeyedEntry,
   type KeyedList,
   type KeyedPlan,
   type Row,
+  planKeyed,
+  sameRow,
+  unchangedPlan,
 } from "./keyed";
-import type { ReactiveRuntime } from "~/reactive/runtime";
-import { deriveSync, makeCell, readonlySignal, signalData } from "~/reactive/signal";
 import { lazy } from "./synchronous";
 
 export interface RowContext {

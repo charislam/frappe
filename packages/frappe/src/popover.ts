@@ -1,12 +1,12 @@
 import { Effect, Match, Option, Result } from "effect";
 import {
+  type ElementOutput,
+  ReactiveError,
+  Sync,
+  type SynchronousContext,
   nativeNode,
   occurrenceId,
-  ReactiveError,
   readonlySignal,
-  Sync,
-  type ElementOutput,
-  type SynchronousContext,
 } from "./framework";
 import * as Positioning from "./positioning";
 

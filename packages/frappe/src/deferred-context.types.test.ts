@@ -2,7 +2,7 @@ import { Context, Effect, Result, Scope } from "effect";
 import { expectTypeOf, it } from "vitest";
 import { capturedWork } from "./deferred-context";
 import type { Structural } from "./requirements";
-import { toEffect, withContext, type Sync } from "./sync";
+import { type Sync, toEffect, withContext } from "./sync";
 
 class Label extends Context.Service<Label, string>()("frappe/capture/Label") {}
 class OtherLabel extends Context.Service<OtherLabel, string>()("frappe/capture/OtherLabel") {}

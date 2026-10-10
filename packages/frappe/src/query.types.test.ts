@@ -1,16 +1,16 @@
 import { Cause, DateTime, Effect, Option, Schedule } from "effect";
 import { expectTypeOf, it } from "vitest";
 import {
-  component,
+  type ApplicationContext,
+  type Component,
   Context,
   Query,
   QueryState,
   Resource,
-  Sync,
-  type ApplicationContext,
-  type Component,
-  type ReactiveError as importReactiveError,
   type Signal,
+  Sync,
+  component,
+  type ReactiveError as importReactiveError,
 } from "./framework";
 import type { Structural } from "./requirements";
 

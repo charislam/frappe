@@ -1,16 +1,16 @@
-import { Deferred, Effect, Exit, Option, Result, Scope, Match } from "effect";
+import { Deferred, Effect, Exit, Match, Option, Result, Scope } from "effect";
 import { afterEach, describe, expect, it } from "vitest";
+import { ReactiveError } from "~/reactive/runtime";
+import { signalData } from "~/reactive/signal";
 import { component } from "./component";
 import { memoryHistory } from "./history";
 import {
-  navigator,
   type NavigationDecision,
   type NavigationEvent,
   type Navigator,
+  navigator,
 } from "./navigation";
-import { ReactiveError } from "~/reactive/runtime";
-import { signalData } from "~/reactive/signal";
-import { router, route, type Destination } from "./routes";
+import { type Destination, route, router } from "./routes";
 import * as Sync from "./sync";
 import { harness, rendered } from "./test-helpers";
 

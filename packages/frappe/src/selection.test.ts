@@ -1,17 +1,17 @@
-import { Cause, Deferred, Effect, Exit, Fiber, Match, Option, Scope, Result } from "effect";
-import { afterEach, describe, expect, it } from "vitest";
 import {
-  component,
-  mounting,
   type Component,
   type ComponentContext,
   type MountFailure,
   type WritableSignal,
+  component,
+  mounting,
 } from "@charismaticalli/frappe";
 import { nativeNode } from "@charismaticalli/frappe";
-import { importTestNode, testText } from "./output-test-helpers";
+import { Sync } from "@charismaticalli/frappe";
+import { Cause, Deferred, Effect, Exit, Fiber, Match, Option, Result, Scope } from "effect";
+import { afterEach, describe, expect, it } from "vitest";
 import { signalData } from "~/reactive/signal";
-import * as Sync from "@charismaticalli/frappe";
+import { importTestNode, testText } from "./output-test-helpers";
 import { rendered } from "./test-helpers";
 
 const run = Effect.runPromise;
@@ -348,7 +348,6 @@ describe("signal-selected subtrees", () => {
     expect(finalizers).toBe(1);
     expect(parent.childNodes.length).toBe(0);
   });
-
 });
 
 describe("application reactive ownership", () => {

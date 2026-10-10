@@ -1,7 +1,7 @@
+import * as Popover from "@charismaticalli/frappe/ui";
 import { Effect, Match, Option } from "effect";
 import { afterEach, describe, expect, it, vi } from "vitest";
 import { component } from "./framework";
-import * as Popover from "./ui";
 import * as Sync from "./sync";
 import { harness, rendered } from "./test-helpers";
 

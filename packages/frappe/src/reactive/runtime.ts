@@ -3,14 +3,14 @@ import {
   Context,
   Data,
   Effect,
+  type Fiber,
   Match,
   Option,
   Queue,
   Result,
   Schema,
-  Stream,
-  type Fiber,
   type Scope,
+  Stream,
 } from "effect";
 
 export class ReactiveError extends Schema.TaggedError<ReactiveError>()("ReactiveError", {

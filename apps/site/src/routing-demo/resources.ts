@@ -1,3 +1,4 @@
+import { Resource } from "@charismaticalli/frappe";
 import {
   Deferred,
   Effect,
@@ -9,7 +10,6 @@ import {
   Stream,
   SubscriptionRef,
 } from "effect";
-import * as Resource from "@charismaticalli/frappe";
 import type { AuthEvent, Project, User } from "./model";
 import type { ProjectId } from "./routes";
 

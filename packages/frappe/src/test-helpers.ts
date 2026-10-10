@@ -1,7 +1,7 @@
 import { Deferred, Effect, Exit, Match, Scope } from "effect";
 import { afterEach } from "vitest";
-import { component, mounting, type ComponentContext, type MountFailure } from "./framework";
-import { nativeNode, type ElementOutput } from "./output";
+import { type ComponentContext, type MountFailure, component, mounting } from "./framework";
+import { type ElementOutput, nativeNode } from "./output";
 import * as Sync from "./sync-public";
 
 const run = Effect.runPromise;

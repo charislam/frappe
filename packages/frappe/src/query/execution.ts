@@ -1,18 +1,18 @@
 import { Cause, DateTime, Deferred, Effect, Exit, Match, Option } from "effect";
 import * as AsyncResult from "effect/unstable/reactivity/AsyncResult";
 import { reportFailure } from "~/reactive/runtime";
-import type { Key } from "./key";
 import {
-  cancel,
-  current,
-  Disposed,
-  launch,
-  notify,
   type AnyDefinition,
+  Disposed,
   type Entry,
   type Store,
   Unavailable,
+  cancel,
+  current,
+  launch,
+  notify,
 } from "./entry";
+import type { Key } from "./key";
 import { activate, freshness, stale, unused } from "./policy";
 
 export const fetch = (options: {

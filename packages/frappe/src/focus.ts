@@ -1,9 +1,9 @@
 import { Result } from "effect";
 import { makeLens } from "~/reactive/lens";
-import { ownerRuntime, type ReactiveOwner } from "~/reactive/owner";
-import { requireValidSync, type ReactiveError } from "~/reactive/runtime";
+import { type ReactiveOwner, ownerRuntime } from "~/reactive/owner";
+import { type ReactiveError, requireValidSync } from "~/reactive/runtime";
 import { type Signal, type WritableSignal } from "~/reactive/signal";
-import { fromResultLazy, type Sync } from "./sync";
+import { type Sync, fromResultLazy } from "./sync";
 
 type Field<A> = Exclude<keyof A, "_tag">;
 export function focus<A, K extends Field<A>>(options: {

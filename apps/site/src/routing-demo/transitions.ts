@@ -1,9 +1,9 @@
-import { Match, Option } from "effect";
 import type { NavigationDecision, NavigationEvent } from "@charismaticalli/frappe/router";
+import { Match, Option } from "effect";
 import type { AppEvent, AppState } from "./model";
 import { privatePage, publicPage } from "./pages";
 import { completeProject } from "./project-transitions";
-import { dashboard, login, type Destination, type NavigationTarget, urls } from "./routes";
+import { type Destination, type NavigationTarget, dashboard, login, urls } from "./routes";
 
 type Decision = NavigationDecision<AppState, Destination>;
 type Event = NavigationEvent<typeof urls.definitions, AppEvent>;

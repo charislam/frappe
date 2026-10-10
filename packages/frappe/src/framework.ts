@@ -1,9 +1,9 @@
 import {
   Cause,
   Clock,
-  Context as EffectContext,
   Deferred,
   Effect,
+  Context as EffectContext,
   Exit,
   Fiber,
   Layer,
@@ -13,58 +13,58 @@ import {
   Scope,
   Stream,
 } from "effect";
+import { type SynchronousReactiveContext, synchronousReactive } from "~/reactive/context";
+import { activateReactiveNode } from "~/reactive/dom";
+import { registerOwner } from "~/reactive/owner";
+import { CurrentTransaction, requireValidSync } from "~/reactive/runtime";
+import { type Signal, isSignal, makeCell, readonlySignal, signalData } from "~/reactive/signal";
 import { isCases } from "./branch";
 import { activateCases } from "./branch-runtime";
-import { isComponent, subtreeContext, type Component, type Lifecycle } from "./component";
+import { type Component, type Lifecycle, isComponent, subtreeContext } from "./component";
 import {
+  type Construct,
+  ConstructionError,
+  type ImportNative,
+  type MountItem,
+  type Region,
+  type SyncConstruct,
+  type SyncImportNative,
+  type Tree,
   casesRegionSync,
   checkStructure,
   construct,
   constructSync,
-  inspectSync,
-  keyedRegionSync,
-  selectedRegionSync,
-  validateSelectionSync,
-  validateSync,
-  type SyncConstruct,
-  ConstructionError,
-  inspect,
   importNative,
   importNativeSync,
-  type ImportNative,
-  type SyncImportNative,
+  inspect,
+  inspectSync,
+  keyedRegionSync,
   makeRegion,
   reserve,
+  selectedRegionSync,
   validate,
-  type Construct,
-  type MountItem,
-  type Region,
-  type Tree,
+  validateSelectionSync,
+  validateSync,
 } from "./construction";
 import type { Identifier as ContextIdentifier } from "./context";
 import { capturedWork } from "./deferred-context";
 import { isKeyedList } from "./keyed";
-import { activateKeyed, type RowContext } from "./keyed-runtime";
-import { isElementOutput, nativeNode, nativeTarget, type MountTarget } from "./output";
+import { type RowContext, activateKeyed } from "./keyed-runtime";
+import { type MountTarget, isElementOutput, nativeNode, nativeTarget } from "./output";
 import {
-  makeReactiveRuntime,
-  reactive,
-  stopReactiveRuntime,
   type Equality,
   type EventStream,
   type ReactiveContext,
   type ReactiveError,
   type ReactiveRuntime,
+  makeReactiveRuntime,
+  reactive,
+  stopReactiveRuntime,
 } from "./reactive";
-import { synchronousReactive, type SynchronousReactiveContext } from "~/reactive/context";
-import { activateReactiveNode } from "~/reactive/dom";
-import { registerOwner } from "~/reactive/owner";
-import { CurrentTransaction, requireValidSync } from "~/reactive/runtime";
-import { isSignal, makeCell, readonlySignal, signalData, type Signal } from "~/reactive/signal";
 import type { OutputRequirements, Structural } from "./requirements";
 import type { Identifier as ResourceIdentifier } from "./resource";
 import { installResourceEnvironment } from "./resource-runtime";
-import { fromResultLazy, toEffect, withContext, type Sync } from "./sync";
+import { type Sync, fromResultLazy, toEffect, withContext } from "./sync";
 import { lazy } from "./synchronous";
 
 export { branch, cases, type Branch, type Cases } from "./branch";

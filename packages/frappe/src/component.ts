@@ -1,8 +1,8 @@
-import { Context as EffectContext, Effect, Match, Predicate, Scope } from "effect";
-import { isToken, type Token, type Identifier as ContextIdentifier } from "./context";
-import type { ComponentContext, SynchronousContext, Output } from "./framework";
+import { Effect, Context as EffectContext, Match, Predicate, Scope } from "effect";
+import { type Identifier as ContextIdentifier, type Token, isToken } from "./context";
+import type { ComponentContext, Output, SynchronousContext } from "./framework";
 import type { Normalize, OutputRequirements } from "./requirements";
-import { succeed, type Sync } from "./sync";
+import { type Sync, succeed } from "./sync";
 
 const TypeId = "~frappe/Component";
 export interface Lifecycle<

@@ -1,5 +1,5 @@
 import { Effect, Option } from "effect";
-import { afterEach, describe, expect, it, vi, type MockInstance } from "vitest";
+import { type MockInstance, afterEach, describe, expect, it, vi } from "vitest";
 import { component } from "./framework";
 import { nativeNode } from "./output";
 import * as Popover from "./popover";

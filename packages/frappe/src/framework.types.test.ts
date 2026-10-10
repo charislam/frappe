@@ -6,13 +6,13 @@ import type {
   ApplicationContext,
   Component,
   ComponentContext,
-  MountFailure,
   Construct,
   Mount,
+  MountFailure,
   ReactiveError,
   Signal,
-  WritableSignal,
   SynchronousContext,
+  WritableSignal,
 } from "./framework";
 import type { ElementOutput } from "./output";
 import { testText } from "./output-test-helpers";

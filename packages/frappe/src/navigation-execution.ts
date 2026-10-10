@@ -1,14 +1,14 @@
 import { Effect, Match, Option } from "effect";
-import { stageHistoryWrite, type NavigationProgress } from "./navigation-commit";
+import { ownerRuntime } from "~/reactive/owner";
+import { ReactiveError, requireValid, runBatch } from "~/reactive/runtime";
+import { signalData } from "~/reactive/signal";
+import { type NavigationProgress, stageHistoryWrite } from "./navigation-commit";
 import {
-  NavigationError,
   type HistoryIntent,
+  NavigationError,
   type NavigationEvent,
   type NavigationOptions,
 } from "./navigation-types";
-import { ReactiveError, runBatch, requireValid } from "~/reactive/runtime";
-import { ownerRuntime } from "~/reactive/owner";
-import { signalData } from "~/reactive/signal";
 import type { Destination, Route } from "./routes";
 
 const observedLocation = <T extends ReadonlyArray<Route>, E>(event: NavigationEvent<T, E>) =>

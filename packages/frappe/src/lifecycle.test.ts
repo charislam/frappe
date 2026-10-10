@@ -1,6 +1,6 @@
 import { Cause, Deferred, Effect, Exit, Match, Option, Queue, Scope } from "effect";
 import { afterEach, describe, expect, it } from "vitest";
-import { component, mounting, type Component, type MountFailure } from "./framework";
+import { type Component, type MountFailure, component, mounting } from "./framework";
 import { nativeNode } from "./output";
 import { importTestNode, testText } from "./output-test-helpers";
 import * as Sync from "./sync-public";

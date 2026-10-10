@@ -1,15 +1,11 @@
-import { Cause, Deferred, Effect, Exit, Layer, Match, Option, Queue, Scope } from "effect";
-import { afterEach, describe, expect, it } from "vitest";
-import { bootstrap } from "./bootstrap";
 import type { ConstructionError } from "@charismaticalli/frappe";
-import { component, mounting, type MountFailure } from "@charismaticalli/frappe";
-import { AuthLive } from "./auth";
-import { Examples } from "./examples";
-import { LocalStorageMemory } from "./local-storage";
+import { type MountFailure, component, mounting } from "@charismaticalli/frappe";
 import { nativeNode } from "@charismaticalli/frappe";
 import type { ElementOutput } from "@charismaticalli/frappe";
-import * as Sync from "@charismaticalli/frappe";
-import { untypedOutput, testText } from "./output-test-helpers";
+import { Sync } from "@charismaticalli/frappe";
+import { Cause, Deferred, Effect, Exit, Match, Option, Queue, Scope } from "effect";
+import { afterEach, describe, expect, it } from "vitest";
+import { testText, untypedOutput } from "./output-test-helpers";
 import { rendered as waitFor } from "./test-helpers";
 
 const run = Effect.runPromise;
@@ -35,7 +31,6 @@ const harness = async () => {
   const app = await run(
     mounting({
       scope,
-      resources: Layer.mergeAll(AuthLive, LocalStorageMemory),
       onError: (failure) => {
         errors.push(failure);
         Queue.offerUnsafe(reports, failure);
@@ -72,30 +67,27 @@ afterEach(async () => {
 });
 
 describe("scoped component mounting", () => {
-  it("creates independent welcome nodes and supports ordered and empty roots", async () => {
+  it("creates independent component nodes and supports ordered and empty roots", async () => {
     const { h, close } = await harness();
     const left = document.createElement("div");
     const right = document.createElement("div");
-    Effect.runSync(h(left, Examples));
-    Effect.runSync(h(right, Examples));
+    const Welcome = component(() =>
+      Sync.succeed({ setup: ({ he }) => he("main", { children: ["Welcome"] }) }),
+    );
+    Effect.runSync(h(left, Welcome));
+    Effect.runSync(h(right, Welcome));
     await Promise.all([
       waitFor({
         parent: left,
-        check: () =>
-          left.querySelectorAll(".counter output").length === 1 &&
-          left.querySelector(".tabs") !== null &&
-          left.querySelector(".text-input") !== null,
+        check: () => left.querySelector("main") !== null,
       }),
       waitFor({
         parent: right,
-        check: () =>
-          right.querySelectorAll(".counter output").length === 1 &&
-          right.querySelector(".tabs") !== null &&
-          right.querySelector(".text-input") !== null,
+        check: () => right.querySelector("main") !== null,
       }),
     ]);
     expect(left.firstChild).not.toBe(right.firstChild);
-    expect(left.querySelector("main > hgroup > h1")?.textContent).toBe("Examples");
+    expect(left.querySelector("main")?.textContent).toBe("Welcome");
     Effect.runSync(
       h(
         left,
@@ -702,19 +694,6 @@ describe("scoped component mounting", () => {
     expect(finalized).toEqual([1, 2]);
   });
 
-  it("bootstrap fails clearly without the existing app root", async () => {
-    document.body.replaceChildren();
-    const exit = await run(bootstrap(() => {}).pipe(Effect.exit));
-    expect(Exit.isFailure(exit)).toBe(true);
-    Exit.match(exit, {
-      onSuccess: () => {
-        throw new Error("Expected missing-root failure");
-      },
-      onFailure: (cause) => expect(Cause.pretty(cause)).toContain('id="app"'),
-    });
-    expect(document.getElementById("app")).toBeNull();
-  });
-
   it("interrupts owned background work before descendant cleanup and preserves background cleanup defects", async () => {
     const { h, close, errors } = await harness();
 
@@ -1240,7 +1219,7 @@ describe("static DOM construction and regions", () => {
     await rendered(parent, "old");
     Effect.runSync(h(parent, text("middle")));
     await run(Deferred.await(cleaning));
-    const reparented = text("stolen");
+    const reparented = Effect.runSync(app.importNative(document.createTextNode("stolen")));
     const mutated = document.createElement("section");
     mutated.append(document.createTextNode("original"));
     const mutatedOutput = Effect.runSync(app.importNative(mutated));
@@ -1302,7 +1281,7 @@ describe("static DOM construction and regions", () => {
   });
 
   it("runs inline synchronous finalizers before detachment and cancels owned work on native replacement", async () => {
-    const { h, close, errors } = await harness();
+    const { app, h, close, errors } = await harness();
     const parent = document.createElement("div");
     const ready = gate();
     const backgroundStopped = gate();
@@ -1310,7 +1289,7 @@ describe("static DOM construction and regions", () => {
     const pendingRelease = gate();
     const events: string[] = [];
     let staleConstruct: () => Effect.Effect<ElementOutput<Node>, ConstructionError> = () =>
-      Effect.succeed(text("unused"));
+      app.importNative(document.createTextNode("unused"));
     Effect.runSync(
       h(
         parent,
@@ -1488,9 +1467,9 @@ describe("replacement resource boundaries", () => {
   });
 
   it("rejects invalid component output as a group and preserves native siblings", async () => {
-    const { h, errors, close, nextFailure } = await harness();
+    const { app, h, errors, close, nextFailure } = await harness();
     const parent = document.createElement("div");
-    const supplied = text("duplicate");
+    const supplied = Effect.runSync(app.importNative(document.createTextNode("duplicate")));
     let cleaned = false;
     Effect.runSync(
       h(parent, [

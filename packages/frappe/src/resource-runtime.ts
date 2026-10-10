@@ -1,4 +1,4 @@
-import { Option, type Clock, type Context } from "effect";
+import { type Clock, type Context, Option } from "effect";
 import type { CommitCoordinator, ReactiveRuntime } from "~/reactive/runtime";
 
 interface Environment {

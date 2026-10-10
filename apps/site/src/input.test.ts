@@ -1,7 +1,7 @@
+import { type WritableSignal } from "@charismaticalli/frappe";
+import { type ElementOutput, nativeNode } from "@charismaticalli/frappe";
 import { Effect, Exit, Option, Queue } from "effect";
 import { describe, expect, it } from "vitest";
-import { type WritableSignal } from "@charismaticalli/frappe";
-import { nativeNode, type ElementOutput } from "@charismaticalli/frappe";
 import { harness, rendered } from "./test-helpers";
 import { TextInput } from "./text-input";
 

@@ -1,14 +1,14 @@
+import { Resource } from "@charismaticalli/frappe";
 import {
-  Context as EffectContext,
   Effect,
+  Context as EffectContext,
   Layer,
   Option,
   Ref,
-  SubscriptionRef,
   type Stream,
+  SubscriptionRef,
 } from "effect";
 import { AuthError, type Credentials, type User } from "./auth-model";
-import { Resource } from "@charismaticalli/frappe";
 
 export class Auth extends Resource.Service<
   Auth,

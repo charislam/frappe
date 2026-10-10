@@ -1,6 +1,6 @@
-import { Effect, Match, Option } from "effect";
 import { component, keyed, row } from "@charismaticalli/frappe";
-import * as Sync from "@charismaticalli/frappe";
+import { Sync } from "@charismaticalli/frappe";
+import { Effect, Match, Option } from "effect";
 
 interface Todo {
   readonly id: string;

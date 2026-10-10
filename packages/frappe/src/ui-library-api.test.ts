@@ -1,15 +1,15 @@
 import { Context, Effect, Match, Option, Result } from "effect";
 import { describe, expect, expectTypeOf, it, vi } from "vitest";
 import {
-  component,
-  ReactiveError,
-  Sync,
   type ComponentContext,
   type DomEventTarget,
   type ElementOutput,
   type EventStream,
+  ReactiveError,
   type Signal,
+  Sync,
   type SynchronousContext,
+  component,
 } from "./framework";
 import { harness, rendered } from "./test-helpers";
 

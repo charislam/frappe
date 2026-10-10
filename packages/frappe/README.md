@@ -19,7 +19,7 @@ output, component, `Signal<Option<Component>>`, or a readonly mixed array of
 those items. `[]` is empty output. Strings and text signals remain children of
 `he`; nested root arrays are unsupported.
 
-Import `Sync` from the framework alongside `Effect` for the examples below.
+Import `Sync` from `@charismaticalli/frappe` alongside `Effect` for the examples below.
 
 The context provides:
 
@@ -343,7 +343,7 @@ Passing a reference through a closure does not bypass lifetime validation.
 
 ```ts
 import { Effect } from "effect";
-import { Sync } from "./framework";
+import { Sync } from "@charismaticalli/frappe";
 
 const Page = component(({ signal }) =>
   Sync.gen(function* () {
@@ -452,12 +452,12 @@ application state, subscriptions, work, and other targets. Scope closure stops
 root handles and work, runs synchronous finalizers, removes DOM immediately, and
 awaits descendant and retired-branch resource cleanup before completing.
 
-For example, with an existing `root` element and application `onError` reporter:
+For example, with an existing `root` element, an application `onError` reporter,
+and app-defined `AccessWarning` and `AccessiblePage` components:
 
 ```ts
 import { Effect, Match, Option } from "effect";
-import { AccessWarning, AccessiblePage } from "./src/access";
-import { mounting, type Component } from "./src/framework";
+import { mounting, type Component } from "@charismaticalli/frappe";
 
 const program = Effect.gen(function* () {
   const scope = yield* Effect.scope;
@@ -550,7 +550,7 @@ names; repeated names within a kind retain Effect's normal identity semantics.
 
 ```ts
 import { Effect, Layer, Option } from "effect";
-import { Context, Resource, mounting, type Signal } from "./src/framework";
+import { Context, Resource, mounting, type Signal } from "@charismaticalli/frappe";
 
 class Storage extends Resource.Service<
   Storage,
@@ -636,7 +636,7 @@ and resource requirements remain inferred through all those boundaries.
 
 ```ts
 import { Effect } from "effect";
-import { branch, cases, focus, Sync } from "./src/framework";
+import { branch, cases, focus, Sync } from "@charismaticalli/frappe";
 
 type State =
   | { readonly _tag: "Editing"; readonly documentId: string; readonly draft: string }
@@ -706,7 +706,7 @@ import {
   route,
   router,
   type Destination,
-} from "./src/framework";
+} from "@charismaticalli/frappe/router";
 
 const ProjectId = Schema.NumberFromString.pipe(
   Schema.check(Schema.isInt(), Schema.isGreaterThan(0)),
@@ -872,7 +872,7 @@ observe through an existing component context:
 
 ```ts
 import { Effect, Match, Option } from "effect";
-import { Query, QueryState } from "./framework";
+import { Query, QueryState } from "@charismaticalli/frappe";
 
 const Project = Query.define({
   name: "Project",

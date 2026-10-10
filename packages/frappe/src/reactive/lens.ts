@@ -1,23 +1,23 @@
 import { Effect, Match, Option, Result } from "effect";
 import { lazy } from "~/synchronous";
 import {
+  type ReactiveError,
+  type ReactiveRuntime,
+  type Transaction,
   calculate,
   calculateSync,
   poison,
   requireValidSync,
   runBatch,
-  type ReactiveError,
-  type ReactiveRuntime,
-  type Transaction,
 } from "./runtime";
 import {
+  type Signal,
+  type WritableSignal,
   deriveSync,
   isWritableSignal,
   readTransaction,
   signalData,
   signalView,
-  type Signal,
-  type WritableSignal,
 } from "./signal";
 
 /** Internal authoritative lens. The derived cell participates in the parent's commit graph. */

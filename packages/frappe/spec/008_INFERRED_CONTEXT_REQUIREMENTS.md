@@ -44,7 +44,13 @@ discussing inferred component types.
 
 ```ts
 import { Context, Effect, Option } from "effect";
-import { component, provideContext, readonlySignal, Sync, type Signal } from "./framework";
+import {
+  component,
+  provideContext,
+  readonlySignal,
+  Sync,
+  type Signal,
+} from "@charismaticalli/frappe";
 
 interface User {
   readonly email: string;
