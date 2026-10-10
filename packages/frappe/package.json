@@ -1,0 +1,28 @@
+{
+  "name": "@charismaticalli/frappe",
+  "private": true,
+  "type": "module",
+  "exports": {
+    ".": "./src/framework.ts",
+    "./*": "./src/*.ts"
+  },
+  "scripts": {
+    "fmt": "oxfmt",
+    "lint": "oxlint src",
+    "prepare": "effect-tsgo patch --no-typescript --oxlint",
+    "typecheck": "tsc --noEmit",
+    "test": "vitest run"
+  },
+  "dependencies": {
+    "effect": "catalog:"
+  },
+  "devDependencies": {
+    "@effect/tsgo": "catalog:",
+    "happy-dom": "catalog:",
+    "oxfmt": "catalog:",
+    "oxlint": "catalog:",
+    "oxlint-tsgolint": "catalog:",
+    "typescript": "catalog:",
+    "vitest": "catalog:"
+  }
+}
