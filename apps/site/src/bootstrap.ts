@@ -1,6 +1,5 @@
 import { type MountFailure, Query, mounting, provideContext } from "@charismaticalli/frappe";
-import { browserHistory } from "@charismaticalli/frappe/router";
-import { History } from "@charismaticalli/frappe/router";
+import { History, browserHistory } from "@charismaticalli/frappe/router";
 import { Effect, Layer, Option } from "effect";
 import { mockResources } from "~/routing-demo/resources";
 import { App } from "./app";

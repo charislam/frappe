@@ -1,8 +1,12 @@
-import type { ConstructionError } from "@charismaticalli/frappe";
-import { type MountFailure, component, mounting } from "@charismaticalli/frappe";
-import { nativeNode } from "@charismaticalli/frappe";
-import type { ElementOutput } from "@charismaticalli/frappe";
-import { Sync } from "@charismaticalli/frappe";
+import {
+  type ConstructionError,
+  type ElementOutput,
+  type MountFailure,
+  Sync,
+  component,
+  mounting,
+  nativeNode,
+} from "@charismaticalli/frappe";
 import { Cause, Deferred, Effect, Exit, Match, Option, Queue, Scope } from "effect";
 import { afterEach, describe, expect, it } from "vitest";
 import { testText, untypedOutput } from "./output-test-helpers";

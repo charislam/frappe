@@ -1,6 +1,4 @@
-import { component } from "@charismaticalli/frappe";
-import { occurrenceId } from "@charismaticalli/frappe";
-import { Sync } from "@charismaticalli/frappe";
+import { Sync, component, occurrenceId } from "@charismaticalli/frappe";
 import { Effect, Match, Option } from "effect";
 
 export const TextInput = component(() =>

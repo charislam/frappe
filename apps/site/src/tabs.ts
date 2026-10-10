@@ -1,6 +1,4 @@
-import { type ElementOutput, component, nativeNode } from "@charismaticalli/frappe";
-import { occurrenceId } from "@charismaticalli/frappe";
-import { Sync } from "@charismaticalli/frappe";
+import { type ElementOutput, Sync, component, nativeNode, occurrenceId } from "@charismaticalli/frappe";
 import { Effect, Match, Option } from "effect";
 
 const names = ["Overview", "Details", "Settings"] as const;

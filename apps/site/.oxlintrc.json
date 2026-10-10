@@ -3,6 +3,7 @@
   "plugins": ["import"],
   "rules": {
     "import/no-relative-parent-imports": "error",
+    "import/no-duplicates": "error",
     "no-restricted-imports": [
       "error",
       {
@@ -17,7 +18,7 @@
     "sort-imports": [
       "error",
       {
-        "ignoreDeclarationSort": true,
+        "ignoreDeclarationSort": false,
         "ignoreMemberSort": false
       }
     ]

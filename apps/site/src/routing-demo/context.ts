@@ -1,5 +1,4 @@
-import { Context } from "@charismaticalli/frappe";
-import type { Signal } from "@charismaticalli/frappe";
+import { Context, type Signal } from "@charismaticalli/frappe";
 import type { Navigator } from "@charismaticalli/frappe/router";
 import type { AppEvent, Project, User } from "./model";
 import type { urls } from "./routes";

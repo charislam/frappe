@@ -1,5 +1,4 @@
-import { component, mounting } from "@charismaticalli/frappe";
-import { Sync } from "@charismaticalli/frappe";
+import { Sync, component, mounting } from "@charismaticalli/frappe";
 import { History, memoryHistory } from "@charismaticalli/frappe/router";
 import { Deferred, Effect, Exit, Layer, Match, Option, Result, Scope } from "effect";
 import { afterEach, describe, expect, it } from "vitest";
