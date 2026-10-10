@@ -962,7 +962,7 @@ retained data is never written to another key's cache. `QueryState.match`, guard
 and dual `map` preserve waiting, provenance, Causes, and timestamps.
 
 The interactive query demo is the Queries page in the existing app. Run
-`pnpm dev:frappe` and open `/queries` to try two project observers sharing
+`pnpm dev:site` and open `/queries` to try two project observers sharing
 requests, optional selection, retained result pages, retry exhaustion, shared
 refresh failures, and session switches.
 

@@ -11,7 +11,7 @@ import {
 } from "effect";
 import * as Resource from "@charismaticalli/frappe/resource";
 import type { AuthEvent, Project, User } from "./model";
-import type { ProjectId } from "@charismaticalli/frappe/routes";
+import type { ProjectId } from "./routes";
 
 export class MockAuth extends Resource.Service<
   MockAuth,

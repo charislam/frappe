@@ -8,7 +8,11 @@ import { Examples } from "./examples";
 import { LocalStorageMemory } from "./local-storage";
 import { nativeNode } from "@charismaticalli/frappe/output";
 import type { ElementOutput } from "@charismaticalli/frappe/output";
-import { importTestNode, untypedOutput, testText } from "@charismaticalli/frappe/output-test-helpers";
+import {
+  importTestNode,
+  untypedOutput,
+  testText,
+} from "@charismaticalli/frappe/output-test-helpers";
 import * as Sync from "@charismaticalli/frappe/sync-public";
 import { rendered as waitFor } from "@charismaticalli/frappe/test-helpers";
 
