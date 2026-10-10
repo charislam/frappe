@@ -1,0 +1,26 @@
+{
+  "name": "@charismaticalli/ui",
+  "private": true,
+  "type": "module",
+  "exports": {
+    ".": "./src/index.ts"
+  },
+  "scripts": {
+    "fmt": "oxfmt",
+    "lint": "oxlint src && oxfmt --check src",
+    "typecheck": "tsc --noEmit",
+    "test": "vitest run"
+  },
+  "dependencies": {
+    "@charismaticalli/frappe": "workspace:*",
+    "effect": "catalog:"
+  },
+  "devDependencies": {
+    "happy-dom": "catalog:",
+    "oxfmt": "catalog:",
+    "oxlint": "catalog:",
+    "oxlint-tsgolint": "catalog:",
+    "typescript": "catalog:",
+    "vitest": "catalog:"
+  }
+}

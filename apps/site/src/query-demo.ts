@@ -1,13 +1,13 @@
 import {
   Context,
-  Query,
-  QueryState,
   Resource,
   type Signal,
   Sync,
   type WritableSignal,
   component,
 } from "@charismaticalli/frappe";
+import * as Query from "@charismaticalli/frappe/query";
+import { QueryState } from "@charismaticalli/frappe/query";
 import { Cause, Effect, Layer, Match, Option, Ref, Schedule, Schema } from "effect";
 
 export class QueryDemoSession extends Context.Service<

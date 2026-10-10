@@ -1,10 +1,8 @@
+import { Sync, component, nativeNode } from "@charismaticalli/frappe";
 import { Effect, Option } from "effect";
 import { type MockInstance, afterEach, describe, expect, it, vi } from "vitest";
-import { component } from "./framework";
-import { nativeNode } from "./output";
 import * as Popover from "./popover";
 import { geometry } from "./positioning";
-import * as Sync from "./sync";
 import { harness, rendered } from "./test-helpers";
 
 const base = {

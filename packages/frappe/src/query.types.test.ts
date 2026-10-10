@@ -4,14 +4,14 @@ import {
   type ApplicationContext,
   type Component,
   Context,
-  Query,
-  QueryState,
   Resource,
   type Signal,
   Sync,
   component,
   type ReactiveError as importReactiveError,
 } from "./framework";
+import * as Query from "./query";
+import { QueryState } from "./query";
 import type { Structural } from "./requirements";
 
 class Projects extends Resource.Service<

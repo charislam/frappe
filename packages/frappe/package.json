@@ -4,8 +4,8 @@
   "type": "module",
   "exports": {
     ".": "./src/framework.ts",
-    "./router": "./src/router.ts",
-    "./ui": "./src/ui.ts"
+    "./query": "./src/query.ts",
+    "./router": "./src/router.ts"
   },
   "scripts": {
     "fmt": "oxfmt",

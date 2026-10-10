@@ -872,7 +872,8 @@ observe through an existing component context:
 
 ```ts
 import { Effect, Match, Option } from "effect";
-import { Query, QueryState } from "@charismaticalli/frappe";
+import * as Query from "@charismaticalli/frappe/query";
+import { QueryState } from "@charismaticalli/frappe/query";
 
 const Project = Query.define({
   name: "Project",

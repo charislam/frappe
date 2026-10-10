@@ -13,6 +13,7 @@
   },
   "dependencies": {
     "@charismaticalli/frappe": "workspace:*",
+    "@charismaticalli/ui": "workspace:*",
     "effect": "catalog:"
   },
   "devDependencies": {

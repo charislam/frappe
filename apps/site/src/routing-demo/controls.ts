@@ -1,5 +1,5 @@
 import { type Signal, Sync, component } from "@charismaticalli/frappe";
-import * as Popover from "@charismaticalli/frappe/ui";
+import * as Popover from "@charismaticalli/ui";
 import { Effect, Option } from "effect";
 import { MockAuth, MockProjects } from "./resources";
 import { button } from "./ui";

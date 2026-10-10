@@ -1,4 +1,5 @@
-import { Query, mounting, provideContext } from "@charismaticalli/frappe";
+import { mounting, provideContext } from "@charismaticalli/frappe";
+import * as Query from "@charismaticalli/frappe/query";
 import { History, memoryHistory } from "@charismaticalli/frappe/router";
 import { Effect, Exit, Layer, Option, Result, Scope } from "effect";
 import { expect, it } from "vitest";
