@@ -1,12 +1,12 @@
 import type { Effect, Option, Scope } from "effect";
 import type { ApplicationContext, OwnerContext } from "./framework";
-import type { Configure, ObserveOptions, Handle } from "./query/api";
-import type { Policy, Retry } from "./query/definition";
-import { observe as observeRuntime } from "./query/observer";
-import { configure as configureRuntime } from "./query/runtime";
-import { ownerRuntime } from "./reactive/owner";
-import type { ReactiveError } from "./reactive/runtime";
-import type { Signal } from "./reactive/signal";
+import type { Configure, ObserveOptions, Handle } from "~/query/api";
+import type { Policy, Retry } from "~/query/definition";
+import { observe as observeRuntime } from "~/query/observer";
+import { configure as configureRuntime } from "~/query/runtime";
+import { ownerRuntime } from "~/reactive/owner";
+import type { ReactiveError } from "~/reactive/runtime";
+import type { Signal } from "~/reactive/signal";
 import type { Structural } from "./requirements";
 import type { Identifier } from "./resource";
 
@@ -44,7 +44,7 @@ export const configure = <Resources extends Identifier, P, R = never>(
       : { readonly invalidQueryRequirements: never }),
 ) => (configureRuntime(ownerRuntime(options.context)) as Configure<Resources>)(options);
 
-export type { Handle, ObserveOptions, Client } from "./query/api";
+export type { Handle, ObserveOptions, Client } from "~/query/api";
 export {
   define,
   disabled,
@@ -53,6 +53,6 @@ export {
   Retry,
   type Definition,
   type Policy,
-} from "./query/definition";
-export { Disposed, PartitionChanged, type FrameworkError, Unavailable } from "./query/entry";
-export * as QueryState from "./query/state";
+} from "~/query/definition";
+export { Disposed, PartitionChanged, type FrameworkError, Unavailable } from "~/query/entry";
+export * as QueryState from "~/query/state";

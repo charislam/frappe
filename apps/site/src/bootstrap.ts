@@ -1,17 +1,17 @@
 import { Effect, Layer, Option } from "effect";
 import { App } from "./app";
 import { AuthLive } from "./auth";
-import { browserHistory } from "@charismaticalli/frappe/browser-history";
+import { browserHistory } from "@charismaticalli/frappe/router";
 import {
   mounting,
   provideContext,
   Query,
   type MountFailure,
-} from "@charismaticalli/frappe/framework";
-import { History } from "@charismaticalli/frappe/history";
+} from "@charismaticalli/frappe";
+import { History } from "@charismaticalli/frappe/router";
 import { LocalStorageLive } from "./local-storage";
 import { QueryDemoSession, queryDemoResources } from "./query-demo";
-import { mockResources } from "./routing-demo/resources";
+import { mockResources } from "~/routing-demo/resources";
 
 /** Remains alive until interrupted, then awaits disposal of the application. */
 export const bootstrap = Effect.fn("frappe.bootstrap")(function* (

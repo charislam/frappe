@@ -8,7 +8,7 @@ import {
   Sync,
   type Signal,
   type WritableSignal,
-} from "@charismaticalli/frappe/framework";
+} from "@charismaticalli/frappe";
 
 export class QueryDemoSession extends Context.Service<
   QueryDemoSession,

@@ -2,7 +2,7 @@ import { Cause, Deferred, Effect, Match, Option, Queue, Stream, type Exit } from
 import type { HistoryAdapter } from "./history";
 import { NavigationError, type NavigationEvent } from "./navigation-types";
 import { observeHistory } from "./navigation-observation";
-import type { ReactiveRuntime } from "./reactive/runtime";
+import type { ReactiveRuntime } from "~/reactive/runtime";
 import type { Route, Router } from "./routes";
 
 const claimedHistories = new WeakSet<object>();

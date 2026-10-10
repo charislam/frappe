@@ -1,7 +1,7 @@
 import { Effect, Match, Option } from "effect";
-import { component } from "@charismaticalli/frappe/framework";
-import { occurrenceId } from "@charismaticalli/frappe/occurrence";
-import * as Sync from "@charismaticalli/frappe/sync-public";
+import { component } from "@charismaticalli/frappe";
+import { occurrenceId } from "@charismaticalli/frappe";
+import * as Sync from "@charismaticalli/frappe";
 
 export const TextInput = component(() =>
   Sync.succeed({

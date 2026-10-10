@@ -1,20 +1,16 @@
 import { Cause, Deferred, Effect, Exit, Layer, Match, Option, Queue, Scope } from "effect";
 import { afterEach, describe, expect, it } from "vitest";
 import { bootstrap } from "./bootstrap";
-import type { ConstructionError } from "@charismaticalli/frappe/construction";
-import { component, mounting, type MountFailure } from "@charismaticalli/frappe/framework";
+import type { ConstructionError } from "@charismaticalli/frappe";
+import { component, mounting, type MountFailure } from "@charismaticalli/frappe";
 import { AuthLive } from "./auth";
 import { Examples } from "./examples";
 import { LocalStorageMemory } from "./local-storage";
-import { nativeNode } from "@charismaticalli/frappe/output";
-import type { ElementOutput } from "@charismaticalli/frappe/output";
-import {
-  importTestNode,
-  untypedOutput,
-  testText,
-} from "@charismaticalli/frappe/output-test-helpers";
-import * as Sync from "@charismaticalli/frappe/sync-public";
-import { rendered as waitFor } from "@charismaticalli/frappe/test-helpers";
+import { nativeNode } from "@charismaticalli/frappe";
+import type { ElementOutput } from "@charismaticalli/frappe";
+import * as Sync from "@charismaticalli/frappe";
+import { untypedOutput, testText } from "./output-test-helpers";
+import { rendered as waitFor } from "./test-helpers";
 
 const run = Effect.runPromise;
 
@@ -36,7 +32,7 @@ const harness = async () => {
   const scope = await run(Scope.make());
   const errors: MountFailure[] = [];
   const reports = await run(Queue.unbounded<MountFailure>());
-  const { h } = await run(
+  const app = await run(
     mounting({
       scope,
       resources: Layer.mergeAll(AuthLive, LocalStorageMemory),
@@ -46,9 +42,10 @@ const harness = async () => {
       },
     }),
   );
+  const { h } = app;
   const close = () => run(Scope.close(scope, Exit.void));
   cleanups.push(close);
-  return { h, errors, close, nextFailure: () => run(Queue.take(reports)) };
+  return { app, h, errors, close, nextFailure: () => run(Queue.take(reports)) };
 };
 
 // Observe actual insertion rather than guessing how many scheduler turns mounting takes.
@@ -128,7 +125,7 @@ describe("scoped component mounting", () => {
     const { h } = await harness();
 
     const parent = document.createElement("div");
-    parent.append(nativeNode(text("pre-existing")));
+    parent.append(document.createTextNode("pre-existing"));
 
     const cleaning = gate();
     const releaseCleanup = gate();
@@ -160,7 +157,7 @@ describe("scoped component mounting", () => {
 
     await rendered(parent, "old");
 
-    parent.append(nativeNode(text("external")));
+    parent.append(document.createTextNode("external"));
 
     Effect.runSync(
       h(
@@ -388,7 +385,7 @@ describe("scoped component mounting", () => {
                   }),
                 );
                 yield* Effect.addFinalizer(() => Effect.die("cleanup failed"));
-                parent.append(nativeNode(text("partial")));
+                parent.append(document.createTextNode("partial"));
                 return yield* Effect.fail(original);
               }),
           }),
@@ -1203,8 +1200,8 @@ describe("static DOM construction and regions", () => {
     Effect.runSync(h(parent, reserved));
     Effect.runSync(h(parent, reserved));
     const attached = document.createElement("aside");
-    const root = text("attached");
-    attached.append(nativeNode(root));
+    const root = document.createTextNode("attached");
+    attached.append(root);
     for (const node of [
       root,
       document,
@@ -1223,7 +1220,7 @@ describe("static DOM construction and regions", () => {
   });
 
   it("rejects queued reparenting and mutation before cleaning the active view", async () => {
-    const { h, errors } = await harness();
+    const { app, h, errors } = await harness();
     const parent = document.createElement("div");
     const cleaning = gate();
     const release = gate();
@@ -1246,7 +1243,7 @@ describe("static DOM construction and regions", () => {
     const reparented = text("stolen");
     const mutated = document.createElement("section");
     mutated.append(document.createTextNode("original"));
-    const mutatedOutput = Effect.runSync(importTestNode(mutated));
+    const mutatedOutput = Effect.runSync(app.importNative(mutated));
     Effect.runSync(h(parent, reparented));
     Effect.runSync(h(parent, mutatedOutput));
     const external = document.createElement("aside");
@@ -1261,11 +1258,11 @@ describe("static DOM construction and regions", () => {
   });
 
   it("rejects foreign constructed regions, missing anchors, and explicit anchor roots", async () => {
-    const { h, errors } = await harness();
+    const { app, h, errors } = await harness();
     const parent = document.createElement("div");
     const foreign = document.createElement("div");
     let tree: ElementOutput<HTMLElement> = Effect.runSync(
-      importTestNode(document.createElement("main")),
+      app.importNative(document.createElement("main")),
     );
     let started = 0;
     const child = component(() =>

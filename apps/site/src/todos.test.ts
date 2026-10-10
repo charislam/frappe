@@ -1,6 +1,6 @@
 import { Effect } from "effect";
 import { expect, it } from "vitest";
-import { harness, rendered } from "@charismaticalli/frappe/test-helpers";
+import { harness, rendered } from "./test-helpers";
 import { Todos } from "./todos";
 
 const run = Effect.runPromise;

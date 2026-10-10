@@ -7,7 +7,7 @@
     "module": "ESNext",
     "moduleResolution": "bundler",
     "paths": {
-      "~/*": ["../../packages/frappe/src/*"]
+      "~/*": ["./src/*"]
     },
     "lib": ["ES2022", "DOM", "DOM.Iterable"],
     "noEmit": true,

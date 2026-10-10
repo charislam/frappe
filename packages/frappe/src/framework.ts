@@ -56,11 +56,11 @@ import {
   type ReactiveError,
   type ReactiveRuntime,
 } from "./reactive";
-import { synchronousReactive, type SynchronousReactiveContext } from "./reactive/context";
-import { activateReactiveNode } from "./reactive/dom";
-import { registerOwner } from "./reactive/owner";
-import { CurrentTransaction, requireValidSync } from "./reactive/runtime";
-import { isSignal, makeCell, readonlySignal, signalData, type Signal } from "./reactive/signal";
+import { synchronousReactive, type SynchronousReactiveContext } from "~/reactive/context";
+import { activateReactiveNode } from "~/reactive/dom";
+import { registerOwner } from "~/reactive/owner";
+import { CurrentTransaction, requireValidSync } from "~/reactive/runtime";
+import { isSignal, makeCell, readonlySignal, signalData, type Signal } from "~/reactive/signal";
 import type { OutputRequirements, Structural } from "./requirements";
 import type { Identifier as ResourceIdentifier } from "./resource";
 import { installResourceEnvironment } from "./resource-runtime";
@@ -68,7 +68,6 @@ import { fromResultLazy, toEffect, withContext, type Sync } from "./sync";
 import { lazy } from "./synchronous";
 
 export { branch, cases, type Branch, type Cases } from "./branch";
-export { browserHistory } from "./browser-history";
 export { component, provideContext, type Component, type Lifecycle } from "./component";
 export { ConstructionError } from "./construction";
 export type {
@@ -82,25 +81,9 @@ export type {
 } from "./construction";
 export * as Context from "./context";
 export { focus } from "./focus";
-export {
-  History,
-  HistoryError,
-  memoryHistory,
-  type HistoryAdapter,
-  type MemoryHistory,
-} from "./history";
 export { keyed, row, type Key, type KeyedList, type Row, type RowInputs } from "./keyed";
-export {
-  NavigationError,
-  navigator,
-  type NavigationDecision,
-  type NavigationEvent,
-  type Navigator,
-} from "./navigation";
 export { nativeNode, type ElementOutput } from "./output";
 export { occurrenceId } from "./occurrence";
-export * as Popover from "./popover";
-export * as Positioning from "./positioning";
 export { ReactiveError, mapEvents, mergeEvents } from "./reactive";
 export type {
   Signal,
@@ -111,29 +94,13 @@ export type {
   EventSource,
   ReactiveContext,
 } from "./reactive";
-export type { ElementBinding } from "./reactive/bind";
-export type { DomEventTarget, DomEventMap, DomEvent, DomEventOptions } from "./reactive/events";
-export { readonlySignal } from "./reactive/signal";
-export type { WatchOptions } from "./reactive/watch";
+export type { ElementBinding } from "~/reactive/bind";
+export type { DomEventTarget, DomEventMap, DomEvent, DomEventOptions } from "~/reactive/events";
+export { readonlySignal } from "~/reactive/signal";
+export type { WatchOptions } from "~/reactive/watch";
 export * as Resource from "./resource";
 export * as Query from "./query";
-export * as QueryState from "./query/state";
-export {
-  arrayQuery,
-  defaultQuery,
-  optionalQuery,
-  parameter,
-  remaining,
-  requiredQuery,
-  router,
-  route,
-  type Destination,
-  type ParseResult,
-  type Prefix,
-  type Router,
-  UrlBuildError,
-} from "./routes";
-export { link } from "./router-link";
+export * as QueryState from "~/query/state";
 export * as Sync from "./sync-public";
 
 export type Output<R = never> = MountItem<R> | ReadonlyArray<MountItem<R>>;

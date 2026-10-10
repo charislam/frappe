@@ -10,8 +10,8 @@ import {
   type ElementOutput,
 } from "./output";
 import { isSignal, type Signal, type ReactiveRuntime, ReactiveError } from "./reactive";
-import { readSync } from "./reactive/signal";
-import { reactiveTextSync as reactiveText } from "./reactive/text";
+import { readSync } from "~/reactive/signal";
+import { reactiveTextSync as reactiveText } from "~/reactive/text";
 import type { OutputRequirements } from "./requirements";
 import { fromResultLazy, type Sync } from "./sync";
 import { lazy } from "./synchronous";
@@ -24,8 +24,8 @@ import {
   validateReactiveNodeSync,
   writeAttributeSync,
   type AttributeValue,
-} from "./reactive/dom";
-import { propertyValidatorSync, writePropertySync } from "./reactive/properties";
+} from "~/reactive/dom";
+import { propertyValidatorSync, writePropertySync } from "~/reactive/properties";
 
 export type MountItem<R = never> =
   | Component<R>

@@ -1,6 +1,6 @@
 import { Deferred, Effect, Option } from "effect";
-import { component, type Signal } from "@charismaticalli/frappe/framework";
-import * as Sync from "@charismaticalli/frappe/sync-public";
+import { component, type Signal } from "@charismaticalli/frappe";
+import * as Sync from "@charismaticalli/frappe";
 
 /** Stable child description closes over parent state; its occurrence owns progress. */
 const loadingContent = (options: { title: Signal<string>; release: Deferred.Deferred<void> }) =>

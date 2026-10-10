@@ -2,8 +2,8 @@ import { Option, Result, type Scope } from "effect";
 import type { FactoryLifecycle, Lifecycle } from "./component";
 import type { Output, SynchronousContext } from "./framework";
 import type { Key } from "./keyed";
-import { calculateSync, requireValidSync, ReactiveError } from "./reactive/runtime";
-import { type Signal, type WritableSignal } from "./reactive/signal";
+import { calculateSync, requireValidSync, ReactiveError } from "~/reactive/runtime";
+import { type Signal, type WritableSignal } from "~/reactive/signal";
 import type { Normalize, OutputRequirements } from "./requirements";
 import type { Sync } from "./sync";
 

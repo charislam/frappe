@@ -1,6 +1,6 @@
 import { Effect, Option } from "effect";
-import { component } from "@charismaticalli/frappe/framework";
-import * as Sync from "@charismaticalli/frappe/sync-public";
+import { component } from "@charismaticalli/frappe";
+import * as Sync from "@charismaticalli/frappe";
 
 const benefitsSection = component(() =>
   Sync.succeed({

@@ -1,6 +1,6 @@
 import { Effect, Match, Option } from "effect";
-import { component, mapEvents, mergeEvents } from "@charismaticalli/frappe/framework";
-import * as Sync from "@charismaticalli/frappe/sync-public";
+import { component, mapEvents, mergeEvents } from "@charismaticalli/frappe";
+import * as Sync from "@charismaticalli/frappe";
 
 type Action = "increment" | "decrement" | "reset";
 

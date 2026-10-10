@@ -1,5 +1,5 @@
 import { Match, Option } from "effect";
-import type { NavigationDecision, NavigationEvent } from "@charismaticalli/frappe/navigation";
+import type { NavigationDecision, NavigationEvent } from "@charismaticalli/frappe/router";
 import type { AppEvent, AppState } from "./model";
 import { privatePage, publicPage } from "./pages";
 import { completeProject } from "./project-transitions";

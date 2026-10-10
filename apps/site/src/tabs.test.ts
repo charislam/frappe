@@ -1,7 +1,7 @@
 import { describe, expect, it } from "vitest";
 import { Effect } from "effect";
 import { Tabs } from "./tabs";
-import { harness, rendered } from "@charismaticalli/frappe/test-helpers";
+import { harness, rendered } from "./test-helpers";
 
 const tabsHarness = async () => {
   const h = await harness();

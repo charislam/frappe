@@ -14,7 +14,7 @@ import {
 import { planKeyed } from "./keyed";
 import { nativeNode } from "./output";
 import { testText } from "./output-test-helpers";
-import { signalData } from "./reactive/signal";
+import { signalData } from "~/reactive/signal";
 import * as Sync from "./sync-public";
 import { rendered } from "./test-helpers";
 

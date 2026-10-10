@@ -1,9 +1,9 @@
 import { Effect, Match, Option } from "effect";
-import { cases } from "@charismaticalli/frappe/branch";
-import { component, provideContext } from "@charismaticalli/frappe/component";
-import { History } from "@charismaticalli/frappe/history";
-import { navigator } from "@charismaticalli/frappe/navigation";
-import * as Sync from "@charismaticalli/frappe/sync";
+import { cases } from "@charismaticalli/frappe";
+import { component, provideContext } from "@charismaticalli/frappe";
+import { History } from "@charismaticalli/frappe/router";
+import { navigator } from "@charismaticalli/frappe/router";
+import * as Sync from "@charismaticalli/frappe";
 import { Anonymous, Authenticated, Resolving } from "./app-views";
 import { Navigation } from "./context";
 import { routingControls } from "./controls";

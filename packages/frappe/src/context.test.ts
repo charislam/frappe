@@ -19,7 +19,7 @@ import {
   type Signal,
   type WritableSignal,
 } from "./framework";
-import { CurrentTransaction } from "./reactive/runtime";
+import { CurrentTransaction } from "~/reactive/runtime";
 import { toEffect } from "./sync";
 import { rendered } from "./test-helpers";
 

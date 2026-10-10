@@ -28,10 +28,9 @@ import {
   Sync,
   type Component,
   type MountFailure,
-} from "@charismaticalli/frappe/framework";
+} from "@charismaticalli/frappe";
 import { LocalStorage, LocalStorageMemory } from "./local-storage";
-import * as Reactive from "@charismaticalli/frappe/reactive";
-import { rendered } from "@charismaticalli/frappe/test-helpers";
+import { rendered } from "./test-helpers";
 
 class Probe extends Resource.Service<Probe, { readonly id: number }>()("test/Probe") {}
 class Other extends Resource.Service<Other, { readonly probe: { readonly id: number } }>()(

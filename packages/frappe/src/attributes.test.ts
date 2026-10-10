@@ -4,7 +4,7 @@ import { construct, type ConstructionError } from "./construction";
 import { component } from "./framework";
 import type { ElementOutput } from "./output";
 import { nativeNode } from "./output";
-import { attributeNameValid, claimDestination, validateAttribute } from "./reactive/dom";
+import { attributeNameValid, claimDestination, validateAttribute } from "~/reactive/dom";
 import * as Sync from "./sync-public";
 import { harness, rendered } from "./test-helpers";
 

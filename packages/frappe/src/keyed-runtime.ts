@@ -11,8 +11,8 @@ import {
   type KeyedPlan,
   type Row,
 } from "./keyed";
-import type { ReactiveRuntime } from "./reactive/runtime";
-import { deriveSync, makeCell, readonlySignal, signalData } from "./reactive/signal";
+import type { ReactiveRuntime } from "~/reactive/runtime";
+import { deriveSync, makeCell, readonlySignal, signalData } from "~/reactive/signal";
 import { lazy } from "./synchronous";
 
 export interface RowContext {

@@ -10,7 +10,7 @@ import {
   type ReactiveFailure,
   type ReactiveRuntime,
 } from "./reactive";
-import { signalData } from "./reactive/signal";
+import { signalData } from "~/reactive/signal";
 
 const run = Effect.runPromise;
 const closes: Array<() => Promise<void>> = [];

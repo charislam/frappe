@@ -8,8 +8,8 @@ import {
   type NavigationEvent,
   type Navigator,
 } from "./navigation";
-import { ReactiveError } from "./reactive/runtime";
-import { signalData } from "./reactive/signal";
+import { ReactiveError } from "~/reactive/runtime";
+import { signalData } from "~/reactive/signal";
 import { router, route, type Destination } from "./routes";
 import * as Sync from "./sync";
 import { harness, rendered } from "./test-helpers";

@@ -1,5 +1,5 @@
 import { Context, Effect, Option, Scope } from "effect";
-import { CurrentTransaction } from "./reactive/runtime";
+import { CurrentTransaction } from "~/reactive/runtime";
 
 /**
  * The context proves non-Scope requirements, including structural bookkeeping.
