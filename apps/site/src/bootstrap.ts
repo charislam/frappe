@@ -2,7 +2,12 @@ import { Effect, Layer, Option } from "effect";
 import { App } from "./app";
 import { AuthLive } from "./auth";
 import { browserHistory } from "@charismaticalli/frappe/browser-history";
-import { mounting, provideContext, Query, type MountFailure } from "@charismaticalli/frappe/framework";
+import {
+  mounting,
+  provideContext,
+  Query,
+  type MountFailure,
+} from "@charismaticalli/frappe/framework";
 import { History } from "@charismaticalli/frappe/history";
 import { LocalStorageLive } from "./local-storage";
 import { QueryDemoSession, queryDemoResources } from "./query-demo";

@@ -1,7 +1,14 @@
 import { Effect, Option } from "effect";
 import { Auth } from "./auth";
 import type { User } from "./auth-model";
-import { Context, component, provideContext, readonlySignal, Sync, type Signal } from "@charismaticalli/frappe/framework";
+import {
+  Context,
+  component,
+  provideContext,
+  readonlySignal,
+  Sync,
+  type Signal,
+} from "@charismaticalli/frappe/framework";
 import { LocalStorage } from "./local-storage";
 
 export class CurrentUser extends Context.Service<CurrentUser, Signal<Option.Option<User>>>()(

@@ -3,7 +3,7 @@ import type { SynchronousContext } from "@charismaticalli/frappe/framework";
 import { link } from "@charismaticalli/frappe/router-link";
 import * as Sync from "@charismaticalli/frappe/sync";
 import { Navigation } from "./context";
-import { urls, type Destination } from "@charismaticalli/frappe/routes";
+import { urls, type Destination } from "./routes";
 
 export const button = <A, E, R>(
   context: SynchronousContext,
