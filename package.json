@@ -3,16 +3,21 @@
   "private": true,
   "type": "module",
   "scripts": {
-	"dev": "pnpm dev:frappe",
-    "dev:frappe": "pnpm --filter @charismaticalli/frappe dev",
-	"fmt": "pnpm fmt:frappe",
+    "dev": "pnpm dev:site",
+    "dev:site": "pnpm --filter @charismaticalli/site dev",
+    "build": "pnpm --filter @charismaticalli/site build",
+    "fmt": "pnpm fmt:frappe && pnpm fmt:site",
     "fmt:frappe": "pnpm --filter @charismaticalli/frappe fmt",
-	"lint": "pnpm lint:frappe",
+    "fmt:site": "pnpm --filter @charismaticalli/site fmt",
+    "lint": "pnpm lint:frappe && pnpm lint:site",
     "lint:frappe": "pnpm --filter @charismaticalli/frappe lint",
-	"test": "pnpm test:frappe",
+    "lint:site": "pnpm --filter @charismaticalli/site lint",
+    "test": "pnpm test:frappe && pnpm test:site",
     "test:frappe": "pnpm --filter @charismaticalli/frappe test",
-	"typecheck": "pnpm typecheck:frappe",
-    "typecheck:frappe": "pnpm --filter @charismaticalli/frappe typecheck"
+    "test:site": "pnpm --filter @charismaticalli/site test",
+    "typecheck": "pnpm typecheck:frappe && pnpm typecheck:site",
+    "typecheck:frappe": "pnpm --filter @charismaticalli/frappe typecheck",
+    "typecheck:site": "pnpm --filter @charismaticalli/site typecheck"
   },
   "packageManager": "pnpm@11.27.1+sha512.a81d4c21b9b09a4b0aebf90ef5e527d4262bdda322d26082978cb549023ac6d9cafc98b19fffaa5c71db438a65f70224edb78d7311187861ff96480d1cdca23c"
 }
