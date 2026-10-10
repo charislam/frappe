@@ -1,11 +1,11 @@
-import { Effect, Match, Option } from "effect";
 import {
   type ElementOutput,
   type Signal,
   Sync,
   type SynchronousContext,
   nativeNode,
-} from "./framework";
+} from "@charismaticalli/frappe";
+import { Effect, Match, Option } from "effect";
 
 export interface Options {
   readonly placement: "bottom-end";

@@ -1,4 +1,3 @@
-import { Effect, Match, Option, Result } from "effect";
 import {
   type ElementOutput,
   ReactiveError,
@@ -7,7 +6,8 @@ import {
   nativeNode,
   occurrenceId,
   readonlySignal,
-} from "./framework";
+} from "@charismaticalli/frappe";
+import { Effect, Match, Option, Result } from "effect";
 import * as Positioning from "./positioning";
 
 const panelIds = new WeakMap<Document, Set<string>>();

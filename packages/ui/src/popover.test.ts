@@ -1,8 +1,7 @@
-import * as Popover from "@charismaticalli/frappe/ui";
-import { Effect, Match, Option } from "effect";
+import { Sync, component } from "@charismaticalli/frappe";
+import { Cause, Effect, Match, Option } from "effect";
 import { afterEach, describe, expect, it, vi } from "vitest";
-import { component } from "./framework";
-import * as Sync from "./sync";
+import * as Popover from "./popover";
 import { harness, rendered } from "./test-helpers";
 
 afterEach(() => vi.restoreAllMocks());
@@ -143,72 +142,50 @@ describe("headless popover", () => {
   it("rejects duplicate attachments, conflicting bindings, and foreign owners", async () => {
     const h = await harness();
     const foreign = await harness();
-    // Construction runs synchronously, before either pair is adopted.
-    const check = component((context) =>
+    const options = {
+      initialOpen: false,
+      positioning: { placement: "bottom-end", gap: 8, padding: 12 },
+    } as const;
+    const duplicate = component((context) =>
       Sync.gen(function* () {
-        const api = yield* Popover.make({
-          context,
-          initialOpen: false,
-          positioning: { placement: "bottom-end", gap: 8, padding: 12 },
-        });
+        const api = yield* Popover.make({ context, ...options });
         const trigger = yield* context.he("button");
         const panel = yield* context.he("section");
         yield* api.attach({ trigger, panel });
-        const duplicate = yield* Sync.sync(
-          () =>
-            Effect.runSync(Sync.toEffect(api.attach({ trigger, panel })).pipe(Effect.flip)).message,
-        );
-        expect(duplicate).toContain("one attachment");
-        const other = yield* Popover.make({
-          context,
-          initialOpen: false,
-          positioning: { placement: "bottom-end", gap: 8, padding: 12 },
-        });
-        const conflictPanel = yield* context.he("section");
-        const conflicting = yield* context.he("button", {
+        yield* api.attach({ trigger, panel });
+        return { setup: () => Effect.succeed([trigger, panel]) };
+      }),
+    );
+    const conflicting = component((context) =>
+      Sync.gen(function* () {
+        const api = yield* Popover.make({ context, ...options });
+        const panel = yield* context.he("section");
+        const trigger = yield* context.he("button", {
           attrs: {
             "aria-expanded": yield* context.derive({
-              sources: { open: other.isOpen },
+              sources: { open: api.isOpen },
               compute: () => Option.some("false"),
             }),
           },
         });
-        const conflict = yield* Sync.sync(
-          () =>
-            Effect.runSync(
-              Sync.toEffect(other.attach({ trigger: conflicting, panel: conflictPanel })).pipe(
-                Effect.flip,
-              ),
-            ).message,
-        );
-        expect(conflict).toContain("Conflicting");
+        yield* api.attach({ trigger, panel });
         return { setup: () => Effect.succeed([trigger, panel]) };
       }),
     );
     const foreignButton = await Effect.runPromise(foreign.ctx.he("button"));
-    const foreignCheck = component((context) =>
+    const foreignOwner = component((context) =>
       Sync.gen(function* () {
-        const api = yield* Popover.make({
-          context,
-          initialOpen: false,
-          positioning: { placement: "bottom-end", gap: 8, padding: 12 },
-        });
+        const api = yield* Popover.make({ context, ...options });
         const panel = yield* context.he("section");
-        const failure = yield* Sync.sync(
-          () =>
-            Effect.runSync(
-              Sync.toEffect(api.attach({ trigger: foreignButton, panel })).pipe(Effect.flip),
-            ).message,
-        );
-        expect(failure).toContain("issuing runtime");
+        yield* api.attach({ trigger: foreignButton, panel });
         return { setup: () => Effect.succeed(panel) };
       }),
     );
-    Effect.runSync(h.ctx.h(h.target, [check, foreignCheck]));
-    await rendered({
-      parent: h.parent,
-      check: () => h.parent.querySelectorAll("section").length >= 2,
-    });
-    expect(h.failures).toEqual([]);
+    Effect.runSync(h.ctx.h(h.target, [duplicate, conflicting, foreignOwner]));
+    await vi.waitFor(() => expect(h.failures).toHaveLength(3));
+    const messages = h.failures.map((failure) => Cause.pretty(failure.cause));
+    expect(messages.some((message) => message.includes("one attachment"))).toBe(true);
+    expect(messages.some((message) => message.includes("Conflicting"))).toBe(true);
+    expect(messages.some((message) => message.includes("issuing runtime"))).toBe(true);
   });
 });

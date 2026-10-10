@@ -99,8 +99,6 @@ export type { DomEventTarget, DomEventMap, DomEvent, DomEventOptions } from "~/r
 export { readonlySignal } from "~/reactive/signal";
 export type { WatchOptions } from "~/reactive/watch";
 export * as Resource from "./resource";
-export * as Query from "./query";
-export * as QueryState from "~/query/state";
 export * as Sync from "./sync-public";
 
 export type Output<R = never> = MountItem<R> | ReadonlyArray<MountItem<R>>;

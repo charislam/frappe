@@ -43,6 +43,9 @@ importers:
       '@charismaticalli/frappe':
         specifier: workspace:*
         version: link:../../packages/frappe
+      '@charismaticalli/ui':
+        specifier: workspace:*
+        version: link:../../packages/ui
       effect:
         specifier: 'catalog:'
         version: 4.0.0-rc.115
@@ -78,6 +81,34 @@ importers:
       '@effect/tsgo':
         specifier: 'catalog:'
         version: 0.45.0
+      happy-dom:
+        specifier: 'catalog:'
+        version: 20.14.5
+      oxfmt:
+        specifier: 'catalog:'
+        version: 0.68.0
+      oxlint:
+        specifier: 'catalog:'
+        version: 1.82.0(oxlint-tsgolint@7.0.2001)
+      oxlint-tsgolint:
+        specifier: 'catalog:'
+        version: 7.0.2001
+      typescript:
+        specifier: 'catalog:'
+        version: 7.0.2
+      vitest:
+        specifier: 'catalog:'
+        version: 5.0.1(@types/node@24.13.4)(happy-dom@20.14.5)(vite@8.3.0(@types/node@24.13.4)(jiti@2.7.0))
+
+  packages/ui:
+    dependencies:
+      '@charismaticalli/frappe':
+        specifier: workspace:*
+        version: link:../frappe
+      effect:
+        specifier: 'catalog:'
+        version: 4.0.0-rc.115
+    devDependencies:
       happy-dom:
         specifier: 'catalog:'
         version: 20.14.5

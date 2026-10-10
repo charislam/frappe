@@ -20,7 +20,9 @@ import {
 import { TestClock } from "effect/testing";
 import { afterEach, describe, expect, it } from "vitest";
 import { snapshot } from "~/query/key";
-import { Query, QueryState, Resource, type Signal, Sync, component, mounting } from "./framework";
+import { Resource, type Signal, Sync, component, mounting } from "./framework";
+import * as Query from "./query";
+import { QueryState } from "./query";
 
 const run = Effect.runPromise;
 const cleanups: Array<() => Promise<void>> = [];
