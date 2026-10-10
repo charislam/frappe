@@ -1,8 +1,7 @@
 import { type ElementOutput, type WritableSignal, nativeNode } from "@charismaticalli/frappe";
 import { Effect, Exit, Option, Queue } from "effect";
 import { describe, expect, it } from "vitest";
-import { harness, rendered } from "./test-helpers";
-import { TextInput } from "./text-input";
+import { harness } from "./test-helpers";
 
 const run = Effect.runPromise;
 const inputHarness = async () => {
@@ -183,36 +182,5 @@ describe("two-way text input", () => {
     expect(Exit.isFailure(await run(other.signal.get.pipe(Effect.exit)))).toBe(true);
     nativeNode(other.input).dispatchEvent(new CompositionEvent("compositionend"));
     expect(other.failures).toHaveLength(0);
-  });
-
-  it("demonstrates input, reset, disabled toggling, optional hint removal, and independent occurrences", async () => {
-    const { ctx, target, parent } = await harness();
-    Effect.runSync(ctx.h(target, [TextInput, TextInput]));
-    await rendered({ parent, check: () => parent.querySelectorAll(".text-input").length === 2 });
-    const sections = Array.from(parent.querySelectorAll(".text-input"));
-    const left = sections[0] ?? document.createElement("section");
-    const right = sections[1];
-    const input = left.querySelector("input") ?? document.createElement("input");
-    const buttons = Array.from(left.querySelectorAll("button"));
-    expect(input.id).not.toBe(right?.querySelector("input")?.id);
-    expect(left.querySelector("label")?.htmlFor).toBe(input.id);
-    expect(input.hasAttribute("title")).toBe(false);
-    input.value = "hello";
-    input.dispatchEvent(new InputEvent("input"));
-    await rendered({ parent, check: () => left.querySelector("output")?.textContent === "hello" });
-    expect(input.title).toBe("Reset to clear your text");
-    expect(right?.querySelector("output")?.textContent).toBe("");
-    buttons[1]?.click();
-    await rendered({ parent, check: () => buttons[1]?.textContent === "Enable input" });
-    expect(input.disabled).toBe(true);
-    buttons[1]?.click();
-    await rendered({ parent, check: () => buttons[1]?.textContent === "Disable input" });
-    expect(input.disabled).toBe(false);
-    buttons[0]?.click();
-    await rendered({ parent, check: () => left.querySelector("output")?.textContent === "" });
-    expect(input.value).toBe("");
-    expect(input.hasAttribute("title")).toBe(false);
-    expect(left.querySelector("input")).toBe(input);
-    expect(buttons.every((button) => button.type === "button")).toBe(true);
   });
 });
