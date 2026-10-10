@@ -1,5 +1,4 @@
-import { component } from "@charismaticalli/frappe";
-import { Sync } from "@charismaticalli/frappe";
+import { Sync, component } from "@charismaticalli/frappe";
 import { Effect, Option } from "effect";
 
 const benefitsSection = component(() =>

@@ -1,5 +1,4 @@
-import { type Signal, component } from "@charismaticalli/frappe";
-import { Sync } from "@charismaticalli/frappe";
+import { type Signal, Sync, component } from "@charismaticalli/frappe";
 import { Deferred, Effect, Option } from "effect";
 
 /** Stable child description closes over parent state; its occurrence owns progress. */

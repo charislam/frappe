@@ -4,9 +4,8 @@ import {
   type MountFailure,
   component,
   mounting,
-  nativeNode,
+  nativeNode,Sync
 } from "@charismaticalli/frappe";
-import { Sync } from "@charismaticalli/frappe";
 import { Deferred, Effect, Exit, Match, Scope } from "effect";
 import { afterEach } from "vitest";
 

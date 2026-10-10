@@ -3,8 +3,7 @@ import { describe, expect, it } from "vitest";
 import { attributeNameValid, claimDestination, validateAttribute } from "~/reactive/dom";
 import { type ConstructionError, construct } from "./construction";
 import { component } from "./framework";
-import type { ElementOutput } from "./output";
-import { nativeNode } from "./output";
+import { type ElementOutput, nativeNode } from "./output";
 import * as Sync from "./sync-public";
 import { harness, rendered } from "./test-helpers";
 

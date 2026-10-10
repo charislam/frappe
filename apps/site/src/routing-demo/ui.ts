@@ -1,5 +1,4 @@
-import type { SynchronousContext } from "@charismaticalli/frappe";
-import { Sync } from "@charismaticalli/frappe";
+import { Sync, type SynchronousContext } from "@charismaticalli/frappe";
 import { link } from "@charismaticalli/frappe/router";
 import { Effect, Option } from "effect";
 import { Navigation } from "./context";

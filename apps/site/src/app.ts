@@ -1,10 +1,5 @@
-import { branch, cases } from "@charismaticalli/frappe";
-import { component } from "@charismaticalli/frappe";
-import { Sync } from "@charismaticalli/frappe";
-import { History } from "@charismaticalli/frappe/router";
-import { navigator } from "@charismaticalli/frappe/router";
-import { link } from "@charismaticalli/frappe/router";
-import { type Destination, type ParseResult, route, router } from "@charismaticalli/frappe/router";
+import { Sync, branch, cases, component } from "@charismaticalli/frappe";
+import { type Destination, History, type ParseResult, link, navigator, route, router } from "@charismaticalli/frappe/router";
 import { Effect, Match, Option } from "effect";
 import { RoutingDemo } from "~/routing-demo/app";
 import { Examples } from "./examples";

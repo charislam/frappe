@@ -1,5 +1,4 @@
-import { component, keyed, row } from "@charismaticalli/frappe";
-import { Sync } from "@charismaticalli/frappe";
+import { Sync, component, keyed, row } from "@charismaticalli/frappe";
 import { Effect, Match, Option } from "effect";
 
 interface Todo {
