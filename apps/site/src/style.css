@@ -223,12 +223,6 @@
           margin-block: 0 0.75rem;
           font-size: 1.25rem;
         }
-
-        :where(p) {
-          margin: 0;
-          color: var(--color-muted);
-          line-height: 1.6;
-        }
       }
     }
   }
