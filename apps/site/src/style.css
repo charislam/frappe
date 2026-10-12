@@ -4,7 +4,7 @@
   :where(*, *::before, *::after) {
     box-sizing: border-box;
   }
-  
+
   :where(:root) {
     --color-text: #1f2937;
     --color-muted: #4b5563;
