@@ -214,7 +214,7 @@
     :where(.benefits) {
       display: flex;
       flex-wrap: wrap;
-      gap: 2.5rem;
+      gap: 4rem;
 
       :where(article) {
         flex: 1 1 16rem;
