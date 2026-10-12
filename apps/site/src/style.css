@@ -207,7 +207,7 @@
     padding-block: var(--space-content-block);
 
     :where(hgroup) {
-      margin-block-end: 2rem;
+      margin-block-end: 4rem;
       text-align: center;
     }
 
