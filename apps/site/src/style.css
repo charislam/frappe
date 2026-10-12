@@ -165,7 +165,7 @@
 
 @layer scaffold {
   .app-shell {
-    width: min(100%, 42rem);
+    width: min(100%, 72rem);
     margin-inline: auto;
     padding: 0 2rem;
   }
@@ -207,7 +207,29 @@
     padding-block: var(--space-content-block);
 
     :where(hgroup) {
+      margin-block-end: 2rem;
       text-align: center;
+    }
+
+    :where(.benefits) {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 1.5rem;
+
+      :where(.card) {
+        flex: 1 1 16rem;
+
+        :where(h2) {
+          margin-block: 0 0.75rem;
+          font-size: 1.25rem;
+        }
+
+        :where(p) {
+          margin: 0;
+          color: var(--color-muted);
+          line-height: 1.6;
+        }
+      }
     }
   }
 
