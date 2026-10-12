@@ -8,6 +8,7 @@ import {
   route,
   router,
 } from "@charismaticalli/frappe/router";
+import { NavigationMenu } from "@charismaticalli/ui";
 import { Effect, Match, Option } from "effect";
 import { RoutingDemo } from "~/routing-demo/app";
 import { Examples } from "./examples";
@@ -118,6 +119,20 @@ export const App = component(() =>
                 }),
               );
             }
+            const menu = yield* NavigationMenu.make({ context, initialOpen: false });
+            const menuTrigger = yield* context.he("button", {
+              attrs: {
+                class: Option.some("app-menu-trigger"),
+                "aria-label": Option.some("Menu"),
+              },
+              props: { type: "button" },
+              children: ["☰"],
+            });
+            const nav = yield* context.he("nav", {
+              attrs: { "aria-label": Option.some("Main navigation") },
+              children: links,
+            });
+            yield* menu.attach({ trigger: menuTrigger, menu: nav });
             const output = yield* context.he("div", {
               attrs: { class: Option.some("app-shell") },
               children: [
@@ -128,10 +143,8 @@ export const App = component(() =>
                       attrs: { class: Option.some("app-header-title") },
                       children: ["frappé"],
                     }),
-                    yield* context.he("nav", {
-                      attrs: { "aria-label": Option.some("Main navigation") },
-                      children: links,
-                    }),
+                    menuTrigger,
+                    nav,
                   ],
                 }),
                 cases({

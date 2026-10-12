@@ -17,10 +17,15 @@
     --radius-control: 0.625rem;
     --space-content-block: 2rem;
     --space-card: 1rem;
+    --space-page-inline: clamp(1rem, 5vw, 4rem);
+    --font-size-heading-sm: 1.0625rem;
+    --font-size-body-sm: 0.9375rem;
     --space-control: 0.625rem;
     --shadow-card: 0 2px 8px #1f293708;
     --transition-control: 120ms ease;
 
+    /* Named size container so any rule can query the viewport width via @container viewport (...). */
+    container: viewport / inline-size;
     box-sizing: border-box;
     font-family: system-ui, sans-serif;
     color: var(--color-text);
@@ -165,9 +170,8 @@
 
 @layer scaffold {
   .app-shell {
-    width: min(100%, 72rem);
-    margin-inline: auto;
-    padding: 0 2rem;
+    width: 100%;
+    padding-inline: var(--space-page-inline);
   }
 }
 
@@ -176,9 +180,14 @@
     display: flex;
     align-items: center;
     justify-content: space-between;
+    flex-wrap: wrap;
     gap: 1rem;
     padding: 1.5rem 0;
     border-bottom: 1px solid var(--color-border);
+
+    :where(.app-menu-trigger) {
+      display: none;
+    }
 
     :where(.app-header-title) {
       font-weight: 700;
@@ -199,6 +208,23 @@
         color: var(--color-accent-hover);
       }
     }
+
+    /* Mobile breakpoint: below 40rem the nav collapses behind the menu trigger.
+       Custom properties cannot be used in container conditions, so keep this value in sync. */
+    @container viewport (width < 40rem) {
+      :where(.app-menu-trigger) {
+        display: block;
+      }
+
+      :where(nav) {
+        flex-basis: 100%;
+        flex-direction: column;
+
+        &:where([data-state="closed"]) {
+          display: none;
+        }
+      }
+    }
   }
 }
 
@@ -214,7 +240,7 @@
     :where(.benefits) {
       display: flex;
       flex-wrap: wrap;
-      gap: 4rem;
+      gap: clamp(2rem, 5vw, 4rem);
 
       :where(article) {
         flex: 1 1 16rem;
@@ -223,11 +249,11 @@
           margin-block: 0 0.75rem;
           padding-block-end: 0.5rem;
           border-block-end: 1px solid var(--color-border);
-          font-size: 1.0625rem;
+          font-size: var(--font-size-heading-sm);
         }
 
         :where(p) {
-          font-size: 0.9375rem;
+          font-size: var(--font-size-body-sm);
         }
       }
     }
