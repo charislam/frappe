@@ -1,6 +1,14 @@
 @layer base, native, components, scaffold, ui, page;
 
 @layer base {
+  :where(html) {
+    box-sizing: border-box;
+  }
+
+  :where(*, *::before, *::after) {
+    box-sizing: inherit;
+  }
+  
   :where(:root) {
     --color-text: #1f2937;
     --color-muted: #4b5563;
@@ -26,7 +34,6 @@
 
     /* Named size container so any rule can query the viewport width via @container viewport (...). */
     container: viewport / inline-size;
-    box-sizing: border-box;
     font-family: system-ui, sans-serif;
     color: var(--color-text);
     background: var(--color-page);
