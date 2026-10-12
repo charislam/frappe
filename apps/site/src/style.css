@@ -1,12 +1,8 @@
 @layer base, native, components, scaffold, ui, page;
 
 @layer base {
-  :where(html) {
-    box-sizing: border-box;
-  }
-
   :where(*, *::before, *::after) {
-    box-sizing: inherit;
+    box-sizing: border-box;
   }
   
   :where(:root) {
