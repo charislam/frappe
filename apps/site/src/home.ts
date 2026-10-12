@@ -31,7 +31,6 @@ const benefitsSection = component(() =>
           children: yield* Effect.forEach(benefits, (benefit) =>
             Effect.gen(function* () {
               return yield* he("article", {
-                attrs: { class: Option.some("card") },
                 children: [
                   yield* he("h2", { children: [benefit.title] }),
                   yield* he("p", { children: [benefit.description] }),

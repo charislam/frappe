@@ -214,14 +214,20 @@
     :where(.benefits) {
       display: flex;
       flex-wrap: wrap;
-      gap: 1.5rem;
+      gap: 2.5rem;
 
-      :where(.card) {
+      :where(article) {
         flex: 1 1 16rem;
 
         :where(h2) {
           margin-block: 0 0.75rem;
-          font-size: 1.25rem;
+          padding-block-end: 0.5rem;
+          border-block-end: 1px solid var(--color-border);
+          font-size: 1.0625rem;
+        }
+
+        :where(p) {
+          font-size: 0.9375rem;
         }
       }
     }
