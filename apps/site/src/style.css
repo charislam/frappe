@@ -28,8 +28,8 @@
     --shadow-card: 0 2px 8px #1f293708;
     --transition-control: 120ms ease;
 
-    /* Named size container so any rule can query the viewport width via @container viewport (...). */
     container: viewport / inline-size;
+    box-sizing: border-box;
     font-family: system-ui, sans-serif;
     color: var(--color-text);
     background: var(--color-page);
@@ -39,9 +39,21 @@
     -moz-osx-font-smoothing: grayscale;
   }
 
+  /* Mobile breakpoint, defined once. Container queries style descendants of the container, so
+     :root queries its own width and toggles these on body. Each is either a space (on) or
+     guaranteed-invalid (off), so rules can branch without repeating the breakpoint:
+     property: var(--is-mobile, <desktop value>) var(--is-desktop, <mobile value>) */
   :where(body) {
+    --is-mobile: initial;
+    --is-desktop: ;
+
     margin: 0;
     min-height: 100vh;
+
+    @container viewport (width < 40rem) {
+      --is-mobile: ;
+      --is-desktop: initial;
+    }
   }
 
   :where(:focus-visible) {
@@ -189,7 +201,7 @@
     border-bottom: 1px solid var(--color-border);
 
     :where(.app-menu-trigger) {
-      display: none;
+      display: var(--is-mobile, none) var(--is-desktop, block);
     }
 
     :where(.app-header-title) {
@@ -198,7 +210,13 @@
 
     :where(nav) {
       display: flex;
+      flex-basis: var(--is-mobile, auto) var(--is-desktop, 100%);
+      flex-direction: var(--is-mobile, row) var(--is-desktop, column);
       gap: 0.5rem;
+
+      &:where([data-state="closed"]) {
+        display: var(--is-mobile, flex) var(--is-desktop, none);
+      }
 
       :where(a) {
         padding: 0.5rem 0.75rem;
@@ -209,23 +227,6 @@
       :where(a[aria-current="page"]) {
         background: #d1fae5;
         color: var(--color-accent-hover);
-      }
-    }
-
-    /* Mobile breakpoint: below 40rem the nav collapses behind the menu trigger.
-       Custom properties cannot be used in container conditions, so keep this value in sync. */
-    @container viewport (width < 40rem) {
-      :where(.app-menu-trigger) {
-        display: block;
-      }
-
-      :where(nav) {
-        flex-basis: 100%;
-        flex-direction: column;
-
-        &:where([data-state="closed"]) {
-          display: none;
-        }
       }
     }
   }
