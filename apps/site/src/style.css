@@ -265,15 +265,45 @@
 
   .examples-page {
     padding-block: var(--space-content-block);
+    display: flex;
+    flex-direction: var(--is-mobile, row) var(--is-desktop, column);
+    gap: 2rem;
 
-    :where(hgroup) {
-      margin-block-end: 2rem;
+    :where(.examples-sidebar) {
+      flex: 0 0 12rem;
+
+      :where(.examples-menu-trigger) {
+        display: var(--is-mobile, none) var(--is-desktop, block);
+      }
+
+      :where(nav) {
+        display: flex;
+        flex-direction: column;
+        gap: 0.25rem;
+
+        &:where([data-state="closed"]) {
+          display: var(--is-mobile, flex) var(--is-desktop, none);
+        }
+
+        :where(a) {
+          padding: 0.5rem 0.75rem;
+          border-radius: var(--radius-control);
+          text-decoration: none;
+        }
+
+        :where(a[aria-current="page"]) {
+          background: #d1fae5;
+          color: var(--color-accent-hover);
+        }
+      }
     }
 
     :where(.example-cards) {
       display: flex;
+      flex: 1;
       flex-direction: column;
       gap: 2rem;
+      min-width: 0;
     }
 
     :where(.counter) {

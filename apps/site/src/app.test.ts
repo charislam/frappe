@@ -41,7 +41,9 @@ it("routes between the home, examples, routing, and queries pages and traverses 
     const shows = (check: () => boolean) => rendered({ parent, check });
     const press = (label: string) => {
       const node = [
-        ...parent.querySelectorAll<HTMLAnchorElement>('nav[aria-label="Main navigation"] a'),
+        ...parent.querySelectorAll<HTMLAnchorElement>(
+          'nav[aria-label="Main navigation"] a, nav[aria-label="Examples navigation"] a',
+        ),
       ].find((node) => node.textContent === label);
       expect(node).toBeDefined();
       node?.dispatchEvent(new MouseEvent("click", { bubbles: true, cancelable: true, button: 0 }));
@@ -50,8 +52,13 @@ it("routes between the home, examples, routing, and queries pages and traverses 
     expect(parent.querySelector(".counter")).toBeNull();
     expect(parent.querySelector(".routing-page")).toBeNull();
     press("Examples");
-    await shows(() => parent.querySelector(".todos") !== null);
+    await shows(() => parent.querySelector(".counter") !== null);
     expect(history.location()).toBe("/examples");
+    expect(parent.querySelector(".todos")).toBeNull();
+    press("Todos");
+    await shows(() => parent.querySelector(".todos") !== null);
+    expect(history.location()).toBe("/examples/todos");
+    expect(parent.querySelector(".counter")).toBeNull();
     expect(parent.querySelector(".routing-page")).toBeNull();
     press("Routing");
     await shows(() => parent.querySelector(".routing-controls") !== null);
