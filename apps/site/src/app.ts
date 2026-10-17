@@ -147,9 +147,9 @@ export const App = component(() =>
                       attrs: { class: Option.some("app-header-title") },
                       children: ["frappé"],
                     }),
+                    nav,
                     provideContext({ key: Theme, value: theme, child: ThemeSelector }),
                     menuTrigger,
-                    nav,
                   ],
                 }),
                 cases({
