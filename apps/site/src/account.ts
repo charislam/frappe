@@ -9,7 +9,7 @@ import {
 import { Effect, Option } from "effect";
 import { Auth } from "./auth";
 import type { User } from "./auth-model";
-import { LocalStorage } from "./local-storage";
+import { LocalStorage, storageDiagnostic } from "./local-storage";
 
 export class CurrentUser extends Context.Service<CurrentUser, Signal<Option.Option<User>>>()(
   "frappe/CurrentUser",
@@ -86,11 +86,17 @@ export const AccountExample = component(({ signal }) =>
           yield* subscribe(yield* events(signIn, "click"), () =>
             Effect.gen(function* () {
               const email = Option.getOrElse(
-                yield* storage.get("demo-email"),
+                yield* storage
+                  .get("demo-email")
+                  .pipe(
+                    Effect.catch(() => storageDiagnostic().pipe(Effect.as(Option.none<string>()))),
+                  ),
                 () => "reader@example.com",
               );
               yield* auth.signIn({ email });
-              yield* storage.set({ key: "demo-email", value: email });
+              yield* storage
+                .set({ key: "demo-email", value: email })
+                .pipe(Effect.catch(storageDiagnostic));
             }),
           );
           const NavigationWithUser = provideContext({
