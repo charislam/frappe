@@ -2,7 +2,9 @@ import { Resource } from "@charismaticalli/frappe";
 import { Effect, Layer, Option } from "effect";
 import * as KeyValueStore from "effect/unstable/persistence/KeyValueStore";
 import type { KeyValueStoreError } from "effect/unstable/persistence/KeyValueStore";
+import { acquireStorage } from "./storage";
 
+/** Operations must complete synchronously, matching Web Storage and the memory adapter. */
 export class LocalStorage extends Resource.Service<
   LocalStorage,
   {
@@ -14,9 +16,6 @@ export class LocalStorage extends Resource.Service<
     }) => Effect.Effect<void, KeyValueStoreError>;
   }
 >()("frappe/LocalStorage") {}
-
-export const storageDiagnostic = () =>
-  Effect.sync(() => console.warn("Browser storage unavailable; preferences may not persist."));
 
 const adapter = (persistent: boolean) =>
   Layer.effect(
@@ -35,14 +34,18 @@ const adapter = (persistent: boolean) =>
       });
     }),
   );
+export const LocalStorageMemory = adapter(false).pipe(Layer.provide(KeyValueStore.layerMemory));
 export const browserStorageLayer = (acquire: () => Storage) =>
   Layer.unwrap(
-    Effect.try(acquire).pipe(
+    acquireStorage(acquire).pipe(
       Effect.map((storage) =>
-        adapter(true).pipe(Layer.provide(KeyValueStore.layerStorage(() => storage))),
+        Option.match(storage, {
+          onSome: (storage) =>
+            adapter(true).pipe(Layer.provide(KeyValueStore.layerStorage(() => storage))),
+          onNone: () => LocalStorageMemory,
+        }),
       ),
-      Effect.catch(() => storageDiagnostic().pipe(Effect.as(LocalStorageMemory))),
     ),
   );
-export const LocalStorageMemory = adapter(false).pipe(Layer.provide(KeyValueStore.layerMemory));
 export const LocalStorageLive = browserStorageLayer(() => window.localStorage);
+export { storageDiagnostic } from "./storage";

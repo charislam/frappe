@@ -9,9 +9,6 @@ catalogs:
     '@effect/tsgo':
       specifier: ^0.45.0
       version: 0.45.0
-    '@effect/vitest':
-      specifier: 4.0.0-rc.115
-      version: 4.0.0-rc.115
     effect:
       specifier: 4.0.0-rc.115
       version: 4.0.0-rc.115
@@ -77,9 +74,6 @@ importers:
 
   packages/frappe:
     dependencies:
-      '@effect/vitest':
-        specifier: 'catalog:'
-        version: 4.0.0-rc.115(effect@4.0.0-rc.115)(vitest@5.0.1(@types/node@24.13.4)(happy-dom@20.14.5)(vite@8.3.0(@types/node@24.13.4)(jiti@2.7.0)))
       effect:
         specifier: 'catalog:'
         version: 4.0.0-rc.115
@@ -174,12 +168,6 @@ packages:
   '@effect/tsgo@0.45.0':
     resolution: {integrity: sha512-gPG0ixVHgtYBUe5DbKX9vzHlhqd9+ZEfs4m/XWy0808av0A2XqMzaG3F5rnPBN7EUJRPlo9TluIi8WHx/pBV+A==}
     hasBin: true
-
-  '@effect/vitest@4.0.0-rc.115':
-    resolution: {integrity: sha512-DJR0hfdr3HNXAkzW8AzfvUz6VmrNFLrKk9tZGDURi33faMyxkc7ZewxELMMZwGpOTGN4mfqYVbX2CXgI+ZJBeQ==}
-    peerDependencies:
-      effect: ^4.0.0-rc.115
-      vitest: '>=5.0.0 <6.0.0'
 
   '@jridgewell/resolve-uri@3.1.2':
     resolution: {integrity: sha512-bRISgCIjP20/tbWSPWMEi54QVPRZExkuD9lJL+UIxUKtwVJA8wW1Trb1jMs1RFXo1CBTNZ/5hpC9QvmKWdopKw==}
@@ -1080,11 +1068,6 @@ snapshots:
       '@effect/tsgo-linux-x64': 0.45.0
       '@effect/tsgo-win32-arm64': 0.45.0
       '@effect/tsgo-win32-x64': 0.45.0
-
-  '@effect/vitest@4.0.0-rc.115(effect@4.0.0-rc.115)(vitest@5.0.1(@types/node@24.13.4)(happy-dom@20.14.5)(vite@8.3.0(@types/node@24.13.4)(jiti@2.7.0)))':
-    dependencies:
-      effect: 4.0.0-rc.115
-      vitest: 5.0.1(@types/node@24.13.4)(happy-dom@20.14.5)(vite@8.3.0(@types/node@24.13.4)(jiti@2.7.0))
 
   '@jridgewell/resolve-uri@3.1.2': {}
 
