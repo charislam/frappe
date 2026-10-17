@@ -389,7 +389,7 @@
     grid-template-columns: 1fr auto auto;
     align-items: center;
     column-gap: var(--is-mobile, 1.25rem) var(--is-desktop, 0.75rem);
-	row-gap: 1rem;
+    row-gap: 1rem;
     padding-block: 1.125rem;
     border-bottom: 1px solid var(--color-border);
 

@@ -15,7 +15,6 @@
     "test": "vitest run"
   },
   "dependencies": {
-    "@effect/vitest": "catalog:",
     "effect": "catalog:"
   },
   "devDependencies": {

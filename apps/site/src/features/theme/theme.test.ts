@@ -1,5 +1,5 @@
 import { Sync, component, provideContext } from "@charismaticalli/frappe";
-import { Deferred, Effect, Layer, Match, Option } from "effect";
+import { Effect, Layer, Match, Option } from "effect";
 import { KeyValueStoreError } from "effect/unstable/persistence/KeyValueStore";
 import { afterEach, expect, it, vi } from "vitest";
 import { LocalStorage, LocalStorageLive } from "~/local-storage";
@@ -146,12 +146,11 @@ it("exposes operation errors rather than defects", async () => {
   expect(warn).not.toHaveBeenCalled();
 });
 
-it.each(["failed-read", "memory-fallback", "slow-write", "failed-write"] as const)(
+it.each(["failed-read", "memory-fallback", "failed-write"] as const)(
   "retains startup and new selections with %s",
   async (mode) => {
     vi.spyOn(console, "warn").mockImplementation(() => {});
     const f = await harness();
-    const gate = Deferred.makeUnsafe<void>();
     const failure = new KeyValueStoreError({ method: "get", message: "unavailable" });
     const writes: string[] = [];
     const storage = Layer.succeed(
@@ -167,7 +166,6 @@ it.each(["failed-read", "memory-fallback", "slow-write", "failed-write"] as cons
           Effect.gen(function* () {
             writes.push(value);
             yield* Match.value(mode).pipe(
-              Match.when("slow-write", () => Deferred.await(gate)),
               Match.when("failed-write", () => Effect.fail(failure)),
               Match.orElse(() => Effect.void),
             );
@@ -201,9 +199,59 @@ it.each(["failed-read", "memory-fallback", "slow-write", "failed-write"] as cons
     }
     await vi.waitFor(() => expect(project).toHaveBeenLastCalledWith("light"));
     expect(select.value).toBe("system");
-    await Effect.runPromise(Deferred.succeed(gate, undefined));
     await vi.waitFor(() => expect(writes).toEqual(["light", "dark", "system"]));
     expect(select.value).toBe("system");
     expect(f.failures).toEqual([]);
   },
 );
+
+it("processes a remote preference after an earlier local save without writing it back", async () => {
+  const f = await harness();
+  let persisted = "system";
+  let receive: (value: Option.Option<"light" | "dark" | "system">) => void = () => {};
+  const set = vi.fn(({ value }: { key: string; value: string }) =>
+    Effect.sync(() => {
+      persisted = value;
+      // Another tab changes storage immediately after this synchronous write.
+      persisted = "light";
+      receive(Option.some("light"));
+    }),
+  );
+  const storage = Layer.succeed(
+    LocalStorage,
+    LocalStorage.of({
+      persistent: true,
+      get: () => Effect.succeed(Option.some(persisted)),
+      set,
+    }),
+  );
+  const view = component(() =>
+    Sync.succeed({
+      setup: (context) =>
+        Effect.gen(function* () {
+          const theme = yield* makeTheme({
+            context,
+            startup: Option.none(),
+            browser: {
+              systemDark: () => false,
+              project: () => {},
+              observe: (listener) => {
+                receive = listener;
+                return () => {};
+              },
+            },
+          });
+          return provideContext({ key: Theme, value: theme, child: ThemeSelector });
+        }).pipe(Effect.provide(storage)),
+    }),
+  );
+  Effect.runSync(f.h(f.target, view));
+  await vi.waitFor(() => expect(f.parent.querySelector("select")).not.toBeNull());
+  const select = Option.getOrThrow(Option.fromNullishOr(f.parent.querySelector("select")));
+  select.value = "dark";
+  select.dispatchEvent(new Event("change"));
+  await vi.waitFor(() => expect(select.value).toBe("light"));
+  expect(persisted).toBe("light");
+  expect(set).toHaveBeenCalledTimes(1);
+  expect(f.failures).toEqual([]);
+});

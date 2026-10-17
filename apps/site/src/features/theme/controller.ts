@@ -26,14 +26,16 @@ export const makeTheme = Effect.fn("Theme.make")(function* (options: {
   const storage = yield* LocalStorage;
   let current = Option.getOrElse(options.startup, () => "system" as const);
   const preference = yield* context.signal({ initial: current });
+  // Synchronous storage completes each local save before processing the next preference event.
   const events = yield* Queue.unbounded<Event>();
-  const writes = yield* Queue.unbounded<Preference>();
   const apply = Effect.fn("Theme.apply")(function* (event: Event) {
     current = Option.getOrElse(event.preference, () => current);
     yield* preference.set(current);
     browser.project(resolveTheme({ preference: current, systemDark: browser.systemDark() }));
     yield* Match.value(event.persist).pipe(
-      Match.when(true, () => Queue.offer(writes, current).pipe(Effect.asVoid)),
+      Match.when(true, () =>
+        storage.set({ key: storageKey, value: current }).pipe(Effect.catch(storageDiagnostic)),
+      ),
       Match.when(false, () => Effect.void),
       Match.exhaustive,
     );
@@ -53,15 +55,6 @@ export const makeTheme = Effect.fn("Theme.make")(function* (options: {
     Effect.catch(() => storageDiagnostic().pipe(Effect.as(current))),
   );
   yield* apply({ preference: Option.some(current), persist: false });
-  yield* context.fork(
-    Effect.forever(
-      Queue.take(writes).pipe(
-        Effect.flatMap((value) =>
-          storage.set({ key: storageKey, value }).pipe(Effect.catch(storageDiagnostic)),
-        ),
-      ),
-    ),
-  );
   yield* context.fork(Effect.forever(Queue.take(events).pipe(Effect.flatMap(apply))));
   return Theme.of({
     preference: readonlySignal(preference),
