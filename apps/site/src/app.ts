@@ -1,4 +1,4 @@
-import { Sync, branch, cases, component } from "@charismaticalli/frappe";
+import { Sync, branch, cases, component, provideContext } from "@charismaticalli/frappe";
 import {
   type Destination,
   History,
@@ -8,6 +8,9 @@ import {
 } from "@charismaticalli/frappe/router";
 import { NavigationMenu } from "@charismaticalli/ui";
 import { Effect, Match, Option } from "effect";
+import { browserTheme } from "~/features/theme/browser";
+import { Theme, makeTheme } from "~/features/theme/controller";
+import { ThemeSelector } from "~/features/theme/selector";
 import { RoutingDemo } from "~/routing-demo/app";
 import { examplesBranch } from "./examples";
 import { type ExamplesState, examplesPageOf } from "./examples-routes";
@@ -56,6 +59,11 @@ export const App = component(() =>
   Sync.succeed({
     setup: (context) =>
       Effect.gen(function* () {
+        const theme = yield* makeTheme({
+          context,
+          browser: browserTheme(window),
+          startup: Option.fromUndefinedOr(window.frappeTheme),
+        });
         const history = yield* History;
         const state = yield* context.signal<Page>({ initial: { _tag: "Home" } });
         const navigation = yield* navigator<typeof urls.definitions, Page, never>({
@@ -139,6 +147,7 @@ export const App = component(() =>
                       attrs: { class: Option.some("app-header-title") },
                       children: ["frappé"],
                     }),
+                    provideContext({ key: Theme, value: theme, child: ThemeSelector }),
                     menuTrigger,
                     nav,
                   ],

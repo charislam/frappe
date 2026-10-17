@@ -10,7 +10,8 @@ import {
   Stream,
   SubscriptionRef,
 } from "effect";
-import { afterEach, expect, it } from "vitest";
+import { KeyValueStoreError } from "effect/unstable/persistence/KeyValueStore";
+import { afterEach, expect, it, vi } from "vitest";
 import { AccountExample } from "./account";
 import { Auth, AuthControl, authMock } from "./auth";
 import { AuthError } from "./auth-model";
@@ -184,4 +185,35 @@ it("unmount cancels Auth session consumption while retaining the runtime listene
   await close();
   await run(Queue.take(stopped));
   expect(listenersReleased).toBe(1);
+});
+
+it("signs in with the default email when persistence reads and writes fail", async () => {
+  const diagnostic = vi.spyOn(console, "warn").mockImplementation(() => {});
+  try {
+    const failure = new KeyValueStoreError({ method: "get", message: "denied" });
+    const { app, parent, failures } = await runtime(
+      Layer.mergeAll(
+        authMock({ initial: Option.none() }),
+        Layer.succeed(
+          LocalStorage,
+          LocalStorage.of({
+            persistent: true,
+            get: () => Effect.fail(failure),
+            set: () => Effect.fail(failure),
+          }),
+        ),
+      ),
+    );
+    Effect.runSync(app.h(parent, AccountExample));
+    await rendered({ parent, check: () => parent.textContent?.includes("Not signed in") === true });
+    parent.querySelector("button")?.click();
+    await rendered({
+      parent,
+      check: () => parent.textContent?.includes("reader@example.com") === true,
+    });
+    await vi.waitFor(() => expect(diagnostic).toHaveBeenCalledTimes(2));
+    expect(Queue.sizeUnsafe(failures)).toBe(0);
+  } finally {
+    diagnostic.mockRestore();
+  }
 });
