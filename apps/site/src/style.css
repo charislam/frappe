@@ -292,19 +292,105 @@
 
 @layer ui {
   .app-theme-selector {
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
-    font-size: 0.875rem;
+    position: relative;
+    display: grid;
+    place-items: center;
+    grid-column: var(--is-mobile, 3) var(--is-desktop, 2);
+    grid-row: 1;
+    border-radius: var(--radius-control);
+    color: var(--color-muted);
+
+    &:where(:hover, :has(select:open)) {
+      background: var(--color-hover);
+      color: var(--color-accent);
+    }
+
+    &:where(:has(select:focus-visible)) {
+      outline: 3px solid var(--color-focus);
+      outline-offset: 3px;
+    }
+
+    :where(label) {
+      position: absolute;
+      inline-size: 1px;
+      block-size: 1px;
+      padding: 0;
+      margin: -1px;
+      overflow: hidden;
+      clip-path: inset(50%);
+      white-space: nowrap;
+      border: 0;
+    }
+
+    /* Keep the real select as the hit target, including the native-picker fallback. */
+    :where(select) {
+      grid-area: 1 / 1;
+      appearance: auto;
+      inline-size: 2.5rem;
+      block-size: 2.5rem;
+      min-inline-size: 0;
+      border: 0;
+      opacity: 0;
+      font-size: 0.875rem;
+      cursor: pointer;
+      outline: none;
+
+      @media (pointer: coarse) {
+        inline-size: 2.75rem;
+        block-size: 2.75rem;
+      }
+    }
+
+    :where([data-theme-icon]) {
+      grid-area: 1 / 1;
+      inline-size: 1.125rem;
+      block-size: 1.125rem;
+      pointer-events: none;
+    }
+
+    :where([hidden]) {
+      display: none;
+    }
+
+    :where(svg) {
+      display: block;
+      inline-size: 100%;
+      block-size: 100%;
+    }
+
+    @supports (appearance: base-select) and selector(::picker(select)) {
+      :where(select) {
+        appearance: base-select;
+        font-size: 0;
+        background: none;
+
+        &:where(:hover:not(:disabled), :open) {
+          background: none;
+        }
+      }
+
+      :where(select)::picker-icon {
+        display: none;
+      }
+
+      :where(select)::picker(select) {
+        min-inline-size: 9rem;
+        font-size: 0.875rem;
+      }
+
+      :where(option) {
+        font-size: 0.875rem;
+      }
+    }
   }
 
   .app-header {
-    display: flex;
+    display: grid;
+    grid-template-columns: 1fr auto auto;
     align-items: center;
-    justify-content: space-between;
-    flex-wrap: wrap;
-    gap: 1rem;
-    padding: 1.5rem 0;
+    column-gap: var(--is-mobile, 1.25rem) var(--is-desktop, 0.75rem);
+	row-gap: 1rem;
+    padding-block: 1.125rem;
     border-bottom: 1px solid var(--color-border);
 
     :where(.app-menu-trigger) {
@@ -313,11 +399,16 @@
 
     :where(.app-header-title) {
       font-weight: 700;
+      letter-spacing: -0.035em;
+      font-size: 1.125rem;
     }
 
     :where(nav) {
       display: flex;
-      flex-basis: var(--is-mobile, auto) var(--is-desktop, 100%);
+      grid-column: var(--is-mobile, 2) var(--is-desktop, 1 / -1);
+      grid-row: var(--is-mobile, 1) var(--is-desktop, 2);
+      align-items: var(--is-mobile, center) var(--is-desktop, stretch);
+      font-size: 0.875rem;
       flex-direction: var(--is-mobile, row) var(--is-desktop, column);
       gap: 0.5rem;
 
