@@ -18,6 +18,8 @@ We stay close to web-native capabilities: one plain `style.css` per app. No Tail
 @layer base, native, components, scaffold, ui, page;
 ```
 
+Define each layer in exactly one block in `style.css`. Add rules to that existing block; never append another `@layer page` (or other repeated layer block) at the end of the file.
+
 Every rule lives inside one of these layers. Later layers win over earlier ones regardless of specificity, so never reach for `!important` or higher-specificity selectors to override across layers.
 
 | Layer        | Purpose                                                                                       | Max specificity                                                  |
@@ -49,7 +51,7 @@ Each page gets exactly one top-level class selector in the `page` layer (its wra
     :where(.counter) {
       display: flex;
 
-      :where(output) {
+      :where([data-slot="count"]) {
         font-size: 1.5rem;
       }
     }
@@ -62,10 +64,11 @@ Page-local sub-components (`.counter`, `.todos`, `.routing-controls`) are scoped
 ## Secondary patterns
 
 - **Tokens**: all colors, radii, spacing, shadows and transitions are custom properties defined in `base` on `:where(:root)`, named by role: `--color-*`, `--radius-*`, `--space-*`, `--shadow-*`, `--transition-*`. Reuse tokens (`var(--color-border)`) instead of literals; add a token when a value is reused or semantic. One-off sizes (`0.5rem`, `2rem`) may stay literal.
-- **Native nesting**: use `&` for state/variant selectors, and `:where(&:disabled)` when the parent should not be counted. Nest `@media` inside the rule it modifies.
+- **Responsive layout**: use the existing `viewport` container query and inherited `--is-mobile` / `--is-desktop` switches. The breakpoint is defined once in `base`; do not introduce component-specific width media queries or repeat arbitrary breakpoint ranges. Branch property values with `property: var(--is-mobile, <desktop value>) var(--is-desktop, <mobile value>)`. For example, `grid-template-columns: var(--is-mobile, minmax(0, 1.5fr) minmax(0, 1fr)) var(--is-desktop, minmax(0, 1fr))` gives two desktop columns and one mobile column. Keep media queries for independent capabilities and preferences, such as pointer precision and reduced motion.
+- **Native nesting**: use `&` for state/variant selectors, and `:where(&:disabled)` when the parent should not be counted. Nest capability/preference queries inside the rule they modify; use the shared switches for responsive layout.
 - **State selectors guard disabled**: `:hover:not(:disabled)`; disabled uses `opacity` and `cursor: not-allowed`.
 - **Accessibility**: global `:focus-visible` outline in `base`; `@media (prefers-reduced-motion: reduce)` disables transitions; select on ARIA state where it exists (`[aria-current="page"]`, `[role="tab"][aria-selected="true"]`, `p[role="alert"]`) instead of adding state classes.
-- **Semantic HTML first**: style elements (`hgroup`, `nav`, `output`, `article`, `label`) and roles via `:where()` descendants rather than adding classes. Add a class only when an element needs a distinct identity (`.todo-title`, `.counter`).
+- **Stable selectors**: keep semantic HTML, but target the intended UI part instead of a tag name or incidental DOM structure. Prefer semantic data attributes such as `[data-slot="field"]`, `[data-slot="hint"]`, and `[data-slot="error"]` for component parts; use ARIA or existing data attributes for state. Use a named class when data attributes do not express the part clearly. Avoid broad page descendants such as `p`, `h3`, or `fieldset p` that accidentally style new content or break when an element or wrapper changes. Keep these targeted selectors inside `:where()` so specificity stays within the layer cap; increase targeting precision rather than selector weight.
 - **Logical properties**: prefer `margin-block-end`, `padding-block`, `margin-inline`, `border-block-start`.
 - **Layout**: flex with `gap` for spacing between siblings; `width: min(100%, 42rem)` with `margin-inline: auto` for containers; avoid sibling margins when `gap` works.
 - **Inherit fonts on controls**: `font: inherit` on buttons and inputs; `accent-color` for checkboxes.
@@ -75,6 +78,7 @@ Page-local sub-components (`.counter`, `.todos`, `.routing-controls`) are scoped
 ## Checklist
 
 1. Pick the layer by scope: tokens/reset → `base`; bare element → `native`; reusable class → `components`; app shell → `scaffold`; shared chrome → `ui`; single page → `page`.
-2. Verify specificity is within the layer's cap; wrap the rest in `:where()`.
-3. Use tokens and logical properties; no `!important`, ids, or inline styles.
-4. Run `pnpm fmt` and `pnpm lint`.
+2. Insert rules into the existing layer block and target stable UI parts with data attributes or classes.
+3. Verify specificity is within the layer's cap; wrap the rest in `:where()`.
+4. Use tokens and logical properties; no `!important`, ids, or inline styles.
+5. Run `pnpm fmt` and `pnpm lint`.

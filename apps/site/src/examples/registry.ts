@@ -6,10 +6,12 @@ import { RoutingDemo } from "~/examples/routing/example";
 import { Tabs } from "~/examples/tabs/example";
 import { TextInput } from "~/examples/text-input/example";
 import { Todos } from "~/examples/todos/example";
+import { ValidationDemo } from "~/examples/validation/example";
 
 export const examples = [
   { tag: "Counter", title: "Counter", content: Counter },
   { tag: "TextInput", title: "Text input", content: TextInput },
+  { tag: "Validation", title: "Validation", content: ValidationDemo },
   { tag: "Tabs", title: "Tabs", content: Tabs },
   { tag: "Access", title: "Auth", content: AuthExample },
   { tag: "Loading", title: "Loading", content: LoadingExample },

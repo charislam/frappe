@@ -5,7 +5,8 @@
   "exports": {
     ".": "./src/framework.ts",
     "./query": "./src/query.ts",
-    "./router": "./src/router.ts"
+    "./router": "./src/router.ts",
+    "./validation": "./src/validation.ts"
   },
   "scripts": {
     "fmt": "oxfmt",

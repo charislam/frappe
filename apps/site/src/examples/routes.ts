@@ -7,6 +7,7 @@ export const examplesRoute = route({
   children: [
     route({ tag: "Counter", path: ["counter"] }),
     route({ tag: "TextInput", path: ["text-input"] }),
+    route({ tag: "Validation", path: ["validation"] }),
     route({ tag: "Tabs", path: ["tabs"] }),
     route({ tag: "Access", path: ["auth"] }),
     route({ tag: "Loading", path: ["loading"] }),
