@@ -165,11 +165,12 @@ it.each([
       press("Routing");
       await shows(() => history.location() === "/examples/routing/login");
       expect(parent.querySelector('[aria-label="Authenticated shell"]')).toBeNull();
-      const signIn = [...parent.querySelectorAll<HTMLButtonElement>(".routing-page button")].find(
-        (button) => button.textContent === "Continue as Ada",
-      );
-      expect(signIn).toBeDefined();
-      signIn?.click();
+      const signIn = () =>
+        [...parent.querySelectorAll<HTMLButtonElement>(".routing-page button")].find(
+          (button) => button.textContent === "Continue as Ada",
+        );
+      await shows(() => Option.isSome(Option.fromUndefinedOr(signIn())));
+      signIn()?.click();
       await shows(() => history.location() === "/examples/routing");
       expect(parent.querySelector(".counter")).toBeNull();
       expect(parent.querySelector(".examples-sidebar")).toBe(sidebar);
