@@ -974,3 +974,49 @@ coordinator uses Effect keyed collections, fibers, Deferred waiters, Clock, and
 Schedule, with AsyncResult as the sole shared asynchronous state. Persistence,
 polling, focus/reconnect refresh, mutation orchestration, hydration, and batching
 remain outside this API.
+
+## Signal validation
+
+Import `attach`, `ValidationState`, guards (`isValidated`, `isInvalid`,
+`isNotValidated`), `match`, and `formatIssues` from
+`@charismaticalli/frappe/validation`.
+
+```ts
+import { attach } from "@charismaticalli/frappe/validation";
+import { Schema } from "effect";
+
+const source = yield * context.signal({ initial: "0012" });
+const field = yield * attach({ context, source, schema: Schema.FiniteFromString });
+yield * field.validate(); // state: Validated { input: "0012", value: 12 }
+yield * field.clearValidation(); // NotValidated; source stays "0012"
+yield * field.reset(); // restores the attachment's original input and clears state
+```
+
+`state` is read-only and starts `NotValidated`, including prefilled values.
+`Validated` contains the decoded `value`; `Invalid` contains the complete
+`SchemaIssue.Issue` tree. `formatIssues(issue).issues` returns individual messages
+with paths. Applications supply labels, localization, and placement. Decoder input
+reporting is disabled; applications should still avoid custom schema messages that
+include sensitive values.
+
+Changes invalidate synchronously using the source's equality and transaction
+semantics. Validation reads staged input, and a failed batch rolls back both input
+and validation. Validation never writes normalization back to the source. Reset
+retains the original immutable value without cloning it. Attachments are scoped to
+the supplied owner and leave the supplied source's lifetime unchanged.
+
+Only synchronous, self-contained schemas are supported. Required decoder services
+are rejected by the type boundary. Async schemas and programming defects fail the
+operation without publishing a user validation error; ordinary rejection publishes
+`Invalid`. All available schema issues are collected, subject to transformation
+dependencies. No validation runs automatically in the primitive.
+
+The **Validation** example at `/examples/validation` presents an account setup
+screen with name, email, password, and team size inputs. Each field validates on
+its first blur, then on committed edits, including IME composition. Inline errors
+and invalid input styling provide feedback; Continue checks all fields and focuses
+the first invalid input. Successful checks show a local confirmation without
+creating an account. Password values never appear in messages. Email uses `^[^\s@]+@[^\s@]+\.[^\s@]+$` after trimming;
+this checks format only. Password length counts UTF-16 code units and preserves
+spaces and case. Team size accepts trimmed ASCII digits only and decodes to a
+nonnegative safe integer, preserving the raw text.

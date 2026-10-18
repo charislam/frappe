@@ -19,6 +19,8 @@
     --color-hover: #f3f4f6;
     --color-border: #e5e7eb;
     --color-border-hover: #d1d5db;
+    --color-error: #b42318;
+    --color-error-surface: #fff6f5;
     --color-accent: #047857;
     --color-accent-hover: #065f46;
     --color-focus: #6ee7b7;
@@ -68,6 +70,8 @@
   }
 
   :where(body.dark) {
+    --color-error: #fda29b;
+    --color-error-surface: #301e1d;
     --color-text: #e8eeeb;
     --color-muted: #b4c2bc;
     --color-control: #d6e3dc;
@@ -1405,6 +1409,114 @@
         color: var(--color-accent);
         border-color: var(--color-accent);
       }
+    }
+  }
+
+  .validation-page {
+    display: grid;
+    gap: 2rem;
+    inline-size: min(100%, 64rem);
+    margin-inline: auto;
+
+    :where([data-slot="heading"]) {
+      max-inline-size: 38rem;
+    }
+    :where([data-slot="title"]) {
+      font-size: clamp(1.8rem, 3vw, 2.75rem);
+      line-height: 1.15;
+      letter-spacing: -0.04em;
+      margin-block: 0.75rem 1rem;
+    }
+    :where([data-slot="description"], [data-slot="hint"]) {
+      color: var(--color-muted);
+      line-height: 1.6;
+      margin-block: 0.5rem;
+    }
+    :where([data-slot="eyebrow"]) {
+      color: var(--color-accent);
+      font-size: var(--font-size-label);
+      font-weight: 650;
+      letter-spacing: 0.1em;
+    }
+    :where([data-slot="layout"]) {
+      display: grid;
+      grid-template-columns:
+        var(--is-mobile, minmax(0, 1.5fr) minmax(0, 1fr))
+        var(--is-desktop, minmax(0, 1fr));
+      gap: 1.5rem;
+      align-items: start;
+    }
+    :where([data-slot="account-form"], [data-slot="intro"]) {
+      background: var(--color-surface);
+      border: 1px solid var(--color-border);
+      border-radius: var(--radius-card);
+      padding: clamp(1.25rem, 3vw, 2.25rem);
+    }
+    :where([data-slot="account-form"]) {
+      display: grid;
+      gap: 0.5rem;
+    }
+    :where([data-slot="section-title"]) {
+      margin: 0;
+      font-size: 1.25rem;
+      letter-spacing: -0.02em;
+    }
+    :where([data-slot="field"]) {
+      display: grid;
+      gap: 0.5rem;
+      min-inline-size: 0;
+      padding: 1.25rem 0;
+      margin: 0;
+      border: 0;
+      border-block-end: 1px solid var(--color-border);
+    }
+    :where([data-slot="label"]) {
+      font-size: var(--font-size-body-sm);
+      font-weight: 600;
+    }
+    :where([data-slot="input"]) {
+      inline-size: 100%;
+      padding: 0.8rem 0.9rem;
+      background: var(--color-page);
+    }
+    :where([data-slot="input"][aria-invalid="true"]) {
+      border-color: var(--color-error);
+      background: var(--color-error-surface);
+      box-shadow: 0 0 0 1px var(--color-error);
+    }
+    :where([data-slot="input"][aria-invalid="true"]:focus-visible) {
+      outline-color: var(--color-error);
+    }
+    :where([data-slot="hint"], [data-slot="error"], [data-slot="benefits"]) {
+      font-size: var(--font-size-body-sm);
+    }
+    :where([data-slot="hint"], [data-slot="error"]) {
+      margin: 0;
+    }
+    :where([data-slot="error"]) {
+      font-weight: 500;
+      color: var(--color-error);
+    }
+    :where([data-slot="submit"]) {
+      inline-size: 100%;
+      margin-block-start: 1rem;
+      padding-block: 0.875rem;
+      font-weight: 600;
+    }
+    :where([data-slot="feedback"]) {
+      color: var(--color-accent);
+      font-size: var(--font-size-body-sm);
+      font-weight: 500;
+    }
+    :where([data-slot="intro"]) {
+      background: var(--color-hover);
+      display: grid;
+      gap: 1rem;
+    }
+    :where([data-slot="benefits"]) {
+      padding-inline-start: 1.25rem;
+      line-height: 2;
+      margin: 0;
     }
   }
 }

@@ -113,6 +113,7 @@ export const examplesBranch = (options: {
           branches: {
             Counter: { branch: exampleBranch("Counter") },
             TextInput: { branch: exampleBranch("TextInput") },
+            Validation: { branch: exampleBranch("Validation") },
             Tabs: { branch: exampleBranch("Tabs") },
             Access: { branch: exampleBranch("Access") },
             Loading: { branch: exampleBranch("Loading") },

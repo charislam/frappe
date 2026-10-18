@@ -16,6 +16,7 @@ it.each([
   { location: "/examples/auth", selector: ".auth-example", active: "Examples" },
   { location: "/examples", selector: ".counter", active: "Examples" },
   { location: "/examples/text-input", selector: ".example-detail input", active: "Examples" },
+  { location: "/examples/validation", selector: ".validation-page", active: "Examples" },
   { location: "/examples/tabs", selector: '[role="tablist"]', active: "Examples" },
   { location: "/examples/loading", selector: ".example-detail section", active: "Examples" },
   { location: "/examples/todos", selector: ".todos", active: "Examples" },
