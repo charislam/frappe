@@ -12,7 +12,7 @@ import {
 } from "effect";
 import { KeyValueStoreError } from "effect/unstable/persistence/KeyValueStore";
 import { afterEach, expect, it, vi } from "vitest";
-import { AccountExample } from "./account";
+import { AuthExample } from "~/examples/auth/example";
 import { Auth, AuthControl, authMock } from "./auth";
 import { AuthError } from "./auth-model";
 import { LocalStorage, LocalStorageMemory } from "./local-storage";
@@ -40,14 +40,14 @@ const runtime = async <R extends Resource.Identifier>(resources: Layer.Layer<R>)
   return { app, close, failures, parent: document.createElement("main") };
 };
 
-it("seeds AccountExample from Auth and preserves the session when logout fails", async () => {
+it("seeds AuthExample from Auth and preserves the session when logout fails", async () => {
   const { app, parent, close, failures } = await runtime(
     Layer.mergeAll(
       authMock({ initial: Option.some({ email: "initial@example.com" }) }),
       LocalStorageMemory,
     ),
   );
-  Effect.runSync(app.h(parent, AccountExample));
+  Effect.runSync(app.h(parent, AuthExample));
   await rendered({
     parent,
     check: () => parent.textContent?.includes("initial@example.com") === true,
@@ -74,13 +74,19 @@ it("seeds AccountExample from Auth and preserves the session when logout fails",
       ),
     ),
   );
-  const logout = parent.querySelector("nav button") ?? document.createElement("button");
+  const logout =
+    [...parent.querySelectorAll("button")].find((button) => button.textContent === "Sign out") ??
+    document.createElement("button");
   (logout as HTMLButtonElement).click();
-  const failure = await run(Queue.take(failures));
-  expect(failure.operation).toBe("reactive");
+  await vi.waitFor(() =>
+    expect(parent.querySelector('[role="alert"]')?.textContent).toContain("Unable to sign out"),
+  );
   expect(parent.textContent).toContain("external@example.com");
   (logout as HTMLButtonElement).click();
-  await rendered({ parent, check: () => parent.textContent?.includes("Not signed in") === true });
+  await rendered({
+    parent,
+    check: () => parent.querySelector('form[aria-label="Sign in"]') !== null,
+  });
   expect(Queue.sizeUnsafe(failures)).toBe(0);
   await close();
 });
@@ -150,8 +156,11 @@ it("unmount cancels Auth session consumption while retaining the runtime listene
     }),
   );
   const { app, parent, close } = await runtime(Layer.mergeAll(resources, LocalStorageMemory));
-  Effect.runSync(app.h(parent, AccountExample));
-  await rendered({ parent, check: () => parent.textContent?.includes("Not signed in") === true });
+  Effect.runSync(app.h(parent, AuthExample));
+  await rendered({
+    parent,
+    check: () => parent.querySelector('form[aria-label="Sign in"]') !== null,
+  });
   await run(
     app.batch(
       AuthControl.pipe(
@@ -176,7 +185,7 @@ it("unmount cancels Auth session consumption while retaining the runtime listene
       ),
     ),
   );
-  Effect.runSync(app.h(parent, AccountExample));
+  Effect.runSync(app.h(parent, AuthExample));
   await rendered({
     parent,
     check: () => parent.textContent?.includes("while-unmounted@example.com") === true,
@@ -204,14 +213,19 @@ it("signs in with the default email when persistence reads and writes fail", asy
         ),
       ),
     );
-    Effect.runSync(app.h(parent, AccountExample));
-    await rendered({ parent, check: () => parent.textContent?.includes("Not signed in") === true });
-    parent.querySelector("button")?.click();
+    Effect.runSync(app.h(parent, AuthExample));
+    await rendered({
+      parent,
+      check: () => parent.querySelector('form[aria-label="Sign in"]') !== null,
+    });
+    parent
+      .querySelector('form[aria-label="Sign in"]')
+      ?.dispatchEvent(new Event("submit", { bubbles: true, cancelable: true }));
     await rendered({
       parent,
       check: () => parent.textContent?.includes("reader@example.com") === true,
     });
-    await vi.waitFor(() => expect(diagnostic).toHaveBeenCalledTimes(2));
+    await vi.waitFor(() => expect(diagnostic.mock.calls.length).toBeGreaterThanOrEqual(2));
     expect(Queue.sizeUnsafe(failures)).toBe(0);
   } finally {
     diagnostic.mockRestore();

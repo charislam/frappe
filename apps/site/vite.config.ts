@@ -1,4 +1,5 @@
 import { build, defineConfig, type Plugin } from "vite";
+import { exampleSources } from "./tooling/example-sources/plugin.ts";
 
 const themeInitializer = (): Plugin => ({
   name: "theme-initializer",
@@ -26,6 +27,6 @@ const themeInitializer = (): Plugin => ({
   },
 });
 export default defineConfig({
-  plugins: [themeInitializer()],
+  plugins: [themeInitializer(), exampleSources()],
   resolve: { tsconfigPaths: true },
 });
