@@ -8,25 +8,18 @@ import {
 } from "@charismaticalli/frappe/router";
 import { NavigationMenu } from "@charismaticalli/ui";
 import { Effect, Match, Option } from "effect";
+import { examplesBranch } from "~/examples/page";
+import { type ExamplesState, examplesPageOf } from "~/examples/routes";
 import { browserTheme } from "~/features/theme/browser";
 import { Theme, makeTheme } from "~/features/theme/controller";
 import { ThemeSelector } from "~/features/theme/selector";
-import { RoutingDemo } from "~/routing-demo/app";
-import { examplesBranch } from "./examples";
-import { type ExamplesState, examplesPageOf } from "./examples-routes";
 import { Home } from "./home";
-import { QueryExample } from "./query-demo";
 import { urls } from "./routes";
 
-type Page =
-  | { readonly _tag: "Home" }
-  | ExamplesState
-  | { readonly _tag: "Routing" }
-  | { readonly _tag: "Queries" }
-  | { readonly _tag: "NotFound" };
+type Page = { readonly _tag: "Home" } | ExamplesState | { readonly _tag: "NotFound" };
 const pageOf = (tag: Destination<typeof urls.definitions>["_tag"]): Page =>
   Match.value(tag).pipe(
-    Match.whenOr("Home", "Routing", "Queries", (tag): Page => ({ _tag: tag })),
+    Match.when("Home", (tag): Page => ({ _tag: tag })),
     Match.orElse(examplesPageOf),
   );
 const page = (target: ParseResult<typeof urls.definitions>): Page =>
@@ -34,19 +27,13 @@ const page = (target: ParseResult<typeof urls.definitions>): Page =>
     Match.tag("Matched", ({ destination }) => pageOf(destination._tag)),
     Match.orElse(({ ancestry }) =>
       Match.value(ancestry.some((route) => route._tag === "Routing")).pipe(
-        Match.when(true, (): Page => ({ _tag: "Routing" })),
+        Match.when(true, (): Page => examplesPageOf("Routing")),
         Match.orElse((): Page => ({ _tag: "NotFound" })),
       ),
     ),
   );
 const HomePage = branch<Extract<Page, { _tag: "Home" }>>()(() =>
   Sync.succeed({ setup: () => Effect.succeed(Home) }),
-);
-const RoutingPage = branch<Extract<Page, { _tag: "Routing" }>>()(() =>
-  Sync.succeed({ setup: () => Effect.succeed(RoutingDemo) }),
-);
-const QueriesPage = branch<Extract<Page, { _tag: "Queries" }>>()(() =>
-  Sync.succeed({ setup: () => Effect.succeed(QueryExample) }),
 );
 const NotFound = branch<Extract<Page, { _tag: "NotFound" }>>()(({ context }) =>
   Sync.gen(function* () {
@@ -97,7 +84,7 @@ export const App = component(() =>
         return component((context) =>
           Sync.gen(function* () {
             const links = [];
-            for (const tag of ["Home", "Examples", "Routing", "Queries"] as const) {
+            for (const tag of ["Home", "Examples"] as const) {
               const destination: Destination<typeof urls.definitions> = {
                 _tag: tag,
                 params: {},
@@ -157,8 +144,6 @@ export const App = component(() =>
                   branches: {
                     Home: { branch: HomePage },
                     Examples: { branch: examplesBranch({ navigation }) },
-                    Routing: { branch: RoutingPage },
-                    Queries: { branch: QueriesPage },
                     NotFound: { branch: NotFound },
                   },
                 }),
