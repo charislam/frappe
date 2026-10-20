@@ -14,6 +14,14 @@
     --color-soft: #eeebfc;
     --color-error: #a2203e;
     --color-focus: #355ac6;
+    --font-size-body: 0.9375rem;
+    --font-size-caption: 0.8125rem;
+    --font-size-input: 1rem;
+    --font-size-display: clamp(3rem, 7cqi, 3.75rem);
+    --letter-spacing-body: 0.01em;
+    --letter-spacing-label: 0.025em;
+    --letter-spacing-button: 0.015em;
+    --letter-spacing-display: -0.055em;
     --radius-control: 0.6rem;
     --radius-card: 1.5rem;
     --space-control: 0.75rem;
@@ -90,7 +98,9 @@
     text-underline-offset: 0.2em;
   }
   label {
-    display: flex;
+    &:where(:not([hidden])) {
+      display: flex;
+    }
     flex-direction: column;
     gap: 0.45rem;
     font-size: 0.9rem;
@@ -145,7 +155,9 @@
   button {
     cursor: pointer;
     transition: background var(--transition-control);
-    font-weight: 600;
+    min-block-size: 3rem;
+    font-weight: 500;
+    letter-spacing: var(--letter-spacing-button);
     &:where(:hover:not(:disabled)) {
       background: var(--color-soft);
     }
@@ -169,23 +181,16 @@
       opacity: 0.7;
     }
   }
-  footer {
-    text-align: center;
-    padding-block: 2rem;
-    color: var(--color-muted);
-    font-size: 0.875rem;
-  }
 }
 @layer components {
-  :where(.card) {
-    background: var(--color-surface);
-    border: 1px solid var(--color-border);
-    border-radius: var(--radius-card);
-    box-shadow: var(--shadow-card);
-    padding: var(--is-mobile, 2.5rem) var(--is-desktop, 1.5rem);
+  :where(.auth-content) {
     display: flex;
     flex-direction: column;
-    gap: 1rem;
+    inline-size: min(100%, 25rem);
+    margin-inline: auto;
+    font-size: var(--font-size-body);
+    letter-spacing: var(--letter-spacing-body);
+    gap: 1.25rem;
   }
   button:where(.primary) {
     background: var(--color-accent);
@@ -194,6 +199,54 @@
     &:where(:hover:not(:disabled)) {
       background: var(--color-accent);
       filter: brightness(1.08);
+    }
+  }
+  :where(.page-heading) {
+    font-size: var(--font-size-display);
+    font-weight: 750;
+    letter-spacing: var(--letter-spacing-display);
+    margin-block-end: 1.5rem;
+  }
+  :where(.form-field) {
+    font-size: var(--font-size-caption);
+    font-weight: 450;
+    letter-spacing: var(--letter-spacing-label);
+    gap: 0.625rem;
+
+    :where([data-slot="field-input"]) {
+      font-size: var(--font-size-input);
+      min-block-size: 3rem;
+      border-color: color-mix(in srgb, var(--color-border) 45%, transparent);
+    }
+    :where([data-slot="field-error"]:empty) {
+      display: none;
+    }
+  }
+  button:where(.secondary) {
+    background: transparent;
+    border-color: transparent;
+    color: var(--color-muted);
+
+    &:where(:hover:not(:disabled)) {
+      background: var(--color-soft);
+      color: var(--color-text);
+    }
+  }
+  :where(.auth-link) {
+    font-size: var(--font-size-caption);
+    color: var(--color-muted);
+    text-decoration: none;
+
+    &:where(:hover) {
+      color: var(--color-accent);
+      text-decoration: underline;
+    }
+  }
+  :where(.form-feedback) {
+    margin-block: 0;
+
+    &:where(:empty) {
+      display: none;
     }
   }
   :where(.button-row) {
@@ -206,12 +259,6 @@
   }
   p:where([role="status"]) {
     color: var(--color-muted);
-  }
-  :where(.eyebrow) {
-    color: var(--color-accent);
-    font-size: 0.75rem;
-    letter-spacing: 0.12em;
-    font-weight: 700;
   }
 }
 @layer scaffold {
@@ -235,7 +282,6 @@
     gap: 1rem;
     padding-block: 1.25rem;
     padding-inline: max(1rem, calc((100% - 72rem) / 2));
-    border-block-end: 1px solid var(--color-border);
   }
   .app-theme-selector {
     position: relative;
@@ -328,22 +374,14 @@
   }
 }
 @layer page {
-  .login-page {
-    gap: 1.25rem;
-  }
   .accounts-page {
-    :where(.empty-state) {
-      padding: var(--space-content);
-      background: var(--color-soft);
-      border-radius: var(--radius-control);
-      display: flex;
-      flex-direction: column;
-      gap: 0.75rem;
-    }
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
   }
-  .reset-page {
-    :where(form) {
-      gap: var(--space-content);
-    }
+  .not-found-page {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
   }
 }

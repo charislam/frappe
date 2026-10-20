@@ -18,6 +18,7 @@ export const emailCodeButton = Effect.fn("Auth.emailCodeButton")(function* (opti
   const { context, actions, email, navigation, intent } = options;
   const auth = yield* Auth;
   const button = yield* context.he("button", {
+    attrs: { class: Option.some("secondary") },
     props: { type: "button", disabled: actions.pending },
     children: [
       Match.value(intent).pipe(
@@ -67,20 +68,13 @@ export const githubButton = Effect.fn("Auth.githubButton")(function* (options: {
     sources: { available, pending: actions.pending },
     compute: ({ available, pending }) => pending || !Option.contains(available, true),
   });
-  const hint = yield* context.derive({
+  const hidden = yield* context.derive({
     sources: { available },
-    compute: ({ available }) =>
-      Option.match(available, {
-        onNone: () => "Checking GitHub availability…",
-        onSome: (value) =>
-          Match.value(value).pipe(
-            Match.when(true, () => "Sign in with your GitHub account."),
-            Match.orElse(() => "GitHub is unavailable. Use email to continue."),
-          ),
-      }),
+    compute: ({ available }) => !Option.contains(available, true),
   });
   const button = yield* context.he("button", {
-    props: { type: "button", disabled },
+    attrs: { class: Option.some("secondary") },
+    props: { type: "button", disabled, hidden },
     children: ["Continue with GitHub"],
   });
   yield* context.subscribe(yield* context.events(button, "click"), () =>
@@ -90,5 +84,11 @@ export const githubButton = Effect.fn("Auth.githubButton")(function* (options: {
         .pipe(Effect.as(Option.some(NonEmptyString.make("Opening GitHub…")))),
     ),
   );
-  return [button, yield* context.he("small", { children: [hint] })];
+  return [
+    button,
+    yield* context.he("small", {
+      props: { hidden },
+      children: ["Sign in with your GitHub account."],
+    }),
+  ];
 });

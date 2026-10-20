@@ -109,6 +109,7 @@ export const App = (partition: WritableSignal<Option.Option<string>>) =>
                     Effect.gen(function* () {
                       const current = yield* inputs.state.get;
                       const retry = yield* context.he("button", {
+                        attrs: { class: Option.some("primary") },
                         props: { type: "button" },
                         children: ["Retry"],
                       });
@@ -116,16 +117,19 @@ export const App = (partition: WritableSignal<Option.Option<string>>) =>
                         auth.retry(),
                       );
                       return yield* context.he("section", {
-                        attrs: { class: Option.some("card") },
+                        attrs: { class: Option.some("auth-content") },
                         children: [
-                          yield* context.he("h1", { children: ["Unable to sign in"] }),
+                          yield* context.he("h1", {
+                            attrs: { class: Option.some("page-heading") },
+                            children: ["Unable to sign in"],
+                          }),
                           yield* context.he("p", {
                             attrs: { role: Option.some("alert") },
                             children: [current.message],
                           }),
                           retry,
                           yield* context.he("a", {
-                            attrs: { href: Option.some("/login") },
+                            attrs: { href: Option.some("/login"), class: Option.some("auth-link") },
                             children: ["Return to sign in"],
                           }),
                         ],
@@ -144,7 +148,7 @@ export const App = (partition: WritableSignal<Option.Option<string>>) =>
                     Effect.gen(function* () {
                       const current = yield* inputs.state.get;
                       return yield* context.he("section", {
-                        attrs: { class: Option.some("card") },
+                        attrs: { class: Option.some("not-found-page") },
                         children: [
                           yield* context.he("h1", { children: ["Page not found"] }),
                           yield* context.he("a", {
@@ -176,7 +180,6 @@ export const App = (partition: WritableSignal<Option.Option<string>>) =>
                 attrs: { class: Option.some("app-main") },
                 children: [content],
               }),
-              yield* context.he("footer", { children: ["A clearer view of your money."] }),
             ],
           });
         }),

@@ -46,25 +46,10 @@ export const Accounts = (user: User) =>
             actions.run(auth.execute({ _tag: "Logout" }).pipe(Effect.as(Option.none()))),
           );
           return yield* context.he("section", {
-            attrs: { class: Option.some("accounts-page card") },
+            attrs: { class: Option.some("accounts-page") },
             children: [
-              yield* context.he("p", {
-                attrs: { class: Option.some("eyebrow") },
-                children: ["YOUR MONEY, AT A GLANCE"],
-              }),
               yield* context.he("h1", { children: ["Accounts"] }),
               yield* context.he("p", { children: [address] }),
-              yield* context.he("div", {
-                attrs: { class: Option.some("empty-state") },
-                children: [
-                  yield* context.he("h2", { children: ["A fresh start"] }),
-                  yield* context.he("p", {
-                    children: [
-                      "Your accounts will live here. Start with a name for the account you have in mind.",
-                    ],
-                  }),
-                ],
-              }),
               form,
               logout,
               actions.errorOutput,

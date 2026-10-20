@@ -69,10 +69,12 @@ export const Signup = (navigation: AuthNavigation) =>
               }),
           });
           return yield* context.he("section", {
-            attrs: { class: Option.some("signup-page card") },
+            attrs: { class: Option.some("signup-page auth-content") },
             children: [
-              yield* context.he("h1", { children: ["Create your account"] }),
-              yield* context.he("p", { children: ["Make room for what matters."] }),
+              yield* context.he("h1", {
+                attrs: { class: Option.some("page-heading") },
+                children: ["Create your account"],
+              }),
               form,
               yield* emailCodeButton({ context, actions, email, intent: "signup", navigation }),
               ...(yield* githubButton({ context, actions })),

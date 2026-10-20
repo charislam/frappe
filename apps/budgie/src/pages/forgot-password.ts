@@ -54,11 +54,11 @@ export const ForgotPassword = (navigation: AuthNavigation) =>
                 ),
           });
           return yield* context.he("section", {
-            attrs: { class: Option.some("forgot-password-page card") },
+            attrs: { class: Option.some("forgot-password-page auth-content") },
             children: [
-              yield* context.he("h1", { children: ["Forgot your password?"] }),
-              yield* context.he("p", {
-                children: ["We’ll email you a link to choose a new password."],
+              yield* context.he("h1", {
+                attrs: { class: Option.some("page-heading") },
+                children: ["Forgot your password?"],
               }),
               form,
               actions.errorOutput,

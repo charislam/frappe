@@ -8,10 +8,54 @@ const run = Effect.runPromise;
 afterEach(cleanupAuthPages);
 
 describe("separate authentication pages", () => {
+  it("starts with email and reveals password sign-in without losing the email", async () => {
+    const h = await harness();
+    await h.page("Sign in");
+    expect(h.input("password").disabled).toBe(true);
+    expect(h.input("password").closest("label")?.hidden).toBe(true);
+    expect(h.button("Sign in").hidden).toBe(true);
+    expect(h.button("Email me a sign-in code").hidden).toBe(false);
+    h.input("email").value = "reader@example.com";
+    h.button("Use Password").click();
+    await expect.poll(() => h.input("password").disabled).toBe(false);
+    expect(h.input("email").value).toBe("reader@example.com");
+    expect(h.input("password").closest("label")?.hidden).toBe(false);
+    expect(h.button("Sign in").hidden).toBe(false);
+    expect(h.button("Use Password").hidden).toBe(true);
+    expect(h.button("Email me a sign-in code").hidden).toBe(true);
+    h.submit();
+    await expect.poll(() => h.input("password").getAttribute("aria-invalid")).toBe("true");
+    expect(h.commands).toEqual([]);
+  });
+  it("submits the email-only form as a code request", async () => {
+    const h = await harness();
+    await h.page("Sign in");
+    h.input("email").value = "reader@example.com";
+    h.submit();
+    await h.page("Check your email");
+    expect(h.commands).toEqual([
+      { _tag: "RequestOtp", email: "reader@example.com", intent: "signin" },
+    ]);
+  });
+  it.each([
+    { path: "/verify-code", heading: "Check your email" },
+    { path: "/signup/confirmation", heading: "Confirm your email" },
+  ])("locks query-provided email on $path", async ({ path, heading }) => {
+    const h = await harness({
+      initial: `${path}?email=reader%40example.com`,
+      auth: Option.none(),
+    });
+    await h.page(heading);
+    expect(h.input("email").value).toBe("reader@example.com");
+    expect(h.input("email").readOnly).toBe(true);
+    expect(h.input("email").disabled).toBe(false);
+  });
   it("password login submits only credentials, prevents duplicates, and exposes errors", async () => {
     const h = await harness();
-    await h.page("Welcome back");
+    await h.page("Sign in");
     h.input("email").value = "reader@example.com";
+    h.button("Use Password").click();
+    await expect.poll(() => h.input("password").disabled).toBe(false);
     h.input("password").value = "password123";
     const completion = h.holdNext();
     h.failNext(new AuthError({ kind: "credentials", message: "Email or password is incorrect." }));
@@ -71,7 +115,7 @@ describe("separate authentication pages", () => {
   it.each([
     {
       start: "/login",
-      heading: "Welcome back",
+      heading: "Sign in",
       button: "Email me a sign-in code",
       intent: "signin",
     },
@@ -144,10 +188,11 @@ describe("separate authentication pages", () => {
     expect(h.history.location()).toBe("/signup");
     expect(h.failures).toEqual([]);
   });
-  it("supports a direct verification visit with no remembered email", async () => {
+  it("allows email entry on verification when the URL has no email parameter", async () => {
     const h = await harness({ initial: "/verify-code", auth: Option.none() });
     await h.page("Check your email");
     expect(h.input("email").value).toBe("");
+    expect(h.input("email").readOnly).toBe(false);
     expect(h.input("email").required).toBe(true);
     expect(h.commands).toEqual([]);
     h.input("email").value = "reader@example.com";
@@ -156,13 +201,14 @@ describe("separate authentication pages", () => {
       .poll(() => h.commands)
       .toEqual([{ _tag: "RequestOtp", email: "reader@example.com", intent: "signin" }]);
   });
-  it("offers direct confirmation email entry and a separate password recovery page", async () => {
+  it("allows email entry on confirmation without an email parameter and links to recovery", async () => {
     const h = await harness({ initial: "/signup/confirmation", auth: Option.none() });
     await h.page("Confirm your email");
     expect(h.input("email").value).toBe("");
+    expect(h.input("email").readOnly).toBe(false);
     expect(h.commands).toEqual([]);
     await h.follow("Back to sign in");
-    await h.page("Welcome back");
+    await h.page("Sign in");
     await h.follow("Forgot password?");
     await h.page("Forgot your password?");
     h.input("email").value = "reader@example.com";
@@ -248,7 +294,7 @@ describe("page-local password recovery", () => {
       initial: "/reset-password?recovery=true&complete=true",
       auth: Option.none(),
     });
-    await h.page("Welcome back");
+    await h.page("Sign in");
     expect(h.history.location()).toBe("/login");
     expect(h.commands).toEqual([]);
   });
@@ -279,7 +325,7 @@ describe("frappe field validation", () => {
   });
   it("validates email-code requests without requiring a password", async () => {
     const h = await harness();
-    await h.page("Welcome back");
+    await h.page("Sign in");
     h.input("email").value = "invalid";
     h.button("Email me a sign-in code").click();
     await expect.poll(() => h.input("email").getAttribute("aria-invalid")).toBe("true");
