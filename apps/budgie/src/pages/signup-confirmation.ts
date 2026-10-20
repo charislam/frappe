@@ -25,6 +25,10 @@ export const SignupConfirmation = (options: {
             name: "email",
           });
           yield* email.setValue(Option.getOrElse(options.email, () => ""));
+          yield* context.bind({
+            element: email.input,
+            props: { readOnly: Option.isSome(options.email) },
+          });
           const form = yield* context.he("form", {
             props: { noValidate: true },
             children: [
@@ -33,6 +37,7 @@ export const SignupConfirmation = (options: {
                 children: [
                   email.label,
                   yield* context.he("button", {
+                    attrs: { class: Option.some("primary") },
                     props: { type: "submit" },
                     children: ["Resend confirmation email"],
                   }),
@@ -53,13 +58,11 @@ export const SignupConfirmation = (options: {
                 ),
           });
           return yield* context.he("section", {
-            attrs: { class: Option.some("signup-confirmation-page card") },
+            attrs: { class: Option.some("signup-confirmation-page auth-content") },
             children: [
-              yield* context.he("h1", { children: ["Confirm your email"] }),
-              yield* context.he("p", {
-                children: [
-                  "Open the confirmation link in your email to finish creating your account. Use the same browser where you signed up.",
-                ],
+              yield* context.he("h1", {
+                attrs: { class: Option.some("page-heading") },
+                children: ["Confirm your email"],
               }),
               form,
               actions.errorOutput,

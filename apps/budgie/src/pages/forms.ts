@@ -39,11 +39,15 @@ export const formActions = Effect.fn("Form.actions")(function* (context: Compone
       ),
   });
   const errorOutput = yield* context.he("p", {
-    attrs: { role: Option.some("alert") },
+    attrs: { class: Option.some("form-feedback"), role: Option.some("alert") },
     children: [error],
   });
   const statusOutput = yield* context.he("p", {
-    attrs: { role: Option.some("status"), "aria-live": Option.some("polite") },
+    attrs: {
+      class: Option.some("form-feedback"),
+      role: Option.some("status"),
+      "aria-live": Option.some("polite"),
+    },
     children: [status],
   });
   const run = (work: Effect.Effect<Option.Option<NonEmptyString>, AuthError | ReactiveError>) =>

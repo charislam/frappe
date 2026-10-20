@@ -57,6 +57,7 @@ export const field = Effect.fn("Form.field")(function* (options: {
   const input = yield* context.he("input", {
     props: { type: options.type, required: true, name: options.name },
     attrs: {
+      "data-slot": Option.some("field-input"),
       autocomplete: Option.some(options.autocomplete),
       "aria-invalid": ariaInvalid,
       "aria-describedby": Option.some(id),
@@ -87,9 +88,16 @@ export const field = Effect.fn("Form.field")(function* (options: {
     ),
   );
   const error = yield* context.he("small", {
-    attrs: { id: Option.some(id), "aria-live": Option.some("polite") },
+    attrs: {
+      "data-slot": Option.some("field-error"),
+      id: Option.some(id),
+      "aria-live": Option.some("polite"),
+    },
     children: [feedback],
   });
-  const label = yield* context.he("label", { children: [options.label, input, error] });
+  const label = yield* context.he("label", {
+    attrs: { class: Option.some("form-field") },
+    children: [options.label, input, error],
+  });
   return { input, label, validate, setValue: source.set };
 });

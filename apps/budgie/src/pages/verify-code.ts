@@ -26,6 +26,10 @@ export const VerifyCode = (options: {
             name: "email",
           });
           yield* email.setValue(Option.getOrElse(options.email, () => ""));
+          yield* context.bind({
+            element: email.input,
+            props: { readOnly: Option.isSome(options.email) },
+          });
           const code = yield* field({
             context,
             label: "Six-digit email code",
@@ -37,6 +41,7 @@ export const VerifyCode = (options: {
           nativeNode(code.input).pattern = "[0-9]{6}";
           nativeNode(code.input).maxLength = 6;
           const resend = yield* context.he("button", {
+            attrs: { class: Option.some("secondary") },
             props: { type: "button", disabled: actions.pending },
             children: ["Resend code"],
           });
@@ -90,11 +95,11 @@ export const VerifyCode = (options: {
                 .pipe(Effect.as(Option.none())),
           });
           return yield* context.he("section", {
-            attrs: { class: Option.some("verify-code-page card") },
+            attrs: { class: Option.some("verify-code-page auth-content") },
             children: [
-              yield* context.he("h1", { children: ["Check your email"] }),
-              yield* context.he("p", {
-                children: ["Enter the six-digit code we sent you. Codes expire after one hour."],
+              yield* context.he("h1", {
+                attrs: { class: Option.some("page-heading") },
+                children: ["Check your email"],
               }),
               form,
               resend,

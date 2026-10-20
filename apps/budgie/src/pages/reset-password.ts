@@ -31,13 +31,13 @@ export const ResetPassword = (continueToAccounts: Effect.Effect<void, AuthError>
           const form = yield* context.he("form", {
             props: { noValidate: true },
             children: [
-              yield* context.he("h1", { children: ["Choose a new password"] }),
               yield* context.he("fieldset", {
                 props: { disabled: actions.pending },
                 children: [
                   password.label,
                   confirmation.label,
                   yield* context.he("button", {
+                    attrs: { class: Option.some("primary") },
                     props: { type: "submit" },
                     children: ["Save password"],
                   }),
@@ -80,8 +80,17 @@ export const ResetPassword = (continueToAccounts: Effect.Effect<void, AuthError>
             actions.run(continueToAccounts.pipe(Effect.as(Option.none()))),
           );
           return yield* context.he("section", {
-            attrs: { class: Option.some("reset-page card") },
-            children: [form, actions.errorOutput, actions.statusOutput, continueButton],
+            attrs: { class: Option.some("reset-page auth-content") },
+            children: [
+              yield* context.he("h1", {
+                attrs: { class: Option.some("page-heading") },
+                children: ["Choose a new password"],
+              }),
+              form,
+              actions.errorOutput,
+              actions.statusOutput,
+              continueButton,
+            ],
           });
         }),
     }),

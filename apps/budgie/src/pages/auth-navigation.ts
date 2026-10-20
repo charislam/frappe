@@ -1,6 +1,6 @@
 import { Sync, component } from "@charismaticalli/frappe";
 import { type Navigator, link } from "@charismaticalli/frappe/router";
-import { Effect } from "effect";
+import { Effect, Option } from "effect";
 import { AuthError } from "~/auth/model";
 import { type Destination, urls } from "~/routes";
 import type { AppEvent } from "~/transitions";
@@ -20,7 +20,12 @@ export const AuthLink = (options: {
         destination: options.destination,
         children: [options.label],
       });
-      return { setup: () => Effect.succeed(anchor) };
+      return {
+        setup: (context) =>
+          context
+            .bind({ element: anchor, attrs: { class: Option.some("auth-link") } })
+            .pipe(Effect.as(anchor)),
+      };
     }),
   );
 export const navigateAuth = (options: {
