@@ -2,7 +2,7 @@ import { Match, Option } from "effect";
 import { expect, it } from "vitest";
 import type { AppEvent, AppState } from "./model";
 import { ProjectId, projectDestination, urls } from "./routes";
-import { transition } from "./transitions";
+import { targetOf, transition } from "./transitions";
 
 const initial = (url: string): AppState => ({
   _tag: "ResolvingSession",
@@ -134,7 +134,7 @@ it("ignores obsolete project completions by session, project and request identit
     state,
     event: {
       _tag: "Navigate",
-      destination: projectDestination({ id: ProjectId.make(456) }),
+      target: targetOf(projectDestination({ id: ProjectId.make(456) })),
       mode: "push",
     },
   }).state;

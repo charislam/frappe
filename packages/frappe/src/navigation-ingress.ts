@@ -2,7 +2,7 @@ import { Cause, Deferred, Effect, type Exit, Match, Option, Queue, Stream } from
 import type { ReactiveRuntime } from "~/reactive/runtime";
 import type { HistoryAdapter } from "./history";
 import { observeHistory } from "./navigation-observation";
-import { NavigationError, type NavigationEvent } from "./navigation-types";
+import { NavigationError, type NavigationRequest } from "./navigation-types";
 import type { Route, Router } from "./routes";
 
 const claimedHistories = new WeakSet<object>();
@@ -15,18 +15,18 @@ export const makeNavigationIngress = Effect.fn("Navigation.makeIngress")(functio
   readonly runtime: ReactiveRuntime;
   readonly router: Router<T>;
   readonly history: HistoryAdapter;
-  readonly execute: (event: NavigationEvent<T, E>) => Effect.Effect<void, NavigationError>;
+  readonly execute: (event: NavigationRequest<T, E>) => Effect.Effect<void, NavigationError>;
   readonly error: (options: { phase: NavigationError["phase"]; cause: unknown }) => NavigationError;
   readonly onError: (error: NavigationError) => void;
 }) {
   const { runtime, history, router, execute, error } = options;
   const queue = yield* Queue.unbounded<{
-    readonly event: NavigationEvent<T, E>;
+    readonly event: NavigationRequest<T, E>;
     readonly result: Deferred.Deferred<void, NavigationError>;
   }>();
   const pending = new Set<Deferred.Deferred<void, NavigationError>>();
   let disposed = false;
-  const submit = (event: NavigationEvent<T, E>) =>
+  const submit = (event: NavigationRequest<T, E>) =>
     Effect.gen(function* () {
       yield* Match.value(disposed).pipe(
         Match.when(true, () =>

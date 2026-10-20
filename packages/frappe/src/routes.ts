@@ -1,6 +1,6 @@
 import { Match, Option, Result, Schema } from "effect";
 import { buildUrl } from "./route-builder";
-import { type Route, type Router, UrlBuildError } from "./route-definition";
+import { type Destination, type Route, type Router, UrlBuildError } from "./route-definition";
 import { parseUrl } from "./route-parser";
 
 export {
@@ -15,6 +15,7 @@ export {
   type Destination,
   type Parameter,
   type ParseResult,
+  type MatchedTarget,
   type Prefix,
   type Query,
   type Remaining,
@@ -112,45 +113,46 @@ export const router = <const T extends ReadonlyArray<Route>>(definitions: T): Ro
 
   visit(definitions, []);
 
-  return {
-    definitions,
-    parse: (original) => parseUrl({ definitions, original }),
-    build: (destination) =>
-      Result.try({
-        try: () =>
-          Result.gen(function* () {
-            const href = yield* buildUrl({
-              index,
-              destination,
-            });
-            const parsed = parseUrl({ definitions, original: href });
-            yield* Match.value(parsed).pipe(
-              Match.tag("Matched", ({ destination: normalized }) =>
-                Match.value(normalized._tag === destination._tag).pipe(
-                  Match.when(true, () => Result.succeed(undefined)),
-                  Match.orElse(() =>
-                    Result.fail(
-                      new UrlBuildError({
-                        message: "Destination is shadowed by an earlier route",
-                        cause: parsed,
-                      }),
-                    ),
+  const resolve = (destination: Destination<T>) =>
+    Result.try({
+      try: () =>
+        Result.gen(function* () {
+          const href = yield* buildUrl({
+            index,
+            destination,
+          });
+          const parsed = parseUrl({ definitions, original: href });
+          return yield* Match.value(parsed).pipe(
+            Match.tag("Matched", (matched) =>
+              Match.value(matched.destination._tag === destination._tag).pipe(
+                Match.when(true, () => Result.succeed(matched)),
+                Match.orElse(() =>
+                  Result.fail(
+                    new UrlBuildError({
+                      message: "Destination is shadowed by an earlier route",
+                      cause: parsed,
+                    }),
                   ),
                 ),
               ),
-              Match.orElse(() =>
-                Result.fail(
-                  new UrlBuildError({
-                    message: "Encoded destination does not match its route",
-                    cause: parsed,
-                  }),
-                ),
+            ),
+            Match.orElse(() =>
+              Result.fail(
+                new UrlBuildError({
+                  message: "Encoded destination does not match its route",
+                  cause: parsed,
+                }),
               ),
-            );
-            return href;
-          }),
-        catch: (cause) =>
-          new UrlBuildError({ message: "Malformed destination or encoding defect", cause }),
-      }).pipe(Result.flatMap((result) => result)),
+            ),
+          );
+        }),
+      catch: (cause) =>
+        new UrlBuildError({ message: "Malformed destination or encoding defect", cause }),
+    }).pipe(Result.flatMap((result) => result));
+  return {
+    definitions,
+    parse: (original) => parseUrl({ definitions, original }),
+    resolve,
+    build: (destination) => resolve(destination).pipe(Result.map(({ original }) => original)),
   };
 };

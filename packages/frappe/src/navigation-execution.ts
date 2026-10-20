@@ -8,10 +8,13 @@ import {
   NavigationError,
   type NavigationEvent,
   type NavigationOptions,
+  type NavigationRequest,
 } from "./navigation-types";
 import type { Destination, Route } from "./routes";
 
-const observedLocation = <T extends ReadonlyArray<Route>, E>(event: NavigationEvent<T, E>) =>
+const observedLocation = <T extends ReadonlyArray<Route>, E>(
+  event: NavigationRequest<T, E> | NavigationEvent<T, E>,
+) =>
   Match.value(event).pipe(
     Match.tag("Location", ({ observed }) => Option.some(observed)),
     Match.orElse(() => Option.none<string>()),
@@ -107,16 +110,21 @@ export const makeNavigationExecution = <T extends ReadonlyArray<Route>, S, E>(
     canonical = progress.canonical;
   });
   const execute = Effect.fn("Navigation.execute")(
-    function* (event: NavigationEvent<T, E>) {
+    function* (request: NavigationRequest<T, E>) {
       yield* requireValid(runtime.lifetime.active(), "Navigation owner disposed");
-      const requestHref = yield* Match.value(event).pipe(
-        Match.tag("Navigate", ({ destination }) => Effect.fromResult(router.build(destination))),
-        Match.orElse(() => Effect.succeed("")),
+      const event: NavigationEvent<T, E> = yield* Match.value(request).pipe(
+        Match.tag("Navigate", (request) =>
+          Effect.fromResult(router.resolve(request.destination)).pipe(
+            Effect.map((target) => ({ _tag: "Navigate" as const, mode: request.mode, target })),
+          ),
+        ),
+        Match.orElse((event) => Effect.succeed(event)),
         Effect.mapError((cause) =>
-          error({ phase: "build", cause, observed: observedLocation(event) }),
+          error({ phase: "build", cause, observed: observedLocation(request) }),
         ),
       );
-      const noop = event._tag === "Navigate" && event.mode === "push" && requestHref === canonical;
+      const noop =
+        event._tag === "Navigate" && event.mode === "push" && event.target.original === canonical;
       yield* Match.value(noop).pipe(
         Match.when(true, () => Effect.void),
         Match.when(false, () => commitRequest(event)),

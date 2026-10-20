@@ -2,6 +2,7 @@ import { Cause, Deferred, Effect, Exit, Fiber, Match, Option, Result } from "eff
 import { describe, expect, it } from "vitest";
 import { ReactiveError } from "~/reactive/runtime";
 import { signalData } from "~/reactive/signal";
+import type { BranchKey } from "./branch";
 import {
   type Signal,
   type WritableSignal,
@@ -24,7 +25,7 @@ const active = (id = 1): Active => ({ _tag: "Active", id, fields: { left: 0, rig
 const Empty = branch<{ readonly _tag: "Empty" }>()(() =>
   Sync.succeed({ setup: () => Effect.succeed([]) }),
 );
-const fixture = async () => {
+const fixture = async (key: (state: Active) => BranchKey = (state) => state.id) => {
   const test = await harness();
   const source = await Effect.runPromise(test.ctx.signal<State>({ initial: active() }));
   const lenses: WritableSignal<Active>[] = [];
@@ -49,7 +50,7 @@ const fixture = async () => {
   );
   const selection = cases({
     state: source,
-    branches: { Active: { branch: Active, key: (state) => state.id }, Empty: { branch: Empty } },
+    branches: { Active: { branch: Active, key }, Empty: { branch: Empty } },
   });
   Effect.runSync(test.ctx.h(test.target, selection));
   await rendered({ parent: test.parent, check: () => test.target.textContent === "1:0:0:1" });
@@ -402,4 +403,15 @@ it("reports adoption-time branch planning failures as typed errors", async () =>
   Effect.runSync(test.ctx.h(test.target, selection));
   await rendered({ parent: test.parent, check: () => test.target.textContent === "ready" });
   expect(factories).toBe(1);
+});
+
+it("retains equal structural branch keys and remounts when their contents change", async () => {
+  const f = await fixture((state) =>
+    Object.freeze({ id: state.id, email: Option.some("reader@example.com") }),
+  );
+  await Effect.runPromise(f.source.set({ ...active(), fields: { left: 7, right: 0 } }));
+  await rendered({ parent: f.parent, check: () => f.target.textContent === "1:7:0:1" });
+  expect(f.factories()).toBe(1);
+  await Effect.runPromise(f.source.set(active(2)));
+  await rendered({ parent: f.parent, check: () => f.factories() === 2 });
 });

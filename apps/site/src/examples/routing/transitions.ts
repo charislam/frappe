@@ -1,5 +1,9 @@
-import type { NavigationDecision, NavigationEvent } from "@charismaticalli/frappe/router";
-import { Match, Option } from "effect";
+import type {
+  MatchedTarget,
+  NavigationDecision,
+  NavigationEvent,
+} from "@charismaticalli/frappe/router";
+import { Match, Option, Result } from "effect";
 import type { AppEvent, AppState } from "./model";
 import { privatePage } from "./pages";
 import { completeProject } from "./project-transitions";
@@ -8,12 +12,8 @@ import { type Destination, type NavigationTarget, dashboard, login, urls } from 
 type Decision = NavigationDecision<AppState, Destination>;
 type Event = NavigationEvent<typeof urls.definitions, AppEvent>;
 
-export const targetOf = (destination: Destination): NavigationTarget => ({
-  _tag: "Matched",
-  original: "",
-  destination,
-  ancestry: [],
-});
+export const targetOf = (destination: Destination): MatchedTarget<typeof urls.definitions> =>
+  Result.getOrThrow(urls.resolve(destination));
 const requested = (state: AppState): NavigationTarget =>
   Match.value(state).pipe(
     Match.tag("ResolvingSession", ({ requested }) => requested),
@@ -170,16 +170,17 @@ const authTransition = (options: {
 export const transition = (options: { state: AppState; event: Event }): Decision => {
   const { state, event } = options;
   return Match.value(event).pipe(
-    Match.tag("Navigate", ({ destination, mode }) =>
+    Match.tag("Navigate", ({ target, mode }) =>
       admit({
         state,
-        target: targetOf(destination),
+        target,
         history: {
           _tag: Match.value(mode).pipe(
             Match.when("push", () => "Push" as const),
-            Match.orElse(() => "Replace" as const),
+            Match.when("replace", () => "Replace" as const),
+            Match.exhaustive,
           ),
-          destination,
+          destination: target.destination,
         },
       }),
     ),

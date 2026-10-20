@@ -1,0 +1,27 @@
+{
+  "name": "@charismaticalli/budgie",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "tsc --noEmit && vite build",
+    "fmt": "oxfmt",
+    "lint": "oxlint src && oxfmt --check src",
+    "typecheck": "tsc --noEmit",
+    "test": "vitest run"
+  },
+  "dependencies": {
+    "@charismaticalli/frappe": "workspace:*",
+    "@supabase/supabase-js": "2.117.3",
+    "effect": "catalog:"
+  },
+  "devDependencies": {
+    "happy-dom": "catalog:",
+    "oxfmt": "catalog:",
+    "oxlint": "catalog:",
+    "oxlint-tsgolint": "catalog:",
+    "typescript": "catalog:",
+    "vite": "catalog:",
+    "vitest": "catalog:"
+  }
+}

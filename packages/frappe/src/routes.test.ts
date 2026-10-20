@@ -70,7 +70,22 @@ describe("typed route codecs", () => {
       query: { page: 1, q: Option.some("a/b & c"), filter: ["b", "a"] },
       fragment: Option.some("section/2"),
     };
+    const resolved = Result.getOrThrow(urls.resolve(destination));
     const href = Result.getOrThrow(urls.build(destination));
+    expect(resolved).toEqual(urls.parse(href));
+    expect(resolved.original).toBe(href);
+    expect(resolved.destination).toEqual(destination);
+    expect(resolved.ancestry.map((prefix) => prefix._tag)).toEqual([
+      "Root",
+      "Projects",
+      "Project",
+      "Settings",
+    ]);
+    expect(resolved.ancestry.at(-1)).toEqual({
+      _tag: "Settings",
+      params: { id: 123 },
+      query: destination.query,
+    });
     expect(href).toBe("/projects/123/settings?q=a%2Fb+%26+c&filter=b&filter=a#section%2F2");
     expect(matched(href)).toEqual(destination);
     expect(matched("/projects/00123/settings/?unknown=ignored")).toEqual({
@@ -283,4 +298,35 @@ it("refuses successful builds for destinations shadowed by an earlier declaratio
       }),
     ]),
   ).toThrow("query default");
+});
+
+it("resolves normalized values and reports encoding and shadowing failures", () => {
+  const normalized = Schema.String.pipe(
+    Schema.decodeTo(
+      Schema.String,
+      SchemaTransformation.transform({
+        decode: (value: string) => value.toLowerCase(),
+        encode: (value: string) => value,
+      }),
+    ),
+  );
+  const routes = router([
+    route({ tag: "Literal", path: ["reserved"] }),
+    route({ tag: "Dynamic", path: [parameter("name", normalized)] }),
+  ]);
+  const destination = {
+    _tag: "Dynamic",
+    params: { name: "HELLO" },
+    query: {},
+    fragment: Option.none(),
+  } as const;
+  expect(Result.getOrThrow(routes.resolve(destination))).toMatchObject({
+    original: "/HELLO",
+    destination: { params: { name: "hello" } },
+    ancestry: [{ _tag: "Dynamic", params: { name: "hello" }, query: {} }],
+  });
+  expect(Result.isFailure(routes.resolve({ ...destination, params: { name: "reserved" } }))).toBe(
+    true,
+  );
+  expect(Result.isFailure(routes.resolve({ ...destination, params: { name: "" } }))).toBe(true);
 });
