@@ -628,7 +628,8 @@ which allocate fresh state per runtime.
 
 `branch<A>()(factory)` describes a reusable occurrence whose `inputs.state` is a
 live `WritableSignal<A>`. `branch<A, Signal<A>>()` describes a read-only consumer,
-which also works over writable sources. `cases({ state, branches })` requires
+which also works over writable sources. Branch keys compare with Effect `Equal.equals`;
+use immutable records or arrays for composite identity instead of serializing them. `cases({ state, branches })` requires
 exactly one correctly narrowed descriptor for every `_tag` in the source union.
 A writable consumer cannot mount over a read-only signal. Cases work in `he`
 children, `h`, setup/fallback output, and mixed root arrays; their deferred context
@@ -745,8 +746,14 @@ const destination: AppDestination = {
   fragment: Option.some("details"),
 };
 const href = urls.build(destination); // Result: /projects/123/settings#details
+const target = urls.resolve(destination); // Result<MatchedTarget, UrlBuildError>
 const outcome = urls.parse("/projects/123/unknown-child");
 ```
+
+`resolve` returns the validated matched target: its `original` is the generated
+URL, `destination` contains decoded normalized values, and `ancestry` contains
+the matched route chain. `build` projects the URL from the same resolution. Both
+reject malformed encodings and destinations shadowed by earlier routes.
 
 Routes match in declaration order at each level. Structural ownership precedes
 schema decoding, so an invalid `:id` cannot fall through to another schema.
@@ -796,6 +803,9 @@ the same controller. A synchronous pure transition receives the latest state
 and a `Navigate`, `Location`, or `Application` event and returns `{ state,
 history }`. History intents are `Keep`, typed `Push`/`Replace`, or `ReplaceUrl`
 for restoring the original URL of an admitted structured failure.
+`Navigate` events include a resolved `target` with its normalized `target.destination`,
+so transitions can use the same metadata as browser `Location` events. Resolution
+failures report a build error before the transition or a history write.
 
 Application transitions own admission and redirects. For example, represent
 unresolved sessions explicitly; when discovery says anonymous, admit a private

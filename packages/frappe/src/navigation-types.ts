@@ -2,14 +2,14 @@ import { Effect, Schema } from "effect";
 import type { ReactiveOwner } from "~/reactive/owner";
 import type { WritableSignal } from "~/reactive/signal";
 import type { HistoryAdapter } from "./history";
-import type { Destination, ParseResult, Route, Router } from "./routes";
+import type { Destination, MatchedTarget, ParseResult, Route, Router } from "./routes";
 
 export type NavigationMode = "push" | "replace";
 export type NavigationEvent<T extends ReadonlyArray<Route>, E> =
   | {
       readonly _tag: "Navigate";
-      readonly destination: Destination<T>;
       readonly mode: NavigationMode;
+      readonly target: MatchedTarget<T>;
     }
   | {
       readonly _tag: "Location";
@@ -18,6 +18,14 @@ export type NavigationEvent<T extends ReadonlyArray<Route>, E> =
       readonly initial: boolean;
     }
   | { readonly _tag: "Application"; readonly event: E };
+/** Internal ingress requests are resolved before application transitions run. */
+export type NavigationRequest<T extends ReadonlyArray<Route>, E> =
+  | {
+      readonly _tag: "Navigate";
+      readonly destination: Destination<T>;
+      readonly mode: NavigationMode;
+    }
+  | Exclude<NavigationEvent<T, E>, { _tag: "Navigate" }>;
 export type HistoryIntent<D> =
   | { readonly _tag: "Keep" }
   | { readonly _tag: "ReplaceUrl"; readonly url: string }

@@ -24,6 +24,7 @@ export {
   route,
   type Destination,
   type ParseResult,
+  type MatchedTarget,
   type Prefix,
   type Router,
   type UrlIssue,

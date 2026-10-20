@@ -1,11 +1,17 @@
-import { Option, Result, type Scope } from "effect";
+import { Equal, Option, Result, type Scope } from "effect";
 import { ReactiveError, calculateSync, requireValidSync } from "~/reactive/runtime";
 import { type Signal, type WritableSignal } from "~/reactive/signal";
 import type { FactoryLifecycle, Lifecycle } from "./component";
 import type { Output, SynchronousContext } from "./framework";
-import type { Key } from "./keyed";
 import type { Normalize, OutputRequirements } from "./requirements";
 import type { Sync } from "./sync";
+
+export type BranchKey =
+  | string
+  | number
+  | Equal.Equal
+  | Readonly<Record<string, unknown>>
+  | ReadonlyArray<unknown>;
 
 const BranchTypeId = "~frappe/Branch";
 const CasesTypeId = "~frappe/Cases";
@@ -61,7 +67,7 @@ type Input<S, A> = S extends { readonly set: (value: never) => unknown }
 type Table<A extends Variant, S> = {
   readonly [T in A["_tag"]]: {
     readonly branch: Branch<Extract<A, { _tag: T }>, Input<S, Extract<A, { _tag: T }>>, unknown>;
-    readonly key?: (value: Extract<A, { _tag: T }>) => Key;
+    readonly key?: (value: Extract<A, { _tag: T }>) => BranchKey;
   };
 };
 type Requirements<T> = T[keyof T] extends infer E
@@ -78,7 +84,7 @@ export interface Cases<out R = never> {
       string,
       {
         readonly branch: Branch<Variant, Signal<Variant>, unknown>;
-        readonly key?: (value: Variant) => Key;
+        readonly key?: (value: Variant) => BranchKey;
       }
     >
   >;
@@ -94,7 +100,7 @@ export const isCases = (value: unknown): value is Cases<unknown> =>
 export interface BranchPlan {
   readonly value: Variant;
   readonly tag: string;
-  readonly key: Option.Option<Key>;
+  readonly key: Option.Option<BranchKey>;
   readonly descriptor: Branch<Variant, Signal<Variant>, unknown>;
 }
 export const planBranch = (options: {
@@ -135,18 +141,22 @@ export const planBranch = (options: {
       Option.match(key, {
         onNone: () => true,
         onSome: (key) =>
-          typeof key === "string" || (typeof key === "number" && Number.isFinite(key)),
+          typeof key === "string" ||
+          (typeof key === "number" && Number.isFinite(key)) ||
+          Equal.isEqual(key) ||
+          (typeof key === "object" &&
+            key !== null &&
+            (Array.isArray(key) ||
+              Object.getPrototypeOf(key) === Object.prototype ||
+              Object.getPrototypeOf(key) === null)),
       }),
-      "Branch keys must be strings or finite numbers",
+      "Branch keys must be strings, finite numbers, records, arrays, or Effect Equal values",
     );
     return { value, tag: value._tag, key, descriptor: entry.branch };
   });
 export const sameBranch = (options: { previous: BranchPlan; proposed: BranchPlan }): boolean =>
   options.previous.tag === options.proposed.tag &&
   options.previous.descriptor === options.proposed.descriptor &&
-  Option.makeEquivalence<Key>((previous, proposed) => previous === proposed)(
-    options.previous.key,
-    options.proposed.key,
-  );
+  Option.makeEquivalence<BranchKey>(Equal.equals)(options.previous.key, options.proposed.key);
 export const unchangedBranch = (options: { previous: BranchPlan; proposed: BranchPlan }): boolean =>
   sameBranch(options) && Object.is(options.previous.value, options.proposed.value);

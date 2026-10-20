@@ -60,15 +60,15 @@ export const App = component(() =>
           history,
           transition: ({ state, event }) =>
             Match.value(event).pipe(
-              Match.tag("Navigate", ({ destination, mode }) => ({
-                state: pageOf(destination._tag),
+              Match.tag("Navigate", ({ target, mode }) => ({
+                state: pageOf(target.destination._tag),
                 history: {
                   _tag: Match.value(mode).pipe(
                     Match.when("push", () => "Push" as const),
                     Match.when("replace", () => "Replace" as const),
                     Match.exhaustive,
                   ),
-                  destination,
+                  destination: target.destination,
                 },
               })),
               Match.tag("Location", ({ target }) => ({

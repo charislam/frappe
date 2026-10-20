@@ -134,6 +134,11 @@ export type ParseResult<T extends ReadonlyArray<Route>> =
       readonly matched: Option.Option<string>;
       readonly issue: UrlIssue;
     };
+export type MatchedTarget<T extends ReadonlyArray<Route>> = Extract<
+  ParseResult<T>,
+  { _tag: "Matched" }
+>;
+
 export class UrlBuildError extends Schema.TaggedError<UrlBuildError>()("UrlBuildError", {
   message: Schema.String,
   cause: Schema.Unknown,
@@ -152,5 +157,6 @@ export interface UntypedPrefix {
 export interface Router<T extends ReadonlyArray<Route>> {
   readonly definitions: T;
   readonly parse: (url: string) => ParseResult<T>;
+  readonly resolve: (destination: Destination<T>) => Result.Result<MatchedTarget<T>, UrlBuildError>;
   readonly build: (destination: Destination<T>) => Result.Result<string, UrlBuildError>;
 }

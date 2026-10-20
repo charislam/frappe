@@ -18,6 +18,7 @@ const urls = router([
   route({ tag: "Login", path: ["login"] }),
   route({ tag: "Home", path: [] }),
   route({ tag: "Private", path: ["private"] }),
+  route({ tag: "Shadowed", path: ["private"] }),
 ]);
 type Target = Destination<typeof urls.definitions>;
 const target = (tag: Target["_tag"]): Target => ({
@@ -38,7 +39,7 @@ const transitions = (options: {
 }): NavigationDecision<State, Target> => {
   const { state, event } = options;
   const requested = Match.value(event).pipe(
-    Match.tag("Navigate", ({ destination }) => destination),
+    Match.tag("Navigate", ({ target }) => target.destination),
     Match.tag("Location", ({ target: parsed }) =>
       Match.value(parsed).pipe(
         Match.tag("Matched", ({ destination }) => destination),
@@ -94,6 +95,7 @@ const fixture = async (initial = "/", signedIn = false) => {
   const state = await Effect.runPromise(
     test.ctx.signal<State>({ initial: { signedIn, page: "Home", decisions: 0 } }),
   );
+  const events: NavigationEvent<typeof urls.definitions, Event>[] = [];
   const failures: unknown[] = [];
   const reported = Deferred.makeUnsafe<void>();
   const controller = await Effect.runPromise(
@@ -102,7 +104,10 @@ const fixture = async (initial = "/", signedIn = false) => {
       router: urls,
       history,
       state,
-      transition: transitions,
+      transition: (options: Parameters<typeof transitions>[0]) => {
+        events.push(options.event);
+        return transitions(options);
+      },
       onError: (error) => {
         failures.push(error);
         Effect.runSync(Deferred.succeed(reported, undefined));
@@ -110,7 +115,7 @@ const fixture = async (initial = "/", signedIn = false) => {
     }),
   );
   await Effect.runPromise(controller.initial);
-  return { ...test, history, state, controller, failures, reported };
+  return { ...test, history, state, controller, failures, reported, events };
 };
 describe("serialized navigation and prepared history commits", () => {
   it("admits initial private URLs with one replacement and no intermediate push", async () => {
@@ -351,4 +356,31 @@ it("rejects an unrelated navigation context before acquiring history", async () 
   );
   await Effect.runPromise(controller.initial);
   expect(history.listenerCount()).toBe(1);
+});
+
+it("supplies real matched metadata before admission and rejects invalid requests without mutation", async () => {
+  const f = await fixture();
+  await Effect.runPromise(f.controller.navigate(target("Login")));
+  expect(f.events.at(-1)).toEqual({
+    _tag: "Navigate",
+    mode: "push",
+    target: Result.getOrThrow(urls.resolve(target("Login"))),
+  });
+  expect(f.events.at(-1)).toMatchObject({
+    target: { original: "/login", ancestry: [{ _tag: "Login" }] },
+  });
+  const state = await Effect.runPromise(f.state.get);
+  const entries = f.history.entries();
+  const count = f.events.length;
+  const malformed: unknown = { _tag: "Missing", params: {}, query: {}, fragment: Option.none() };
+  // @ts-expect-error Malformed destination exercises the runtime boundary.
+  const invalid: Target = malformed;
+  for (const destination of [target("Shadowed"), invalid]) {
+    expect(
+      Exit.isFailure(await Effect.runPromise(f.controller.navigate(destination).pipe(Effect.exit))),
+    ).toBe(true);
+    expect(await Effect.runPromise(f.state.get)).toBe(state);
+    expect(f.history.entries()).toEqual(entries);
+    expect(f.events).toHaveLength(count);
+  }
 });
