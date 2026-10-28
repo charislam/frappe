@@ -20,3 +20,7 @@ packages:
   - packages/*
 
 minimumReleaseAge: 10080
+
+# Keep the Node adapter on the same Effect prerelease as this workspace.
+overrides:
+  '@effect/platform-node@4.0.0-rc.115>@effect/platform-node-shared': 4.0.0-rc.115

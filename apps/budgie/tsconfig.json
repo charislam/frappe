@@ -1,6 +1,6 @@
 {
   "extends": "../../tsconfig.json",
-  "include": ["src/**/*.ts", "vite.config.ts", "vitest.config.ts"],
+  "include": ["src/**/*.ts", "vite.config.ts", "vitest.config.ts", "database-tests/**/*.ts"],
   "exclude": ["node_modules", "dist"],
   "compilerOptions": {
     "target": "ES2022",

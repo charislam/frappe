@@ -81,3 +81,7 @@ pnpm test
 Budgie's deterministic Node tests cover SDK callback ownership, auth initialization/event ordering and disposal, confirmation-pending signup, OTP intent/errors, failed logout, recovery precedence, routing/traversal decisions, real frappe query cache isolation/in-flight retirement, and theme storage fallback.
 
 References: [local Supabase](https://supabase.com/docs/guides/local-development), [email OTP](https://supabase.com/docs/guides/auth/auth-email-passwordless), [password recovery](https://supabase.com/docs/guides/auth/passwords), [GitHub](https://supabase.com/docs/guides/auth/social-login/auth-github), [PKCE](https://supabase.com/docs/guides/auth/sessions/pkce-flow).
+
+## Financial database
+
+The database schema, protected commands, credit replay, summaries, and application boundary implement [database design 0002](spec/0002_DATABASE_DESIGN.md). See [DATABASE.md](DATABASE.md) for local migration and test commands, RPC payloads, and calculation semantics.

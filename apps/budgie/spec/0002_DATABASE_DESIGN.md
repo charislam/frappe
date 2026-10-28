@@ -1,6 +1,6 @@
 # Budgie database design
 
-Status: proposed schema implementing the agreed product requirements. This document does not create tables or migrations.
+Status: implemented in `supabase/schemas/` and the initial migration. See [DATABASE.md](../DATABASE.md) for RPC contracts, replay semantics, and local checks.
 
 ## Product rules
 
@@ -30,20 +30,20 @@ Columns below describe the logical schema; migrations must add concrete checks, 
 
 ### Budgets and ownership
 
-| Table | Columns and constraints |
-| --- | --- |
-| `budgets` | `id`, `name`, `currency_code`, `minor_unit_scale`, `created_at`, `archived_at` |
+| Table           | Columns and constraints                                                                                         |
+| --------------- | --------------------------------------------------------------------------------------------------------------- |
+| `budgets`       | `id`, `name`, `currency_code`, `minor_unit_scale`, `created_at`, `archived_at`                                  |
 | `budget_owners` | `budget_id`, `user_id` referencing the authenticated identity, `created_at`; primary key `(budget_id, user_id)` |
 
-Financial dates are explicitly selected calendar dates; no budget timezone is stored. The UI defaults to the device-local date and passes its selected as-of date to date-sensitive commands. Posting is a manual action, not a server-midnight job. No role column is needed until another permission level exists. Owner additions and removals are audited. Creating a budget and its first ownership row is atomic. Serialize membership changes on the budget row and reject removal of its final owner; deleting an identity must not silently orphan a budget. Adding another existing user grants full owner access. Invitation delivery is outside this design.
+Financial dates are explicitly selected calendar dates; no budget timezone is stored. The client supplies the current viewer’s IANA timezone, and the database derives that viewer’s current day from its own clock. Owners in different timezones may have different posting eligibility at the same instant. There is no caller-selected as-of date. Posting is a manual action, not a server-midnight job. No role column is needed until another permission level exists. Owner additions and removals are audited. Creating a budget and its first ownership row is atomic. Serialize membership changes on the budget row and reject removal of its final owner; deleting an identity must not silently orphan a budget. Adding another existing user grants full owner access. Invitation delivery is outside this design.
 
 ### Accounts and envelopes
 
-| Table | Columns and constraints |
-| --- | --- |
-| `accounts` | `id`, `budget_id`, `name`, `kind` (`cash`, `credit`, `investment`), `sort_order`, `created_at`, `archived_at` |
-| `envelope_groups` | `id`, `budget_id`, `name`, `sort_order`, `archived_at` |
-| `envelopes` | `id`, `budget_id`, nullable `group_id`, `name`, `kind` (`regular`, `ready_to_assign`, `credit_payment`), nullable `credit_account_id`, `sort_order`, `archived_at` |
+| Table             | Columns and constraints                                                                                                                                            |
+| ----------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| `accounts`        | `id`, `budget_id`, `name`, `kind` (`cash`, `credit`, `investment`), `sort_order`, `created_at`, `archived_at`                                                      |
+| `envelope_groups` | `id`, `budget_id`, `name`, `sort_order`, `archived_at`                                                                                                             |
+| `envelopes`       | `id`, `budget_id`, nullable `group_id`, `name`, `kind` (`regular`, `ready_to_assign`, `credit_payment`), nullable `credit_account_id`, `sort_order`, `archived_at` |
 
 Each budget has exactly one system Ready to assign envelope. Each credit account has exactly one payment envelope linked through `credit_account_id`; only payment envelopes may have that link, and the linked account must be credit. System envelopes cannot be removed or repurposed. Their entries remain visible even if the associated account is archived. Account kind is immutable after financial activity exists. Budget participation is derived from account kind initially rather than a separately editable flag.
 
@@ -57,12 +57,12 @@ A reorder command accepts the complete ordered list for the affected scope, vali
 
 ### Financial transactions
 
-| Table | Columns and constraints |
-| --- | --- |
-| `payees` | `id`, `budget_id`, `name`, `created_at`, `archived_at`; unique normalized name within the budget (trimmed, case-insensitive) |
-| `transactions` | `id`, `budget_id`, `kind` (`income`, `expense`, `refund`, `transfer`, `opening_balance`, `adjustment`, `valuation`), `status` (`scheduled`, `posted`, `voided`), `effective_date`, `payee_id` nullable, `memo` nullable, `sequence bigint`, `version bigint`, `created_by`, `created_at`, `updated_at` |
-| `account_entries` | `id`, `budget_id`, `transaction_id`, `account_id`, `amount_minor`, `position`; unique `(transaction_id, position)` |
-| `transaction_splits` | `id`, `budget_id`, `transaction_id`, `envelope_id`, `amount_minor`, `position`; unique `(transaction_id, position)` |
+| Table                | Columns and constraints                                                                                                                                                                                                                                                                                |
+| -------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| `payees`             | `id`, `budget_id`, `name`, `created_at`, `archived_at`; unique normalized name within the budget (trimmed, case-insensitive)                                                                                                                                                                           |
+| `transactions`       | `id`, `budget_id`, `kind` (`income`, `expense`, `refund`, `transfer`, `opening_balance`, `adjustment`, `valuation`), `status` (`scheduled`, `posted`, `voided`), `effective_date`, `payee_id` nullable, `memo` nullable, `sequence bigint`, `version bigint`, `created_by`, `created_at`, `updated_at` |
+| `account_entries`    | `id`, `budget_id`, `transaction_id`, `account_id`, `amount_minor`, `position`; unique `(transaction_id, position)`                                                                                                                                                                                     |
+| `transaction_splits` | `id`, `budget_id`, `transaction_id`, `envelope_id`, `amount_minor`, `position`; unique `(transaction_id, position)`                                                                                                                                                                                    |
 
 Account entries and splits represent user intent, not automatically generated payment-reserve movements. Transactions have no duplicate authoritative total: derive it from the applicable account entries. Single-envelope purchases still have one split. A stable sequence is assigned by the database on creation and retained through edits.
 
@@ -85,14 +85,14 @@ Validate the complete transaction at commit time, not with row-local CHECK const
 - Adjustments are explicit signed corrections with a memo/reason. Cash corrections require matching envelope splits; investment corrections have no budget splits. Credit corrections must explicitly choose categorized activity or an opening-debt-style adjustment, rather than silently inventing a category.
 - Initial support covers these transfer routes. Credit borrowing into cash, credit-to-credit balance transfers, and direct credit-to-investment transfers need explicit debt/reserve rules before being enabled; reject them rather than interpreting them as ordinary payments.
 
-When posting, the effective date must be on or before the explicitly selected as-of date. This is a user bookkeeping choice, not a timezone-based authorization boundary. Scheduled transactions keep their proposed entries and splits but affect neither current accounts nor funded envelopes. Posting is an explicit, idempotent operation available on or after the effective date; automatic recurring generation is deferred. Voiding a schedule has no balance effect.
+When posting, the effective date must be on or before the database’s current day in the requesting viewer’s validated IANA timezone. The viewer supplies a timezone, never a clock value or arbitrary posting cutoff; this is a scheduling rule rather than an authorization boundary. Scheduled transactions keep their proposed entries and splits but affect neither current accounts nor funded envelopes. Posting is an explicit, idempotent operation available on or after the effective date; automatic recurring generation is deferred. Voiding a schedule has no balance effect.
 
 ### Allocations
 
-| Table | Columns and constraints |
-| --- | --- |
+| Table                | Columns and constraints                                                                                                            |
+| -------------------- | ---------------------------------------------------------------------------------------------------------------------------------- |
 | `allocation_batches` | `id`, `budget_id`, `month`, `sequence`, `memo` nullable, `version`, `voided_at` nullable, `created_by`, `created_at`, `updated_at` |
-| `allocation_entries` | `id`, `budget_id`, `batch_id`, `envelope_id`, `amount_minor`; unique `(batch_id, envelope_id)` |
+| `allocation_entries` | `id`, `budget_id`, `batch_id`, `envelope_id`, `amount_minor`; unique `(batch_id, envelope_id)`                                     |
 
 `sequence` and `version` have the same meanings as on transactions: stable creation order for batches in the same month, and stale-edit protection for the entire batch and its entries.
 
@@ -104,14 +104,14 @@ Future allocations reserve existing money immediately for assignment-capacity ch
 
 For example, October's raw Ready to assign is 1,000 and November has a -300 Ready to assign allocation: October displays 700. November's raw balance already includes the -300, so November also displays 700, assuming no other activity. Historical views use this same current-plan convention; later allocation edits can change their displayed Ready to assign adjustment without changing their raw historical closing balances.
 
-Funding validation uses this calculation for the current as-of month and excludes scheduled income. Also reject future releases that rely on unposted income or make their source envelope unfunded in the projected allocation timeline. Funding commands may not worsen an existing overassignment. Historical corrections can expose an overassigned budget and must remain recordable; show the shortage instead of rejecting the correction.
+Allocations may make Ready to assign or source envelopes more negative, including future releases, edits, and voids of earlier assignments. Show the resulting overassignment or envelope shortage to the user; do not reject allocations based on available funds. Scheduled income remains excluded from actual account and envelope balances until posted. Historical corrections also remain recordable when they expose shortages.
 
 ### Reconciliation and audit
 
-| Table | Columns and constraints |
-| --- | --- |
-| `audit_events` | `id`, `budget_id`, `actor_user_id` nullable, `recorded_at`, `operation`, `entity_type`, `entity_id`, `before_data jsonb` nullable, `after_data jsonb` nullable, `request_id` |
-| `write_requests` | `budget_id`, `request_id`, `actor_user_id`, `payload_hash`, `result jsonb`, `created_at`; primary key `(budget_id, request_id)` |
+| Table            | Columns and constraints                                                                                                                                                      |
+| ---------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `audit_events`   | `id`, `budget_id`, `actor_user_id` nullable, `recorded_at`, `operation`, `entity_type`, `entity_id`, `before_data jsonb` nullable, `after_data jsonb` nullable, `request_id` |
+| `write_requests` | `budget_id`, `request_id`, `actor_user_id`, `payload_hash`, `result jsonb`, `created_at`; primary key `(budget_id, request_id)`                                              |
 
 Reconciliation is a regular `adjustment` transaction. The user supplies the observed account balance and a financial date; under the budget lock, calculate the recorded balance through that date and post the difference with the appropriate envelope splits and a reconciliation memo. The preview supplies the expected recorded balance so intervening account activity forces a refreshed preview rather than an unexpected adjustment. A zero difference needs no transaction. There are no statement records, cleared flags, reconciliation memberships, or invalidation workflows. Historical edits recalculate balances but leave later adjustments as originally entered; users can edit those transactions explicitly.
 
@@ -119,20 +119,21 @@ Audit events capture full before/after transaction aggregates, including entries
 
 ## Derived envelope ledger and caches
 
-Credit calculations produce two intermediate structures during replay: envelope effects explain the automatic payment-reserve changes attributable to each source, and deficit lots track which unfunded spending belongs to which card (or cash), in oldest-first order. For example, a -50 envelope balance alone cannot tell us that 20 belongs to card A and 30 to card B. That detail is necessary to fund the correct payment reserves later.
+Credit calculations retain deficit lots during replay to track which unfunded spending belongs to which card (or cash), in oldest-first order. For example, a -50 envelope balance alone cannot tell us that 20 belongs to card A and 30 to card B. That detail is necessary to fund the correct payment reserves later.
 
-Initially keep these structures in calculation memory, not separate persisted `envelope_effects` or `deficit_lots` tables. Full replay can reconstruct them from authoritative entries. An explanation endpoint can return generated effects when needed; persist them only if measured performance or an actual query requires it.
+Persist outstanding deficit lots in a budget-scoped `deficit_lots` derived cache. Store the source transaction and split position, a deterministic budget-local ordinal for oldest-first processing, envelope and optional credit account, remaining deficit, eligible unpaid debt, and direct coverage. Rebuild the cache from authoritative entries under the budget lock alongside account and monthly envelope summaries; remove settled lots at the end of replay. Deficit lots are not manually editable accounting inputs. Apply automatic payment-reserve effects directly to the running envelope balances; do not tabulate every effect or include effect traces in ordinary snapshots. Per-source tracing is deferred until an explanation endpoint or a concrete debugging need requires it.
 
-| Table | Key and contents |
-| --- | --- |
-| `account_balances` | Primary key `(budget_id, account_id)`; current posted balance |
-| `envelope_month_balances` | Primary key `(budget_id, envelope_id, month)`; opening, allocated, activity, closing amounts |
+| Table                     | Key and contents                                                                                 |
+| ------------------------- | ------------------------------------------------------------------------------------------------ |
+| `deficit_lots`            | Primary key `(budget_id, ordinal)`; outstanding spending deficits and reproducible debt coverage |
+| `account_balances`        | Primary key `(budget_id, account_id)`; current posted balance                                    |
+| `envelope_month_balances` | Primary key `(budget_id, envelope_id, month)`; opening, allocated, activity, closing amounts     |
 
-`activity` includes both user transaction splits and generated payment-reserve effects. A separate reserve-transfer aggregate is unnecessary; the replay explanation can identify automatic effects without another monthly balance column.
+`activity` includes both user transaction splits and generated payment-reserve effects. A separate reserve-transfer aggregate is unnecessary; future on-demand explanation tracing can identify automatic effects without another monthly balance column.
 
 There are no budget/source revision columns or `budget_projection_state` table. Those were freshness markers for detecting mismatched cache generations, but synchronous atomic maintenance already ensures source/cache agreement. Read a combined budget screen in one database statement/snapshot. Separate requests can naturally observe different commits and should not be presented as a single snapshot. Entity `version` remains necessary for stale-edit protection; it serves a different purpose.
 
-Expose these through authorized read views where useful. Use ordinary summary tables maintained in the write transaction rather than periodically refreshed materialized views. Missing month rows mean not materialized, not zero; reads must generate the requested range or derive carry-forward from the preceding row. Materialize through the current month, latest allocation month, or requested view month, whichever is later. Scheduled activity belongs in a separate forecast view.
+Expose these through authorized read views where useful. Use ordinary summary and deficit-lot tables maintained in the write transaction rather than periodically refreshed materialized views. Missing month rows mean not materialized, not zero; reads must generate the requested range or derive carry-forward from the preceding row. Materialize through the current month, latest allocation month, or requested view month, whichever is later. Scheduled activity belongs in a separate forecast view.
 
 For each envelope and month:
 
@@ -169,7 +170,7 @@ An overpayment can make a credit account positive. That positive balance is spen
 
 The user enters a positive credit account entry and positive envelope splits, without linking an original purchase. Apply each chosen split to its envelope and debit the card's payment reserve by the total refund. A refund of 20 to Groceries yields Groceries +20 and reserve -20, whether or not the original purchase can be identified.
 
-Do not silently cap the reserve debit or redirect the refund to Ready to assign. If the reserve is insufficient, it becomes negative and signals that money must be reassigned. If the refund covers a negative destination envelope, consume its deficit lots in the same oldest-first order and apply any warranted reserve funding; record both effects separately. A refund after payment may create a positive credit account balance and a negative payment envelope; both remain visible. The user can explicitly rebalance envelopes rather than having the system invent an original category.
+Do not silently cap the reserve debit or redirect the refund to Ready to assign. If the reserve is insufficient, it becomes negative and signals that money must be reassigned. If the refund covers a negative destination envelope, consume its deficit lots in the same oldest-first order and apply any warranted reserve funding independently of the reserve debit. Future explanation tracing must preserve both movements. A refund after payment may create a positive credit account balance and a negative payment envelope; both remain visible. The user can explicitly rebalance envelopes rather than having the system invent an original category.
 
 ### Accounting checks
 
@@ -181,13 +182,13 @@ The replay state must distinguish purchase deficits, outstanding account debt, a
 
 ## Atomic writes, authorization, and recalculation
 
-All financial commands execute in the database as a single transaction: authenticate owner access, lock the budget row, validate request/version, write authoritative aggregates and audit, replay derived effects, refresh summaries, and record the idempotent response. Initially replay the whole budget for credit correctness; optimize to a checkpoint before the earliest changed date only after equivalence tests exist. Ordinary additive account totals may use deltas, but must match rebuild results.
+All financial commands execute in the database as a single transaction: authenticate owner access, lock the budget row, validate request/version, write authoritative aggregates and audit, replay derived effects, refresh summaries, and record the idempotent response. Safe new postings apply directly when they follow the complete financial timeline, including future allocations. Historical transaction changes restore the last month-end checkpoint before the earliest changed date and replay the affected tail; a missing checkpoint falls back to a full rebuild. Metadata and schedules leave financial caches untouched. Allocation creates, edits, month moves, and voids then replay from the checkpoint before the earliest affected old/new month; only a missing checkpoint requires a full canonical rebuild. Equivalence tests compare all caches and checkpoints with the full rebuild reference across financial scenarios.
 
 The budget lock serializes concurrent owner writes, including membership changes. Obtain it before reading balances or permissions used for mutation, and recheck membership after locking. Keep external work outside the transaction. Backdated changes, changed allocation months, and voids replay all affected later credit decisions, not just the edited month.
 
 Enable RLS on every exposed table. Reads require membership in `budget_owners`, including caches and audit records. Membership checks must avoid recursive policies. Revoke direct financial-table and cache mutations from client roles; expose narrowly scoped commands. If privileged functions are needed to write protected tables, use a fixed safe search path, explicit authenticated-owner checks, fully qualified relations, and restricted execution grants. Do not use user-editable JWT metadata for authorization. Read views must preserve underlying access controls. Bootstrap membership through a dedicated create-budget command.
 
-Rebuild caches from authoritative current records, not audit JSON or old projections. A rebuild uses the same budget lock and replaces summaries atomically. Deployments that change calculation rules must rebuild affected summaries before exposing the new calculations. Use a single database read statement for a consistent screen snapshot; no projection-state table is required.
+Rebuild caches from authoritative current records, not audit JSON or old projections. A rebuild uses the same budget lock and replaces summaries atomically. Deployments that change calculation rules must rebuild affected summaries before exposing the new calculations. Month-end `replay_checkpoints` store reproducible account balances, outstanding deficit lots, and the lot ordinal high-water mark for suffix recalculation. Protect them with the same ownership and client-write restrictions as summaries. Snapshots lock and read a consistent aggregate, materializing only missing empty months without replaying history.
 
 ## Indexes and integrity
 
@@ -212,7 +213,7 @@ Rebuild caches from authoritative current records, not audit JSON or old project
 7. Direct debt funding followed by deficit coverage does not reserve debt twice.
 8. Card payments before deficit coverage, payments exceeding reserves, and positive card balances remain consistent.
 9. Independent refunds restore user-selected splits and debit reserves, including insufficient reserves, already-paid cards, and refunds to negative envelopes.
-10. Future allocations reserve actual resources; scheduled income cannot fund them. Posting a schedule twice has one effect.
+10. Future allocations adjust displayed Ready to assign even when they overassign it. Scheduled income stays out of actual balances until posted; posting twice has one effect.
 11. Backdated edits, split changes, date changes, and voids yield exactly the same result as a full rebuild.
 12. Historical corrections can expose overassignment without losing the real transaction.
 13. Reconciliation writes an ordinary adjustment for the observed difference, writes nothing for zero difference, and rejects a stale preview. Historical edits do not silently change that adjustment.
@@ -220,7 +221,7 @@ Rebuild caches from authoritative current records, not audit JSON or old project
 15. All cached amounts match a full rebuild; missing monthly rows never display a false zero.
 16. Reordering cannot produce duplicate positions within a scope; swaps and group moves succeed atomically.
 17. Reusable payees remain budget-scoped and archived payees retain historical references.
-18. Ready to assign deducts future reservations exactly once when navigating months; unposted income cannot fund future releases.
+18. Ready to assign deducts future reservations exactly once when navigating months; unfunded releases remain recordable and their source-envelope shortages remain visible.
 
 ## Implementation sequence
 

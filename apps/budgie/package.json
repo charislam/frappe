@@ -6,9 +6,13 @@
     "dev": "vite",
     "build": "tsc --noEmit && vite build",
     "fmt": "oxfmt",
-    "lint": "oxlint src && oxfmt --check src",
+    "lint": "oxlint src database-tests && oxfmt --check src database-tests",
     "typecheck": "tsc --noEmit",
-    "test": "vitest run"
+    "test": "vitest run",
+    "test:database": "supabase test db",
+    "test:database:concurrency": "node --experimental-strip-types database-tests/concurrency.test.ts",
+    "test:database:lint": "supabase db lint --schema public,budgie_private --level warning --fail-on warning",
+    "db:sync": "supabase db schema declarative sync --no-apply --strict-coverage"
   },
   "dependencies": {
     "@charismaticalli/frappe": "workspace:*",
@@ -16,6 +20,7 @@
     "effect": "catalog:"
   },
   "devDependencies": {
+    "@effect/platform-node": "4.0.0-rc.115",
     "happy-dom": "catalog:",
     "oxfmt": "catalog:",
     "oxlint": "catalog:",
