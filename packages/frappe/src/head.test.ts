@@ -4,6 +4,7 @@ import { type ComponentContext, branch, cases } from "./framework";
 import * as Head from "./head";
 import { browser } from "./head-browser";
 import { resolve as resolveResult } from "./head-resolver";
+import { toEffect } from "./sync";
 import * as Sync from "./sync";
 import { harness, rendered } from "./test-helpers";
 
@@ -142,7 +143,7 @@ describe("head lifecycle", () => {
     );
     const root = await Effect.runPromise(Head.root({ context: h.ctx, document, defaults: source }));
     const invalidHandle = await Effect.runPromise(
-      Head.child({
+      child({
         context: h.ctx,
         parent: { ...root },
         metadata: {},
@@ -163,13 +164,11 @@ describe("head lifecycle", () => {
         Head.root({ context: h.ctx, document, defaults: {} }).pipe(Effect.flip),
       ),
     ).toBeDefined();
-    await Effect.runPromise(
-      Head.child({ context: h.ctx, parent: root, metadata: { title: "Child" } }),
-    );
+    await Effect.runPromise(child({ context: h.ctx, parent: root, metadata: { title: "Child" } }));
     expect(document.title).toBe("Child");
     expect(
       await Effect.runPromise(
-        Head.child({ context: h.ctx, parent: root, metadata: {} }).pipe(Effect.flip),
+        child({ context: h.ctx, parent: root, metadata: {} }).pipe(Effect.flip),
       ),
     ).toBeDefined();
     await h.close();
@@ -178,7 +177,7 @@ describe("head lifecycle", () => {
 });
 
 describe("head branch commits", () => {
-  it("retains metadata until delayed replacement presents and restores the parent on removal", async () => {
+  it("publishes metadata while replacement setup is pending and restores the parent on removal", async () => {
     document.head.innerHTML = "";
     const h = await harness();
     const root = await Effect.runPromise(
@@ -190,20 +189,28 @@ describe("head branch commits", () => {
         initial: { _tag: "First" },
       }),
     );
-    const page = (title: string) =>
-      Sync.succeed({
-        setup: (context: ComponentContext) =>
-          Effect.gen(function* () {
-            yield* Head.child({ context, parent: root, metadata: { title } });
-            yield* Match.value(String(title)).pipe(
-              Match.when("Second", () => Deferred.await(gate)),
-              Match.orElse(() => Effect.void),
-            );
-            return yield* context.he("span", { children: [String(title)] });
-          }),
+    const page = (options: {
+      title: string;
+      context: Parameters<typeof Head.child>[0]["context"];
+    }) =>
+      Sync.gen(function* () {
+        const { title, context } = options;
+        yield* Head.child({ context, parent: root, metadata: { title } });
+        return {
+          setup: (context: ComponentContext) =>
+            Effect.gen(function* () {
+              yield* Match.value(String(title)).pipe(
+                Match.when("Second", () => Deferred.await(gate)),
+                Match.orElse(() => Effect.void),
+              );
+              return yield* context.he("span", { children: [String(title)] });
+            }),
+        };
       });
-    const First = branch<{ _tag: "First" }>()(() => page("First"));
-    const Second = branch<{ _tag: "Second" }>()(() => page("Second"));
+    const First = branch<{ _tag: "First" }>()(({ context }) => page({ title: "First", context }));
+    const Second = branch<{ _tag: "Second" }>()(({ context }) =>
+      page({ title: "Second", context }),
+    );
     const Empty = branch<{ _tag: "Empty" }>()(() =>
       Sync.succeed({ setup: () => Effect.succeed([]) }),
     );
@@ -222,7 +229,7 @@ describe("head branch commits", () => {
     );
     await rendered({ parent: document.head, check: () => document.title === "First" });
     await Effect.runPromise(state.set({ _tag: "Second" }));
-    expect(document.title).toBe("First");
+    await rendered({ parent: document.head, check: () => document.title === "Second" });
     await Effect.runPromise(Deferred.succeed(gate, undefined));
     await rendered({ parent: document.head, check: () => document.title === "Second" });
     await Effect.runPromise(state.set({ _tag: "Empty" }));
@@ -230,3 +237,8 @@ describe("head branch commits", () => {
     await h.close();
   });
 });
+
+const child: typeof childEffect = childEffect;
+function childEffect(options: Parameters<typeof Head.child>[0]) {
+  return toEffect(Head.child(options));
+}

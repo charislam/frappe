@@ -1030,3 +1030,20 @@ creating an account. Password values never appear in messages. Email uses `^[^\s
 this checks format only. Password length counts UTF-16 code units and preserves
 spaces and case. Team size accepts trimmed ASCII digits only and decodes to a
 nonnegative safe integer, preserving the raw text.
+
+## Page metadata
+
+Use `@charismaticalli/frappe/head` for document titles and page metadata.
+Create the document's `Head.root` during application startup as an Effect, then
+register `Head.child` declarations in component factories with `Sync.gen`.
+Explicit parent handles provide inheritance; sources may be static metadata or
+reactive signals.
+
+A declaration takes effect when its component occurrence commits, including
+while a fallback or empty placeholder is shown. Async setup and descendant
+loading do not delay its title. One declaration covers loading and loaded
+content, and signal updates continue while loading.
+
+See [the page metadata API guide](docs/PAGE_METADATA_API.md) for examples,
+initial HTML ownership, validation, and disposal behavior, and
+[the metadata spec](spec/015_PAGE_METADATA.md) for the lifecycle contract.

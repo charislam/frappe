@@ -1,8 +1,8 @@
-import { Effect } from "effect";
 import { expectTypeOf, it } from "vitest";
 import type { ReactiveError } from "~/reactive/runtime";
 import type { ComponentContext, Signal } from "./framework";
 import * as Head from "./head";
+import type { Sync } from "./sync";
 
 it("requires an explicit capability and accepts complete static or reactive metadata", () => {
   const proof = (options: {
@@ -12,7 +12,7 @@ it("requires an explicit capability and accepts complete static or reactive meta
   }) => {
     expectTypeOf(
       Head.child({ context: options.context, parent: options.parent, metadata: options.signal }),
-    ).toEqualTypeOf<Effect.Effect<Head.Handle, ReactiveError>>();
+    ).toEqualTypeOf<Sync<Head.Handle, ReactiveError>>();
     Head.child({
       context: options.context,
       parent: options.parent,
