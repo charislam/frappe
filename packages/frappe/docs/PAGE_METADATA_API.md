@@ -6,25 +6,43 @@ Import the dedicated namespace with:
 import * as Head from "@charismaticalli/frappe/head";
 ```
 
-In an Effect setup, create one root for the document:
+Create one root for the document during application startup. `Head.root` returns
+`Effect<Head.Handle, ReactiveError>`:
 
 ```ts
 const appHead =
   yield *
   Head.root({
-    context,
+    context: app,
     document,
     siteUrl: "https://example.com",
     defaults: { title: "Example", titleTemplate: "%s · Example" },
   });
-const pageHead =
-  yield *
-  Head.child({
-    context,
-    parent: appHead,
-    metadata: { title: "Accounts", description: "Manage accounts." },
-  });
 ```
+
+Declare page or layout metadata in its component factory. `Head.child` returns
+`Sync<Head.Handle, ReactiveError>` and can be yielded from `Sync.gen`:
+
+```ts
+import { Sync, component } from "@charismaticalli/frappe";
+
+const Accounts = component((context) =>
+  Sync.gen(function* () {
+    yield* Head.child({
+      context,
+      parent: appHead,
+      metadata: { title: "Accounts", description: "Manage accounts." },
+    });
+    return {
+      setup: (context) => loadAccounts(context),
+    };
+  }),
+);
+```
+
+Here `loadAccounts` is application code returning the page output as an Effect;
+it may await asynchronous work. A layout keeps the returned child handle and
+passes it to its nested page factories.
 
 Pass handles explicitly to page and layout factories. The creating context owns
 the declaration; the parent handle controls inheritance. A handle allows one
@@ -45,11 +63,20 @@ title, canonical, description, robots, Open Graph and Twitter tags before writin
 Other head elements remain untouched. Disposal restores adopted node values and
 removes newly created nodes. Initial managed nodes retain their identity.
 
-Signal candidates validate before navigation and signal state commit. Structural
-replacements defer reconciliation through component presentation, retaining the
-previous snapshot while setup is pending. A rendered fallback may own its own
-declaration. A failure after state commit follows the surviving component tree;
-there is no promise of DOM rollback.
+Signal candidates validate before navigation and signal state commit. Factory
+registration validates metadata but does not publish an uncommitted occurrence.
+Metadata becomes eligible when its occurrence and ancestors commit into the
+active tree, including when the occurrence contains a fallback or empty
+placeholder. It does not wait for asynchronous setup or descendant loading.
+
+Declare one title for both loading and loaded content. Signal-driven metadata
+continues updating while content loads. A fallback needs no separate declaration;
+if it declares an override, that override follows the fallback owner's lifetime.
+Retirement removes a scope's contribution and reveals its surviving parent.
+Structural replacement reconciles once at the commit boundary, without an
+intermediate write of defaults. An uncommitted replacement contributes nothing.
+A failure after state commit follows the surviving component tree; there is no
+promise of DOM rollback.
 
 The pure resolve function returns Result<Snapshot, MetadataError>. Invalid title
 templates and URLs produce recoverable failures. The head lifecycle translates

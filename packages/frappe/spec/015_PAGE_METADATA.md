@@ -2,9 +2,9 @@
 
 ## Purpose and agreed scope
 
-Add reactive document metadata through a dedicated public entry point,
-`@charismaticalli/frappe/head`. This spec describes future implementation; it
-does not implement the feature.
+Reactive document metadata is implemented through the dedicated public entry
+point `@charismaticalli/frappe/head`. This spec records its API and lifecycle
+contract; see [the usage guide](../docs/PAGE_METADATA_API.md) for examples.
 
 Support document titles, descriptions, canonical URLs, robots directives,
 Open Graph properties, and Twitter card properties. Metadata follows the active
@@ -19,33 +19,44 @@ head elements, scripts, and server rendering infrastructure.
 ## Public API direction
 
 Provide `Head.root` and `Head.child`, each taking a named options object.
-Names and exact signatures remain provisional until implementation type proofs.
-Operations must fit existing Frappe context, Effect, and error conventions.
+`Head.root` returns `Effect<Head.Handle, ReactiveError>` for application startup.
+`Head.child` returns `Sync<Head.Handle, ReactiveError>` for declaration inside a
+component factory. Child declarations belong in `Sync.gen`, separately from
+asynchronous `setup` work.
 
 ```ts
-// Illustrative API; not currently implemented.
-const appHead = yield* Head.root({
-  context,
-  defaults: {
-    title: "My app",
-    titleTemplate: "%s · My app",
-  },
-});
+// Application startup (Effect.gen).
+const appHead =
+  yield *
+  Head.root({
+    context,
+    document,
+    defaults: {
+      title: "My app",
+      titleTemplate: "%s · My app",
+    },
+  });
 
-const accountsHead = yield* Head.child({
-  context,
-  parent: appHead,
-  metadata: {
-    title: "Accounts",
-    description: "Manage your accounts.",
-  },
-});
+// Accounts component factory (Sync.gen).
+const accountsHead =
+  yield *
+  Head.child({
+    context,
+    parent: appHead,
+    metadata: {
+      title: "Accounts",
+      description: "Manage your accounts.",
+    },
+  });
 
-const detailHead = yield* Head.child({
-  context,
-  parent: accountsHead,
-  metadata: accountMetadata,
-});
+// Detail component factory (Sync.gen), given accountsHead explicitly.
+const detailHead =
+  yield *
+  Head.child({
+    context,
+    parent: accountsHead,
+    metadata: accountMetadata,
+  });
 ```
 
 Each declaration accepts a static metadata description or a read-only signal
@@ -105,15 +116,15 @@ committed loading or error branch may declare its own metadata.
 
 Support these initial fields:
 
-| Field | Browser output |
-| --- | --- |
-| `title` | Document title / `title` element |
-| `titleTemplate` | Formatting rule for the resolved title |
-| `description` | `meta[name="description"]` |
-| `canonical` | `link[rel="canonical"]` |
-| `robots` | `meta[name="robots"]` |
-| `openGraph` | Title, description, URL, type, site name, and images |
-| `twitter` | Card type, title, description, image, and site |
+| Field           | Browser output                                       |
+| --------------- | ---------------------------------------------------- |
+| `title`         | Document title / `title` element                     |
+| `titleTemplate` | Formatting rule for the resolved title               |
+| `description`   | `meta[name="description"]`                           |
+| `canonical`     | `link[rel="canonical"]`                              |
+| `robots`        | `meta[name="robots"]`                                |
+| `openGraph`     | Title, description, URL, type, site name, and images |
+| `twitter`       | Card type, title, description, image, and site       |
 
 Resolve from root to active leaf. Missing fields inherit. Explicit values
 override. An explicit clear suppresses inherited values and automatic
@@ -152,10 +163,22 @@ navigation or failed candidate validation must not publish candidate metadata.
 For failures after state has committed, reflect the actual surviving/error
 branch instead of claiming the navigation was rolled back.
 
-Batch scope replacement before DOM reconciliation, retaining the previous
-snapshot until the replacement boundary has a resolved result. Verify the
-exact integration against existing asynchronous branch activation semantics;
-do not promise DOM transaction rollback that the framework cannot provide.
+Register metadata synchronously in the factory. Registration validates the
+source and ownership but does not publish an uncommitted occurrence. A component
+occurrence becomes committed when its region and fallback or empty placeholder
+are adopted, before asynchronous setup completes. Its metadata is eligible only
+when the occurrence and its ancestors are committed and active.
+
+Metadata publication must not wait for setup completion or pending descendants.
+The same declaration applies while loading and after loading; signal updates
+continue to reconcile during loading. Fallback-specific metadata is optional
+and follows the fallback owner's lifetime.
+
+Batch scope replacement at the existing DOM/reactive commit boundary. Retire the
+outgoing occurrence and commit the incoming occurrence before flushing the head,
+with no intermediate default snapshot. Retain the old contribution only while
+the old occurrence remains active and the replacement is uncommitted. Do not
+promise DOM transaction rollback that the framework cannot provide.
 
 ## Browser adapter and initial HTML
 
@@ -190,6 +213,11 @@ support. Server rendering infrastructure is outside this implementation scope.
 ## Acceptance criteria
 
 - Static and signal-driven titles and tags update without page reloads.
+- Child declarations are synchronous factory computations with typed failures.
+- Committed occurrences publish metadata while setup is pending, with either a
+  fallback or an empty placeholder; pending descendants do not delay ancestors.
+- Uncommitted occurrences contribute nothing, and reactive metadata updates
+  continue during asynchronous loading.
 - Root/layout/page inheritance, explicit clearing, title formatting, and
   documented social fallbacks resolve deterministically.
 - Nested branch disposal restores the surviving parent contribution.

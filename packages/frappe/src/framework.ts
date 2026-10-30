@@ -694,11 +694,7 @@ const prepareComponent = Effect.fn("frappe.prepareComponent")(function* (options
     report: (failure) => report(owner, { ...failureContext, ...failure }),
   });
 
-  runtime.lifetime.presented = false;
-  runtime.coordinator.pendingPresentation.add(runtime.lifetime);
-  runtime.lifetime.cleanups.add(() =>
-    runtime.coordinator.pendingPresentation.delete(runtime.lifetime),
-  );
+  runtime.lifetime.committed = false;
 
   owner.reactiveRuntime = Option.some(runtime);
   return { owner, scope, subject, parent, region, definition, runtime };
@@ -905,8 +901,6 @@ const startComponent = (options: Occurrence & { lifecycle: AnyLifecycle }): void
                     region.end.parentNode?.insertBefore(node, region.end);
                   }
                   yield* activateTree({ tree, lifetime: owner, parent });
-                  runtime.lifetime.presented = true;
-                  runtime.coordinator.pendingPresentation.delete(runtime.lifetime);
                   return tree;
                 }).pipe((work) => domCommit({ owner, work }), Effect.exit);
                 yield* Exit.match(adoption, {
@@ -1003,6 +997,7 @@ const activateComponent = Effect.fn("frappe.activateComponent")(
                 Match.exhaustive,
               ),
           });
+          occurrence.runtime.lifetime.committed = true;
           startComponent({ ...occurrence, lifecycle });
         }),
     });

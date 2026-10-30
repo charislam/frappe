@@ -7,6 +7,7 @@ import {
   type Transaction,
   activeInTransaction,
   calculate,
+  calculateSync,
   reportFailure,
   requireValid,
   requireValidSync,
@@ -14,6 +15,7 @@ import {
 import { type Signal, isSignal, readSync, signalData } from "~/reactive/signal";
 import { browser } from "./head-browser";
 import { type Metadata, resolve } from "./head-resolver";
+import * as Sync from "./sync";
 export type { Metadata, Image, Snapshot, Clear, Field } from "./head-resolver";
 export { MetadataError, clear, resolve } from "./head-resolver";
 
@@ -47,6 +49,12 @@ const within = (owner: ComponentLifetime, parent: ComponentLifetime): boolean =>
     onNone: () => false,
     onSome: (ancestor) => within(ancestor, parent),
   });
+const committed = (lifetime: ComponentLifetime): boolean =>
+  lifetime.committed &&
+  Option.match(lifetime.parent, {
+    onNone: () => true,
+    onSome: committed,
+  });
 const alive = (entry: Entry, transaction: Option.Option<Transaction>): boolean =>
   entry.active &&
   !entry.manager.disposed &&
@@ -54,50 +62,51 @@ const alive = (entry: Entry, transaction: Option.Option<Transaction>): boolean =
     onNone: () => entry.ownerRuntime.lifetime.active(),
     onSome: (tx) => activeInTransaction({ lifetime: entry.ownerRuntime.lifetime, transaction: tx }),
   });
-const install = Effect.fn("Head.install")(function* (options: {
+const install = (options: {
   context: ReactiveOwner;
   source: Metadata | Signal<Metadata>;
   parent: Option.Option<Entry>;
   manager: Manager;
-}) {
-  const runtime = yield* calculate(() => ownerRuntime(options.context));
-  yield* requireValid(runtime.lifetime.active(), "Head owner is disposed");
-  const entry: Entry = {
-    id: ++sequence,
-    ownerRuntime: runtime,
-    parent: options.parent,
-    children: new Set(),
-    source: options.source,
-    manager: options.manager,
-    active: true,
-  };
-  yield* Match.value(options.source).pipe(
-    Match.when(isSignal, (signal) => Effect.fromResult(readSync({ runtime, signal }))),
-    Match.orElse(Effect.succeed),
-  );
-  const handle: Handle = { [brand]: true };
-  entries.set(handle, entry);
-  Option.map(entry.parent, (parent) => parent.children.add(entry));
-  let disconnect = () => {};
-  const cleanup = () => {
-    entry.active = false;
-    disconnect();
-    runtime.lifetime.cleanups.delete(cleanup);
-    Option.map(entry.parent, (parent) => parent.children.delete(entry));
-    entry.manager.reconcile();
-  };
-  runtime.lifetime.cleanups.add(cleanup);
-  Match.value(options.source).pipe(
-    Match.when(isSignal, (signal) => {
-      disconnect = signalData(signal).bind({
-        validate: () => Result.succeed(undefined),
-        flush: () => Effect.sync(entry.manager.reconcile),
-      });
-    }),
-    Match.orElse(() => {}),
-  );
-  return { handle, entry, cleanup };
-});
+}) =>
+  Result.gen(function* () {
+    const runtime = yield* calculateSync(() => ownerRuntime(options.context));
+    yield* requireValidSync(runtime.lifetime.active(), "Head owner is disposed");
+    const entry: Entry = {
+      id: ++sequence,
+      ownerRuntime: runtime,
+      parent: options.parent,
+      children: new Set(),
+      source: options.source,
+      manager: options.manager,
+      active: true,
+    };
+    yield* Match.value(options.source).pipe(
+      Match.when(isSignal, (signal) => readSync({ runtime, signal })),
+      Match.orElse(Result.succeed),
+    );
+    const handle: Handle = { [brand]: true };
+    entries.set(handle, entry);
+    Option.map(entry.parent, (parent) => parent.children.add(entry));
+    let disconnect = () => {};
+    const cleanup = () => {
+      entry.active = false;
+      disconnect();
+      runtime.lifetime.cleanups.delete(cleanup);
+      Option.map(entry.parent, (parent) => parent.children.delete(entry));
+      entry.manager.reconcile();
+    };
+    runtime.lifetime.cleanups.add(cleanup);
+    Match.value(options.source).pipe(
+      Match.when(isSignal, (signal) => {
+        disconnect = signalData(signal).bind({
+          validate: () => Result.succeed(undefined),
+          flush: () => Effect.sync(entry.manager.reconcile),
+        });
+      }),
+      Match.orElse(() => {}),
+    );
+    return { handle, entry, cleanup };
+  });
 export const root = Effect.fn("Head.root")(function* (options: {
   context: ReactiveOwner;
   document: Document;
@@ -122,7 +131,7 @@ export const root = Effect.fn("Head.root")(function* (options: {
             ),
             Match.orElse((value: Metadata) => Result.succeed(value)),
           );
-          Match.value(includePending || entry.ownerRuntime.lifetime.presented).pipe(
+          Match.value(includePending || committed(entry.ownerRuntime.lifetime)).pipe(
             Match.when(true, () => {
               chain.push(value);
             }),
@@ -143,37 +152,13 @@ export const root = Effect.fn("Head.root")(function* (options: {
         Result.mapError((error) => new ReactiveError({ message: error.message, cause: error })),
       );
     });
-  const ready = () => {
-    const presented: Entry[] = [];
-    const visit = (entry: Entry): void => {
-      Match.value(alive(entry, Option.none())).pipe(
-        Match.when(true, () => {
-          Match.value(entry.ownerRuntime.lifetime.presented).pipe(
-            Match.when(true, () => {
-              presented.push(entry);
-            }),
-            Match.orElse(() => {}),
-          );
-          entry.children.forEach(visit);
-        }),
-        Match.orElse(() => {}),
-      );
-    };
-    Option.map(top, visit);
-    return [...runtime.coordinator.pendingPresentation]
-      .filter((owner) => owner.active() && within(owner, runtime.lifetime))
-      .every((owner) => presented.some((entry) => within(entry.ownerRuntime.lifetime, owner)));
-  };
   const manager: Manager = {
     rootRuntime: runtime,
     disposed: false,
     validate: (transaction) => snapshot(transaction, true).pipe(Result.map(() => undefined)),
     reconcile: () => {
       Match.value(
-        !manager.disposed &&
-          !runtime.coordinator.committing &&
-          runtime.lifetime.active() &&
-          ready(),
+        !manager.disposed && !runtime.coordinator.committing && runtime.lifetime.active(),
       ).pipe(
         Match.when(true, () => {
           const result = snapshot(Option.none()).pipe(Result.flatMap(adapter.write));
@@ -198,12 +183,14 @@ export const root = Effect.fn("Head.root")(function* (options: {
       Effect.fromResult(manager.validate(Option.some(transaction))),
     flush: manager.reconcile,
   };
-  const result = yield* install({
-    context: options.context,
-    source: options.defaults,
-    parent: Option.none(),
-    manager,
-  });
+  const result = yield* Effect.fromResult(
+    install({
+      context: options.context,
+      source: options.defaults,
+      parent: Option.none(),
+      manager,
+    }),
+  );
   top = Option.some(result.entry);
   yield* Effect.fromResult(manager.validate(Option.none())).pipe(
     Effect.onError(() =>
@@ -225,35 +212,43 @@ export const root = Effect.fn("Head.root")(function* (options: {
   });
   return result.handle;
 });
-export const child = Effect.fn("Head.child")(function* (options: {
+export const child = (options: {
   context: ReactiveOwner;
   parent: Handle;
   metadata: Metadata | Signal<Metadata>;
-}) {
-  const parent = yield* Option.match(Option.fromUndefinedOr(entries.get(options.parent)), {
-    onNone: () => Effect.fail(new ReactiveError({ message: "Invalid Head handle" })),
-    onSome: Effect.succeed,
-  });
-  const runtime = yield* calculate(() => ownerRuntime(options.context));
-  yield* requireValid(
-    alive(parent, Option.none()) &&
-      runtime.coordinator === parent.ownerRuntime.coordinator &&
-      within(runtime.lifetime, parent.ownerRuntime.lifetime),
-    "Head parent is disposed or belongs to an unrelated owner",
+}) =>
+  Sync.suspend(() =>
+    Sync.fromResult(
+      Result.gen(function* () {
+        const parent = yield* Option.match(Option.fromUndefinedOr(entries.get(options.parent)), {
+          onNone: () => Result.fail(new ReactiveError({ message: "Invalid Head handle" })),
+          onSome: Result.succeed,
+        });
+        const runtime = yield* calculateSync(() => ownerRuntime(options.context));
+        yield* requireValidSync(
+          alive(parent, Option.none()) &&
+            runtime.coordinator === parent.ownerRuntime.coordinator &&
+            within(runtime.lifetime, parent.ownerRuntime.lifetime),
+          "Head parent is disposed or belongs to an unrelated owner",
+        );
+        yield* requireValidSync(
+          [...parent.children].every((child) => !alive(child, Option.none())),
+          `Conflicting child of Head scope ${parent.id}`,
+        );
+        const result = yield* install({
+          context: options.context,
+          source: options.metadata,
+          parent: Option.some(parent),
+          manager: parent.manager,
+        });
+        yield* parent.manager.validate(Option.none()).pipe(
+          Result.mapError((error) => {
+            result.cleanup();
+            return error;
+          }),
+        );
+        yield* calculateSync(parent.manager.reconcile);
+        return result.handle;
+      }),
+    ),
   );
-  yield* requireValid(
-    [...parent.children].every((child) => !alive(child, Option.none())),
-    `Conflicting child of Head scope ${parent.id}`,
-  );
-  const result = yield* install({
-    context: options.context,
-    source: options.metadata,
-    parent: Option.some(parent),
-    manager: parent.manager,
-  });
-  yield* Effect.fromResult(parent.manager.validate(Option.none())).pipe(
-    Effect.onError(() => Effect.sync(result.cleanup)),
-  );
-  yield* calculate(parent.manager.reconcile);
-  return result.handle;
-});

@@ -1,4 +1,5 @@
 import { Sync, branch, cases, component, provideContext } from "@charismaticalli/frappe";
+import * as Head from "@charismaticalli/frappe/head";
 import {
   type Destination,
   History,
@@ -9,6 +10,7 @@ import {
 import { NavigationMenu } from "@charismaticalli/ui";
 import { Effect, Match, Option } from "effect";
 import { examplesBranch } from "~/examples/page";
+import { examples } from "~/examples/registry";
 import { type ExamplesState, examplesPageOf } from "~/examples/routes";
 import { browserTheme } from "~/features/theme/browser";
 import { Theme, makeTheme } from "~/features/theme/controller";
@@ -81,6 +83,24 @@ export const App = component(() =>
           onError: (error) => console.error("App navigation failed", error),
         });
         yield* navigation.initial;
+        const metadata = yield* context.derive({
+          sources: { state },
+          compute: ({ state }): Head.Metadata => ({
+            title: Match.value(state).pipe(
+              Match.tag("Home", () => "Home"),
+              Match.tag("NotFound", () => "Page not found"),
+              Match.tag("Examples", ({ page }) =>
+                Option.fromUndefinedOr(examples.find((example) => example.tag === page._tag)).pipe(
+                  Option.map((example) => `${example.title} example`),
+                  Option.getOrElse(() => "Examples"),
+                ),
+              ),
+              Match.exhaustive,
+            ),
+            titleTemplate: "%s · frappé",
+          }),
+        });
+        yield* Head.root({ context, document, defaults: metadata });
         return component((context) =>
           Sync.gen(function* () {
             const links = [];

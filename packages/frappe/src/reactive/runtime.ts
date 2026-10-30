@@ -87,7 +87,6 @@ export interface SignalCommit {
 export interface CommitCoordinator {
   readonly signals: Set<SignalCommit>;
   readonly stagedChecks: Map<SignalCommit, Set<(transaction: Transaction) => void>>;
-  readonly pendingPresentation: Set<ComponentLifetime>;
   readonly commitObservers: Set<{
     validate: (transaction: Transaction) => Effect.Effect<void, ReactiveError>;
     flush: () => void;
@@ -103,7 +102,7 @@ export interface ReactiveFailure {
 
 /** Component ownership and teardown; independent of signals and transactions. */
 export interface ComponentLifetime {
-  presented: boolean;
+  committed: boolean;
   readonly active: () => boolean;
   readonly parent: Option.Option<ComponentLifetime>;
   readonly fork: (work: Effect.Effect<unknown, unknown, Scope.Scope>) => Effect.Effect<void>;
@@ -159,7 +158,6 @@ export const makeReactiveRuntime = Effect.fn("frappe.makeReactiveRuntime")(funct
       stagedChecks: new Map(),
       committing: false,
       commitObservers: new Set(),
-      pendingPresentation: new Set(),
     }),
     onSome: (parent) => parent.coordinator,
   });
@@ -172,7 +170,7 @@ export const makeReactiveRuntime = Effect.fn("frappe.makeReactiveRuntime")(funct
         }),
       ));
   const lifetime: ComponentLifetime = {
-    presented: true,
+    committed: true,
     active: options.active,
     parent: Option.map(options.parent, (parent) => parent.lifetime),
     fork: options.fork,

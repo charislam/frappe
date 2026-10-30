@@ -11,14 +11,20 @@ import { AuthLive } from "./auth";
 import { LocalStorageMemory } from "./local-storage";
 
 it.each([
-  { location: "/", selector: "main h1", active: "Home" },
+  { location: "/", selector: "main h1", active: "Home", title: "Home" },
+  { location: "/missing", selector: "main", active: undefined, title: "Page not found" },
   { location: "/examples/counter", selector: ".counter", active: "Examples" },
   { location: "/examples/auth", selector: ".auth-example", active: "Examples" },
   { location: "/examples", selector: ".counter", active: "Examples" },
   { location: "/examples/text-input", selector: ".example-detail input", active: "Examples" },
   { location: "/examples/validation", selector: ".validation-page", active: "Examples" },
   { location: "/examples/tabs", selector: '[role="tablist"]', active: "Examples" },
-  { location: "/examples/loading", selector: ".example-detail section", active: "Examples" },
+  {
+    location: "/examples/loading",
+    selector: ".example-detail section",
+    active: "Examples",
+    title: "Loading example",
+  },
   { location: "/examples/todos", selector: ".todos", active: "Examples" },
   { location: "/examples/routing", selector: ".routing-page", active: "Examples" },
   { location: "/examples/queries", selector: ".example-detail section", active: "Examples" },
@@ -34,7 +40,7 @@ it.each([
   },
 ])(
   "initializes $location, retains the examples shell, and traverses browser history",
-  async ({ location, selector, active }) => {
+  async ({ location, selector, active, title }) => {
     const scope = await Effect.runPromise(Scope.make());
     try {
       const history = await Effect.runPromise(
@@ -83,23 +89,33 @@ it.each([
         );
       };
       await shows(() => parent.querySelector(selector) !== null);
+      const initialTitle = () =>
+        Option.fromUndefinedOr(title).pipe(
+          Option.getOrElse(
+            () =>
+              `${parent.querySelector('nav[aria-label="Examples navigation"] [aria-current="page"]')?.textContent} example`,
+          ),
+        );
+      await shows(() => document.title === `${initialTitle()} · frappé`);
       const initialLocation = Match.value(location.startsWith("/examples/routing")).pipe(
         Match.when(true, () => "/examples/routing/login"),
         Match.orElse(() => location),
       );
       await shows(() => history.location() === initialLocation);
-      await shows(() => parent.querySelector(".code-viewer") !== null || location === "/");
+      await shows(() => parent.querySelector(".code-viewer") !== null || active !== "Examples");
       expect(
         parent.querySelector('nav[aria-label="Main navigation"] [aria-current="page"]')
           ?.textContent,
       ).toBe(active);
       press("Home");
       await shows(() => parent.querySelector("main h1")?.textContent === "frappé");
+      await shows(() => document.title === "Home · frappé");
       const header = parent.querySelector(".app-header");
       expect(parent.querySelector(".counter")).toBeNull();
       expect(parent.querySelector(".routing-page")).toBeNull();
       press("Examples");
       await shows(() => parent.querySelector(".counter") !== null);
+      await shows(() => document.title === "Counter example · frappé");
       expect(history.location()).toBe("/examples");
       expect(parent.querySelector(".todos")).toBeNull();
       const sidebar = parent.querySelector(".examples-sidebar");
@@ -121,6 +137,7 @@ it.each([
       press("Todos");
       await shows(() => parent.querySelector(".todos") !== null);
       await shows(() => trigger?.getAttribute("aria-expanded") === "false");
+      await shows(() => document.title === "Todos example · frappé");
       expect(history.location()).toBe("/examples/todos");
       expect(parent.querySelector(".counter")).toBeNull();
       expect(parent.contains(counter)).toBe(false);
@@ -150,6 +167,7 @@ it.each([
       await shows(() => trigger?.getAttribute("aria-expanded") === "true");
       Result.getOrThrow(history.traverse(-1));
       await shows(() => parent.querySelector(".counter") !== null);
+      await shows(() => document.title === "Counter example · frappé");
       expect(history.location()).toBe("/examples");
       expectExamplesShell();
       expect(parent.querySelector(".counter")).not.toBe(counter);
@@ -158,6 +176,7 @@ it.each([
       expect(trigger?.getAttribute("aria-expanded")).toBe("true");
       Result.getOrThrow(history.traverse(1));
       await shows(() => parent.querySelector(".todos") !== null);
+      await shows(() => document.title === "Todos example · frappé");
       expect(history.location()).toBe("/examples/todos");
       expectExamplesShell();
       expect(nav?.querySelector('[aria-current="page"]')?.textContent).toBe("Todos");
@@ -220,6 +239,7 @@ it.each([
       await shows(() => parent.querySelector(".routing-page") !== null);
       press("Queries");
       await shows(() => parent.textContent?.includes("Customer details") === true);
+      await shows(() => document.title === "Queries example · frappé");
       expect(history.location()).toBe("/examples/queries");
       expect(parent.textContent).toContain("Inbox");
       expect(parent.textContent).toContain("Customer details");
