@@ -5,6 +5,10 @@ The following commands are used to enforce repository conventions:
 - `pnpm lint`
 - `pnpm typecheck`
 
+### Recoverable runtime errors
+
+Never throw for recoverable runtime errors. Represent them as typed failures through Effect error mechanisms: use Effect.fail or Result.fail (and existing validation helpers) rather than throw, getOrThrow, or wrapping an intentional throw in Effect.try/Result.try. Catch exceptions from third-party boundaries into the typed error channel.
+
 ### Options
 
 Prefer Option<T> over T | undefined. Only convert an Option<T> to T | undefined at the boundary, where third-party code does not accept Option<T>.
