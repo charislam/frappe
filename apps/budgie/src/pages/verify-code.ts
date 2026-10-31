@@ -7,11 +7,7 @@ import { type AuthNavigation, AuthLink } from "./auth-navigation";
 import { field } from "./field";
 import { formActions } from "./forms";
 
-export const VerifyCode = (options: {
-  navigation: AuthNavigation;
-  email: Option.Option<string>;
-  intent: "signin" | "signup";
-}) =>
+export const VerifyCode = (options: { navigation: AuthNavigation; email: Option.Option<string> }) =>
   component(() =>
     Sync.succeed({
       setup: (context) =>
@@ -55,7 +51,6 @@ export const VerifyCode = (options: {
                       .execute({
                         _tag: "RequestOtp",
                         email: address,
-                        intent: options.intent,
                       })
                       .pipe(
                         Effect.as(

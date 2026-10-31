@@ -161,10 +161,7 @@ site_url = "http://localhost:5174"
 # The public URL that Auth serves on. Defaults to the API external URL with `/auth/v1` appended.
 # external_url = ""
 # A list of *exact* URLs that auth providers are permitted to redirect to post authentication.
-additional_redirect_urls = [
-  "http://localhost:5174/auth/callback",
-  "http://localhost:5174/reset-password",
-]
+additional_redirect_urls = []
 # How long tokens are valid for, in seconds. Defaults to 3600 (1 hour), maximum 604,800 (1 week).
 jwt_expiry = 3600
 # JWT issuer URL. If not set, defaults to auth.external_url.
@@ -417,18 +414,11 @@ enabled = true
 # and column/key alignment. Set to "null" to emit raw, unformatted SQL.
 # format_options = "{\"keywordCase\":\"upper\",\"indent\":2,\"maxWidth\":180,\"commaStyle\":\"trailing\"}"
 
-# A six-digit code for existing-user OTP. Signup confirmation stays link-based.
+# Both new and existing users receive a six-digit email code.
 [auth.email.template.magic_link]
 subject = "Your Budgie sign-in code"
 content_path = "./supabase/templates/code.html"
 
 [auth.email.template.confirmation]
-subject = "Confirm your Budgie account"
-content_path = "./supabase/templates/confirmation.html"
-
-# Leave disabled for email-only development. Enable after setting these server-side variables.
-[auth.external.github]
-enabled = false
-client_id = "env(SUPABASE_AUTH_EXTERNAL_GITHUB_CLIENT_ID)"
-secret = "env(SUPABASE_AUTH_EXTERNAL_GITHUB_SECRET)"
-redirect_uri = "http://127.0.0.1:54321/auth/v1/callback"
+subject = "Your Budgie sign-in code"
+content_path = "./supabase/templates/code.html"

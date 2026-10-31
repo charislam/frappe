@@ -1,8 +1,6 @@
 import { Sync, component } from "@charismaticalli/frappe";
 import { Effect, Option } from "effect";
-import { destination } from "~/routes";
-import { githubButton } from "./auth-controls";
-import { type AuthNavigation, AuthLink } from "./auth-navigation";
+import { type AuthNavigation } from "./auth-navigation";
 import { loginForm } from "./login-form";
 
 export const Login = (navigation: AuthNavigation) =>
@@ -18,20 +16,14 @@ export const Login = (navigation: AuthNavigation) =>
                 attrs: { class: Option.some("page-heading") },
                 children: ["Sign in"],
               }),
+              yield* context.he("p", {
+                children: [
+                  "Enter your email to sign in. New here? We’ll create your account automatically.",
+                ],
+              }),
               form,
-              ...(yield* githubButton({ context, actions })),
               actions.errorOutput,
               actions.statusOutput,
-              AuthLink({
-                navigation,
-                destination: destination("Signup"),
-                label: "Create an account",
-              }),
-              AuthLink({
-                navigation,
-                destination: destination("ForgotPassword"),
-                label: "Forgot password?",
-              }),
             ],
           });
         }),
