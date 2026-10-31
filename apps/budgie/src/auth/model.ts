@@ -76,7 +76,7 @@ export const identity = (state: AuthState): Option.Option<string> =>
     Match.orElse(() => Option.none()),
   );
 export type Command =
-  | { readonly _tag: "RequestOtp"; readonly email: string; readonly intent: "signin" | "signup" }
+  | { readonly _tag: "RequestOtp"; readonly email: string }
   | { readonly _tag: "VerifyOtp"; readonly email: string; readonly code: string }
   | { readonly _tag: "Logout" };
 

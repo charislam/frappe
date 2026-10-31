@@ -1,8 +1,7 @@
 import { Sync, component } from "@charismaticalli/frappe";
 import { Effect, Option } from "effect";
-import { destination } from "~/routes";
 import { emailCodeButton } from "./auth-controls";
-import { type AuthNavigation, AuthLink } from "./auth-navigation";
+import type { AuthNavigation } from "./auth-navigation";
 import { field } from "./field";
 import { formActions } from "./forms";
 
@@ -23,7 +22,6 @@ export const Login = (navigation: AuthNavigation) =>
             context,
             actions,
             email,
-            intent: "signin",
             navigation,
           });
           const form = yield* context.he("form", {
@@ -40,16 +38,11 @@ export const Login = (navigation: AuthNavigation) =>
             children: [
               yield* context.he("h1", {
                 attrs: { class: Option.some("page-heading") },
-                children: ["Sign in"],
+                children: ["Sign in or create an account"],
               }),
               form,
               actions.errorOutput,
               actions.statusOutput,
-              AuthLink({
-                navigation,
-                destination: destination("Signup"),
-                label: "Create an account",
-              }),
             ],
           });
         }),

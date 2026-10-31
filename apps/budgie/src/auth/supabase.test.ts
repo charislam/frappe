@@ -77,30 +77,16 @@ describe("Supabase boundary", () => {
       message: expect.stringContaining("Restart sign in"),
     });
   });
-  it("never silently creates OTP sign-in users, but permits explicit signup", async () => {
+  it("uses email codes with automatic signup", async () => {
     const h = driver();
-    await run(h.driver.execute({ _tag: "RequestOtp", email: "a@example.com", intent: "signin" }));
-    await run(h.driver.execute({ _tag: "RequestOtp", email: "a@example.com", intent: "signup" }));
-    expect(sdk.signInWithOtp.mock.calls).toEqual([
-      [
-        {
-          email: "a@example.com",
-          options: {
-            shouldCreateUser: false,
-            emailRedirectTo: "http://localhost:5174/auth/callback",
-          },
-        },
-      ],
-      [
-        {
-          email: "a@example.com",
-          options: {
-            shouldCreateUser: true,
-            emailRedirectTo: "http://localhost:5174/auth/callback",
-          },
-        },
-      ],
-    ]);
+    await run(h.driver.execute({ _tag: "RequestOtp", email: "a@example.com" }));
+    expect(sdk.signInWithOtp).toHaveBeenCalledExactlyOnceWith({
+      email: "a@example.com",
+      options: {
+        shouldCreateUser: true,
+        emailRedirectTo: "http://localhost:5174/auth/callback",
+      },
+    });
     await run(h.driver.execute({ _tag: "VerifyOtp", email: "a@example.com", code: "123456" }));
     expect(sdk.verifyOtp).toHaveBeenCalledWith({
       email: "a@example.com",

@@ -79,14 +79,23 @@ describe("auth-aware navigation", () => {
     expect(traversal.history._tag).toBe("Keep");
     expect(traversal.state.view._tag).toBe("Accounts");
   });
-  it.each(["Signup", "VerifyCode"] as const)(
-    "admits signed-out %s visits and applies authentication guards",
-    (tag) => {
-      expect(navigate({ auth: ready(false), tag }).state.view._tag).toBe(tag);
-      expect(navigate({ auth: ready(true), tag }).state.view._tag).toBe("Accounts");
-      expect(navigate({ auth: initial.auth, tag }).state.view._tag).toBe("Loading");
-    },
-  );
+  it("does not expose a separate signup route", () => {
+    const result = transition({
+      state: { ...initial, auth: ready(false) },
+      event: {
+        _tag: "Location",
+        target: urls.parse("/signup"),
+        observed: "/signup",
+        initial: false,
+      },
+    });
+    expect(result.state.view).toEqual({ _tag: "NotFound", home: "/login" });
+  });
+  it("admits verification for signed-out users and redirects authenticated users", () => {
+    expect(navigate({ auth: ready(false), tag: "VerifyCode" }).state.view._tag).toBe("VerifyCode");
+    expect(navigate({ auth: ready(true), tag: "VerifyCode" }).state.view._tag).toBe("Accounts");
+    expect(navigate({ auth: initial.auth, tag: "VerifyCode" }).state.view._tag).toBe("Loading");
+  });
   it("auth changes re-evaluate the current route", () => {
     const state = navigate({
       auth: ready(true),

@@ -2,7 +2,6 @@ import {
   type Destination as InferredDestination,
   type ParseResult,
   type MatchedTarget,
-  defaultQuery,
   optionalQuery,
   route,
   router,
@@ -12,13 +11,11 @@ import { Match, Option, Result, Schema } from "effect";
 export const urls = router([
   route({ tag: "Home", path: [] }),
   route({ tag: "Login", path: ["login"] }),
-  route({ tag: "Signup", path: ["signup"] }),
   route({
     tag: "VerifyCode",
     path: ["verify-code"],
     query: {
       email: optionalQuery(Schema.String),
-      intent: defaultQuery(Schema.Literals(["signin", "signup"]), "signin"),
     },
   }),
   route({ tag: "Accounts", path: ["accounts"] }),
@@ -26,19 +23,18 @@ export const urls = router([
 ]);
 export type Destination = InferredDestination<typeof urls.definitions>;
 export type Target = ParseResult<typeof urls.definitions>;
-export const verificationDestination = (options: {
-  email: Option.Option<string>;
-  intent: "signin" | "signup";
-}): Extract<Destination, { _tag: "VerifyCode" }> => ({
+export const verificationDestination = (
+  email: Option.Option<string>,
+): Extract<Destination, { _tag: "VerifyCode" }> => ({
   _tag: "VerifyCode",
   params: {},
-  query: options,
+  query: { email },
   fragment: Option.none(),
 });
 export const destination = (tag: Destination["_tag"]): Destination =>
   Match.value(tag).pipe(
     Match.when("VerifyCode", () =>
-      verificationDestination({ email: Option.none(), intent: "signin" }),
+      verificationDestination(Option.none()),
     ),
     Match.orElse((tag) => ({ _tag: tag, params: {}, query: {}, fragment: Option.none() })),
   );

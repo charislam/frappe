@@ -10,7 +10,6 @@ import { formActions } from "./forms";
 export const VerifyCode = (options: {
   navigation: AuthNavigation;
   email: Option.Option<string>;
-  intent: "signin" | "signup";
 }) =>
   component(() =>
     Sync.succeed({
@@ -55,7 +54,6 @@ export const VerifyCode = (options: {
                       .execute({
                         _tag: "RequestOtp",
                         email: address,
-                        intent: options.intent,
                       })
                       .pipe(
                         Effect.as(

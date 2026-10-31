@@ -1,5 +1,5 @@
 import { type ComponentContext } from "@charismaticalli/frappe";
-import { Effect, Match, Option } from "effect";
+import { Effect, Option } from "effect";
 import { Auth } from "~/auth/service";
 import { verificationDestination } from "~/routes";
 import { type AuthNavigation, navigateAuth } from "./auth-navigation";
@@ -11,21 +11,14 @@ export const emailCodeButton = Effect.fn("Auth.emailCodeButton")(function* (opti
   context: ComponentContext;
   actions: Actions;
   email: Effect.Success<ReturnType<typeof field>>;
-  intent: "signin" | "signup";
   navigation: AuthNavigation;
 }) {
-  const { context, actions, email, navigation, intent } = options;
+  const { context, actions, email, navigation } = options;
   const auth = yield* Auth;
   const button = yield* context.he("button", {
     attrs: { class: Option.some("primary") },
     props: { type: "button", disabled: actions.pending },
-    children: [
-      Match.value(intent).pipe(
-        Match.when("signin", () => "Email me a sign-in code"),
-        Match.when("signup", () => "Sign up with an email code"),
-        Match.exhaustive,
-      ),
-    ],
+    children: ["Email me a code"],
   });
   yield* context.subscribe(yield* context.events(button, "click"), () =>
     email.validate().pipe(
@@ -34,11 +27,11 @@ export const emailCodeButton = Effect.fn("Auth.emailCodeButton")(function* (opti
           onSome: (address) =>
             actions.run(
               Effect.gen(function* () {
-                yield* auth.execute({ _tag: "RequestOtp", email: address, intent });
+                yield* auth.execute({ _tag: "RequestOtp", email: address });
                 yield* navigateAuth({
                   mode: "push",
                   navigation,
-                  destination: verificationDestination({ email: Option.some(address), intent }),
+                  destination: verificationDestination(Option.some(address)),
                 });
                 return Option.none();
               }),

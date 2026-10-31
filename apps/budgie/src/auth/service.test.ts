@@ -139,13 +139,11 @@ describe("auth lifetime", () => {
       Option.some("A"),
     ]);
   });
-  it("retains explicit OTP intent and maps expired-code failures", async () => {
+  it("requests email codes and maps expired-code failures", async () => {
     const h = await harness();
-    await run(h.auth.execute({ _tag: "RequestOtp", email: "a@example.com", intent: "signin" }));
-    await run(h.auth.execute({ _tag: "RequestOtp", email: "a@example.com", intent: "signup" }));
+    await run(h.auth.execute({ _tag: "RequestOtp", email: "a@example.com" }));
     expect(h.commands).toEqual([
-      { _tag: "RequestOtp", email: "a@example.com", intent: "signin" },
-      { _tag: "RequestOtp", email: "a@example.com", intent: "signup" },
+      { _tag: "RequestOtp", email: "a@example.com" },
     ]);
     h.failNext({ code: "otp_expired", message: "Expired" });
     expect(

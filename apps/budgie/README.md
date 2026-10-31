@@ -42,7 +42,7 @@ pnpm exec supabase stop
 
 Open the local **Mailpit inbox at http://127.0.0.1:54324**. No external SMTP credentials are needed; local email is captured rather than delivered.
 
-- `/login` and `/signup` both use email codes; signup is the only flow that permits a new account. Each opens `/verify-code` for **six-digit code** entry and resend. Resend preserves the sign-in or signup intent. The email and intent are carried in typed URL query parameters so verification survives reloads; codes are never placed in URLs. Codes expire after one hour.
+- `/login` is the only authentication entry point. Email codes work for existing users and automatically create an account for new email addresses. The flow opens `/verify-code` for **six-digit code** entry and resend. The email is carried in typed URL query parameters so verification survives reloads; codes are never placed in URLs. Codes expire after one hour.
 - Logout follows SDK auth events. A failed logout retains the session and displays its error.
 
 Supabase owns session persistence, refresh, and cross-tab synchronization. Budgie uses PKCE with SDK URL detection disabled. Its adapter explicitly exchanges callback codes once and removes consumed query/fragment parameters from history. PKCE links require the initiating browser's stored verifier; expired, reused, rejected, or cross-browser links require starting a new flow. `/auth/callback` handles email links before ordinary route guards.
@@ -65,6 +65,6 @@ pnpm build:budgie
 pnpm test
 ```
 
-Budgie's deterministic Node tests cover SDK callback ownership, auth initialization/event ordering and disposal, email-code sign-in/signup intent and errors, failed logout, routing/traversal decisions, real frappe query cache isolation/in-flight retirement, and theme storage fallback.
+Budgie's deterministic Node tests cover SDK callback ownership, auth initialization/event ordering and disposal, auto-signup email-code flow and errors, failed logout, routing/traversal decisions, real frappe query cache isolation/in-flight retirement, and theme storage fallback.
 
 References: [local Supabase](https://supabase.com/docs/guides/local-development), [email OTP](https://supabase.com/docs/guides/auth/auth-email-passwordless), [PKCE](https://supabase.com/docs/guides/auth/sessions/pkce-flow).

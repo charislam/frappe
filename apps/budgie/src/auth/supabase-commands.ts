@@ -6,11 +6,11 @@ import { request } from "./supabase-request";
 export const makeExecute = (options: { auth: SupabaseClient["auth"]; callback: string }) => {
   return Effect.fn("Supabase.execute")((command: Command) =>
     Match.value(command).pipe(
-      Match.tag("RequestOtp", ({ email, intent }) =>
+      Match.tag("RequestOtp", ({ email }) =>
         request(() =>
           options.auth.signInWithOtp({
             email,
-            options: { shouldCreateUser: intent === "signup", emailRedirectTo: options.callback },
+            options: { shouldCreateUser: true, emailRedirectTo: options.callback },
           }),
         ).pipe(Effect.asVoid),
       ),

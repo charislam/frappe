@@ -7,11 +7,9 @@ export type View =
   | { readonly _tag: "Loading" }
   | { readonly _tag: "Failed"; readonly message: string }
   | { readonly _tag: "Login" }
-  | { readonly _tag: "Signup" }
   | {
       readonly _tag: "VerifyCode";
       readonly email: Option.Option<string>;
-      readonly intent: "signin" | "signup";
     }
   | { readonly _tag: "Accounts"; readonly user: User }
   | { readonly _tag: "NotFound"; readonly home: string };
@@ -48,7 +46,6 @@ const admit = (options: {
             onNone: () =>
               Match.value(requested).pipe(
                 Match.tag("Login", () => show({ _tag: "Login" })),
-                Match.tag("Signup", () => show({ _tag: "Signup" })),
                 Match.tag("VerifyCode", ({ query }) => show({ _tag: "VerifyCode", ...query })),
                 Match.orElse(() => redirect({ _tag: "Login" })),
               ),

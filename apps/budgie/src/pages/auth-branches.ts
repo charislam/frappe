@@ -3,7 +3,6 @@ import { Effect } from "effect";
 import type { View } from "~/transitions";
 import type { AuthNavigation } from "./auth-navigation";
 import { Login } from "./login";
-import { Signup } from "./signup";
 import { VerifyCode } from "./verify-code";
 
 type Page<Tag extends View["_tag"]> = Extract<View, { _tag: Tag }>;
@@ -13,19 +12,14 @@ export const authBranches = (navigation: AuthNavigation) => ({
       Sync.succeed({ setup: () => Effect.succeed(Login(navigation)) }),
     ),
   },
-  Signup: {
-    branch: branch<Page<"Signup">, Signal<Page<"Signup">>>()(() =>
-      Sync.succeed({ setup: () => Effect.succeed(Signup(navigation)) }),
-    ),
-  },
   VerifyCode: {
-    key: (page: Page<"VerifyCode">) => Object.freeze({ intent: page.intent, email: page.email }),
+    key: (page: Page<"VerifyCode">) => Object.freeze({ email: page.email }),
     branch: branch<Page<"VerifyCode">, Signal<Page<"VerifyCode">>>()(({ inputs }) =>
       Sync.succeed({
         setup: () =>
           inputs.state.get.pipe(
             Effect.map((page) =>
-              VerifyCode({ navigation, email: page.email, intent: page.intent }),
+              VerifyCode({ navigation, email: page.email }),
             ),
           ),
       }),
