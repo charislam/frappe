@@ -87,8 +87,8 @@ describe("email-code authentication", () => {
       _tag: "Ready",
       user: Option.some({ id: "A", email: Option.some("reader@example.com") }),
     });
-    await h.page("Accounts");
-    expect(h.history.location()).toBe("/accounts");
+    await h.page("Create budget");
+    expect(h.history.location()).toBe("/new");
     expect(h.commands).toEqual([
       { _tag: "RequestOtp", email: "reader@example.com" },
       { _tag: "VerifyOtp", email: "reader@example.com", code: "123456" },

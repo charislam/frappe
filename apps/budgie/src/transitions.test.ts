@@ -16,7 +16,7 @@ const initial: State = {
   target: targetOf("Home"),
   view: { _tag: "Loading" },
 };
-const navigate = (options: { auth: AuthState; tag: Destination["_tag"] }) =>
+const navigate = (options: { auth: AuthState; tag: Exclude<Destination["_tag"], "Budget"> }) =>
   transition({
     state: transition({
       state: initial,
@@ -30,16 +30,16 @@ const navigate = (options: { auth: AuthState; tag: Destination["_tag"] }) =>
   });
 describe("auth-aware navigation", () => {
   it("waits for initialization on protected routes", () => {
-    for (const tag of ["Accounts"] as const)
+    for (const tag of ["New"] as const)
       expect(navigate({ auth: initial.auth, tag }).state.view._tag).toBe("Loading");
   });
   it("replaces automatic redirects and never mounts protected content signed out", () => {
-    expect(navigate({ auth: ready(false), tag: "Accounts" })).toMatchObject({
+    expect(navigate({ auth: ready(false), tag: "New" })).toMatchObject({
       state: { view: { _tag: "Login" } },
       history: { _tag: "Replace", destination: { _tag: "Login" } },
     });
     expect(navigate({ auth: ready(true), tag: "Login" })).toMatchObject({
-      state: { view: { _tag: "Accounts" } },
+      state: { view: { _tag: "Workspace" } },
       history: { _tag: "Replace" },
     });
   });
@@ -59,26 +59,26 @@ describe("auth-aware navigation", () => {
       state: { ...initial, auth: ready(true) },
       event: {
         _tag: "Location",
-        target: targetOf("Accounts"),
-        observed: "/accounts",
+        target: targetOf("New"),
+        observed: "/new",
         initial: false,
       },
     });
     expect(traversal.history._tag).toBe("Keep");
-    expect(traversal.state.view._tag).toBe("Accounts");
+    expect(traversal.state.view._tag).toBe("Workspace");
   });
   it.each(["Login", "VerifyCode"] as const)(
     "admits signed-out %s visits and applies authentication guards",
     (tag) => {
       expect(navigate({ auth: ready(false), tag }).state.view._tag).toBe(tag);
-      expect(navigate({ auth: ready(true), tag }).state.view._tag).toBe("Accounts");
+      expect(navigate({ auth: ready(true), tag }).state.view._tag).toBe("Workspace");
       expect(navigate({ auth: initial.auth, tag }).state.view._tag).toBe("Loading");
     },
   );
   it("auth changes re-evaluate the current route", () => {
     const state = navigate({
       auth: ready(true),
-      tag: "Accounts",
+      tag: "New",
     }).state;
     expect(
       transition({

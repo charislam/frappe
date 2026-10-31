@@ -3,6 +3,9 @@
   "private": true,
   "type": "module",
   "scripts": {
+    "supabase:budgie:start": "supabase start --workdir apps/budgie",
+    "supabase:budgie:status": "supabase status --workdir apps/budgie",
+    "supabase:budgie:stop": "supabase stop --workdir apps/budgie",
     "dev": "pnpm dev:budgie && pnpm dev:site",
     "dev:budgie": "pnpm --filter @charismaticalli/budgie dev",
     "dev:site": "pnpm --filter @charismaticalli/site dev",

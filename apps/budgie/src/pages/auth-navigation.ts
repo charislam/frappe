@@ -1,22 +1,17 @@
 import { Sync, component } from "@charismaticalli/frappe";
-import { type Navigator, link } from "@charismaticalli/frappe/router";
+import { link } from "@charismaticalli/frappe/router";
 import { Effect, Option } from "effect";
-import { AuthError } from "~/auth/model";
+import { Navigation } from "~/context";
 import { type Destination, urls } from "~/routes";
-import type { AppEvent } from "~/transitions";
 
-export type AuthNavigation = Navigator<typeof urls.definitions, AppEvent>;
-export const AuthLink = (options: {
-  navigation: AuthNavigation;
-  destination: Destination;
-  label: string;
-}) =>
+export const AuthLink = (options: { destination: Destination; label: string }) =>
   component((context) =>
     Sync.gen(function* () {
+      const navigation = yield* Sync.service(Navigation);
       const anchor = yield* link({
         context,
         router: urls,
-        navigator: options.navigation,
+        navigator: navigation,
         destination: options.destination,
         children: [options.label],
       });
@@ -28,17 +23,9 @@ export const AuthLink = (options: {
       };
     }),
   );
-export const navigateAuth = (options: {
-  navigation: AuthNavigation;
-  destination: Destination;
-  mode: "push" | "replace";
-}) =>
-  options.navigation.navigate(options.destination, { mode: options.mode }).pipe(
-    Effect.mapError(
-      () =>
-        new AuthError({
-          kind: "other",
-          message: "Unable to open the next page. Please try again.",
-        }),
+export const navigateAuth = (options: { destination: Destination; mode: "push" | "replace" }) =>
+  Navigation.pipe(
+    Effect.flatMap((navigation) =>
+      navigation.navigate(options.destination, { mode: options.mode }),
     ),
   );

@@ -1,13 +1,16 @@
 import { Sync, component, nativeNode } from "@charismaticalli/frappe";
 import { Effect, Option } from "effect";
 import { Auth } from "~/auth/service";
-import { destination } from "~/routes";
+import { loginDestination } from "~/routes";
 import { NonEmptyString } from "~/utils/non-empty-string";
-import { type AuthNavigation, AuthLink } from "./auth-navigation";
+import { AuthLink } from "./auth-navigation";
 import { field } from "./field";
 import { formActions } from "./forms";
 
-export const VerifyCode = (options: { navigation: AuthNavigation; email: Option.Option<string> }) =>
+export const VerifyCode = (options: {
+  email: Option.Option<string>;
+  returnTo: Option.Option<string>;
+}) =>
   component(() =>
     Sync.succeed({
       setup: (context) =>
@@ -101,8 +104,7 @@ export const VerifyCode = (options: { navigation: AuthNavigation; email: Option.
               actions.errorOutput,
               actions.statusOutput,
               AuthLink({
-                navigation: options.navigation,
-                destination: destination("Login"),
+                destination: loginDestination(options.returnTo),
                 label: "Back to sign in",
               }),
             ],

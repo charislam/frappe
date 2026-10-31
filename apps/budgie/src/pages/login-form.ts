@@ -2,15 +2,15 @@ import type { ComponentContext } from "@charismaticalli/frappe";
 import { Effect, Option } from "effect";
 import { Auth } from "~/auth/service";
 import { verificationDestination } from "~/routes";
-import { type AuthNavigation, navigateAuth } from "./auth-navigation";
+import { navigateAuth } from "./auth-navigation";
 import { field } from "./field";
 import { formActions } from "./forms";
 
 export const loginForm = Effect.fn("Login.form")(function* (options: {
   context: ComponentContext;
-  navigation: AuthNavigation;
+  returnTo: Option.Option<string>;
 }) {
-  const { context, navigation } = options;
+  const { context } = options;
   const auth = yield* Auth;
   const actions = yield* formActions(context);
   const email = yield* field({
@@ -44,8 +44,10 @@ export const loginForm = Effect.fn("Login.form")(function* (options: {
         yield* auth.execute({ _tag: "RequestOtp", email: values.email });
         yield* navigateAuth({
           mode: "push",
-          navigation,
-          destination: verificationDestination({ email: Option.some(values.email) }),
+          destination: verificationDestination({
+            email: Option.some(values.email),
+            returnTo: options.returnTo,
+          }),
         });
         return Option.none();
       }),
