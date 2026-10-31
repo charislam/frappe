@@ -2,7 +2,6 @@ import { type ComponentContext } from "@charismaticalli/frappe";
 import { Effect, Match, Option } from "effect";
 import { Auth } from "~/auth/service";
 import { verificationDestination } from "~/routes";
-import { NonEmptyString } from "~/utils/non-empty-string";
 import { type AuthNavigation, navigateAuth } from "./auth-navigation";
 import { field } from "./field";
 import { formActions } from "./forms";
@@ -18,7 +17,7 @@ export const emailCodeButton = Effect.fn("Auth.emailCodeButton")(function* (opti
   const { context, actions, email, navigation, intent } = options;
   const auth = yield* Auth;
   const button = yield* context.he("button", {
-    attrs: { class: Option.some("secondary") },
+    attrs: { class: Option.some("primary") },
     props: { type: "button", disabled: actions.pending },
     children: [
       Match.value(intent).pipe(
@@ -50,45 +49,4 @@ export const emailCodeButton = Effect.fn("Auth.emailCodeButton")(function* (opti
     ),
   );
   return button;
-});
-export const githubButton = Effect.fn("Auth.githubButton")(function* (options: {
-  context: ComponentContext;
-  actions: Actions;
-}) {
-  const { context, actions } = options;
-  const auth = yield* Auth;
-  const available = yield* context.signal<Option.Option<boolean>>({ initial: Option.none() });
-  yield* context.fork(
-    auth.githubAvailable.pipe(
-      Effect.flatMap((value) => available.set(Option.some(value))),
-      Effect.catch(() => available.set(Option.some(false))),
-    ),
-  );
-  const disabled = yield* context.derive({
-    sources: { available, pending: actions.pending },
-    compute: ({ available, pending }) => pending || !Option.contains(available, true),
-  });
-  const hidden = yield* context.derive({
-    sources: { available },
-    compute: ({ available }) => !Option.contains(available, true),
-  });
-  const button = yield* context.he("button", {
-    attrs: { class: Option.some("secondary") },
-    props: { type: "button", disabled, hidden },
-    children: ["Continue with GitHub"],
-  });
-  yield* context.subscribe(yield* context.events(button, "click"), () =>
-    actions.run(
-      auth
-        .execute({ _tag: "Github" })
-        .pipe(Effect.as(Option.some(NonEmptyString.make("Opening GitHub…")))),
-    ),
-  );
-  return [
-    button,
-    yield* context.he("small", {
-      props: { hidden },
-      children: ["Sign in with your GitHub account."],
-    }),
-  ];
 });

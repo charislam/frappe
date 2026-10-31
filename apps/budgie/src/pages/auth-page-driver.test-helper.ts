@@ -20,7 +20,6 @@ export const makePageAuth = async (initial: Option.Option<AuthState>) => {
     sessions: Stream.succeed(Option.none()),
     current: SubscriptionRef.get(states),
     retry: () => Effect.void,
-    githubAvailable: Effect.succeed(false),
     execute: (command) =>
       Effect.gen(function* () {
         commands.push(command);
@@ -30,7 +29,7 @@ export const makePageAuth = async (initial: Option.Option<AuthState>) => {
         const failure = nextFailure;
         nextFailure = Option.none();
         yield* Option.match(failure, { onNone: () => Effect.void, onSome: Effect.fail });
-        return { confirmationPending: command._tag === "Signup" };
+        return undefined;
       }),
   });
   return {

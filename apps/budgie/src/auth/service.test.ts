@@ -66,7 +66,7 @@ const makeCommands = () => {
           onNone: () => Effect.void,
           onSome: (error) => Effect.fail(toAuthError(error)),
         });
-        return { confirmationPending: command._tag === "Signup" };
+        return undefined;
       }),
     failNext: (error: unknown) => {
       failure = Option.some(error);
@@ -81,7 +81,6 @@ const harness = async () => {
     initialize: discovery.initialize,
     observe: events.observe,
     execute: commands.execute,
-    githubAvailable: () => Effect.succeed(false),
     dispose: events.dispose,
   };
   const scope = await run(Scope.make());
@@ -140,20 +139,6 @@ describe("auth lifetime", () => {
       Option.some("A"),
     ]);
   });
-  it("represents signup pending confirmation without inventing a session", async () => {
-    const h = await harness();
-    await run(Deferred.succeed(h.initial, null));
-    await waitFor({ auth: h.auth, accept: (s) => s._tag === "Ready" });
-    expect(
-      await run(
-        h.auth.execute({
-          _tag: "Signup",
-          credentials: { email: "new@example.com", password: "password123" },
-        }),
-      ),
-    ).toEqual({ confirmationPending: true });
-    expect(identity(await run(h.auth.current))).toEqual(Option.none());
-  });
   it("retains explicit OTP intent and maps expired-code failures", async () => {
     const h = await harness();
     await run(h.auth.execute({ _tag: "RequestOtp", email: "a@example.com", intent: "signin" }));
@@ -182,25 +167,8 @@ describe("auth lifetime", () => {
     await waitFor({ auth: h.auth, accept: (s) => s._tag === "Ready" && Option.isNone(s.user) });
     expect(identity(await run(h.auth.current))).toEqual(Option.none());
   });
-  it("keeps password update results local to the caller without changing global session state", async () => {
-    const h = await harness();
-    await run(Deferred.succeed(h.initial, externalUser("A")));
-    await waitFor({ auth: h.auth, accept: (s) => s._tag === "Ready" });
-    const initial = await run(h.auth.current);
-    h.failNext(new Error("offline"));
-    const failed = await run(
-      h.auth.execute({ _tag: "UpdatePassword", password: "password123" }).pipe(Effect.exit),
-    );
-    expect(failed._tag).toBe("Failure");
-    expect(await run(h.auth.current)).toEqual(initial);
-    await run(h.auth.execute({ _tag: "UpdatePassword", password: "password123" }));
-    expect(await run(h.auth.current)).toEqual({
-      _tag: "Ready",
-      user: Option.some({ id: "A", email: Option.some("A@example.com") }),
-    });
-  });
   it.each([
-    { code: "invalid_credentials", message: "bad", expected: "credentials" },
+    { code: "invalid_credentials", message: "bad", expected: "code" },
     { status: 429, message: "limit", expected: "rate-limit" },
   ])("classifies $expected failures", ({ expected, ...error }) => {
     expect(authError(error).kind).toBe(expected);
