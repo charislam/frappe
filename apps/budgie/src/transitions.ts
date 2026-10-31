@@ -8,15 +8,12 @@ export type View =
   | { readonly _tag: "Failed"; readonly message: string }
   | { readonly _tag: "Login" }
   | { readonly _tag: "Signup" }
-  | { readonly _tag: "ForgotPassword" }
   | {
       readonly _tag: "VerifyCode";
       readonly email: Option.Option<string>;
       readonly intent: "signin" | "signup";
     }
-  | { readonly _tag: "SignupConfirmation"; readonly email: Option.Option<string> }
   | { readonly _tag: "Accounts"; readonly user: User }
-  | { readonly _tag: "Reset"; readonly userId: string }
   | { readonly _tag: "NotFound"; readonly home: string };
 export interface State {
   readonly auth: AuthState;
@@ -45,7 +42,6 @@ const admit = (options: {
           Option.match(user, {
             onSome: (user) =>
               Match.value(requested).pipe(
-                Match.tag("Reset", () => show({ _tag: "Reset", userId: user.id })),
                 Match.tag("Accounts", () => show({ _tag: "Accounts", user })),
                 Match.orElse(() => redirect({ _tag: "Accounts", user })),
               ),
@@ -53,11 +49,7 @@ const admit = (options: {
               Match.value(requested).pipe(
                 Match.tag("Login", () => show({ _tag: "Login" })),
                 Match.tag("Signup", () => show({ _tag: "Signup" })),
-                Match.tag("ForgotPassword", () => show({ _tag: "ForgotPassword" })),
                 Match.tag("VerifyCode", ({ query }) => show({ _tag: "VerifyCode", ...query })),
-                Match.tag("SignupConfirmation", ({ query }) =>
-                  show({ _tag: "SignupConfirmation", ...query }),
-                ),
                 Match.orElse(() => redirect({ _tag: "Login" })),
               ),
           }),

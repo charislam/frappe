@@ -77,7 +77,7 @@ export const makeInitialize = (options: {
   location: URL;
   cleanCallback: () => void;
 }) => {
-  const callbackPage = ["/auth/callback", "/reset-password"].includes(options.location.pathname);
+  const callbackPage = options.location.pathname === "/auth/callback";
   let exchanged = false;
   return Effect.fn("Supabase.initialize")(function* () {
     yield* Match.value(callbackPage && !exchanged).pipe(

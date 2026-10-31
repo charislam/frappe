@@ -13,7 +13,6 @@ import { Auth } from "~/auth/service";
 import { Accounts } from "~/pages/accounts";
 import { authBranches } from "~/pages/auth-branches";
 import { navigateAuth } from "~/pages/auth-navigation";
-import { ResetPassword } from "~/pages/reset-password";
 import { ThemeSelector } from "~/theme/selector";
 import { destination, targetOf, urls } from "./routes";
 import { type AppEvent, type State, type View, transition } from "./transitions";
@@ -76,26 +75,6 @@ export const App = (partition: WritableSignal<Option.Option<string>>) =>
               >()(({ inputs }) =>
                 Sync.succeed({
                   setup: () => inputs.state.get.pipe(Effect.map(({ user }) => Accounts(user))),
-                }),
-              ),
-            },
-            Reset: {
-              key: (view: Extract<View, { _tag: "Reset" }>) => view.userId,
-              branch: branch<
-                Extract<View, { _tag: "Reset" }>,
-                Signal<Extract<View, { _tag: "Reset" }>>
-              >()(() =>
-                Sync.succeed({
-                  setup: () =>
-                    Effect.succeed(
-                      ResetPassword(
-                        navigateAuth({
-                          navigation,
-                          destination: destination("Accounts"),
-                          mode: "replace",
-                        }),
-                      ),
-                    ),
                 }),
               ),
             },

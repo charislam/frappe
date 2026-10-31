@@ -3,7 +3,6 @@ import { Effect, Option } from "effect";
 import type { AuthDriver } from "./service";
 import { makeExecute } from "./supabase-commands";
 import { makeInitialize } from "./supabase-initialize";
-import { makeGithubAvailability } from "./supabase-providers";
 
 export const supabaseDriver = (options: {
   url: string;
@@ -19,7 +18,6 @@ export const supabaseDriver = (options: {
       autoRefreshToken: true,
     },
   });
-  const githubAvailable = makeGithubAvailability(options);
   return {
     initialize: makeInitialize({
       auth: client.auth,
@@ -29,8 +27,6 @@ export const supabaseDriver = (options: {
     execute: makeExecute({
       auth: client.auth,
       callback: new URL("/auth/callback", options.location.origin).href,
-      reset: new URL("/reset-password", options.location.origin).href,
-      githubAvailable,
     }),
     observe: (receive) => {
       const { data } = client.auth.onAuthStateChange((_event, session) =>
@@ -38,7 +34,6 @@ export const supabaseDriver = (options: {
       );
       return () => data.subscription.unsubscribe();
     },
-    githubAvailable,
     dispose: () => Effect.promise(() => client.auth.dispose()),
   };
 };
