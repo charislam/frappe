@@ -47,6 +47,9 @@ importers:
       '@charismaticalli/frappe':
         specifier: workspace:*
         version: link:../../packages/frappe
+      '@charismaticalli/ui':
+        specifier: workspace:*
+        version: link:../../packages/ui
       '@supabase/supabase-js':
         specifier: 2.117.3
         version: 2.117.3

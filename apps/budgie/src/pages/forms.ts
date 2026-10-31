@@ -19,7 +19,6 @@ type FormState = Data.TaggedEnum<{
   Succeeded: { readonly message: Option.Option<NonEmptyString> };
 }>;
 const FormState = Data.taggedEnum<FormState>();
-
 export const formActions = Effect.fn("Form.actions")(function* (context: ComponentContext) {
   const state = yield* context.signal<FormState>({ initial: FormState.Idle() });
   const pending = yield* context.derive({

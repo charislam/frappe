@@ -9,11 +9,12 @@ import {
 } from "@charismaticalli/frappe";
 import { History, navigator } from "@charismaticalli/frappe/router";
 import { Effect, Match, Option } from "effect";
-import { identity } from "~/auth/model";
+import { identity, type User } from "~/auth/model";
 import { applyAuth } from "~/auth/partition";
 import { Auth } from "~/auth/service";
 import { Preferences } from "~/budget/preferences";
 import { Navigation } from "~/context";
+import { AccountMenu } from "~/pages/account-menu";
 import { authBranches } from "~/pages/auth-branches";
 import { Workspace } from "~/pages/workspace";
 import { ThemeSelector } from "~/theme/selector";
@@ -57,6 +58,14 @@ export const App = (partition: WritableSignal<Option.Option<string>>) =>
           const view = yield* context.derive({
             sources: { state },
             compute: ({ state }) => state.view,
+          });
+          const headerUser = yield* context.derive({
+            sources: { state },
+            compute: ({ state }): Option.Option<User> =>
+              Match.value(state.auth).pipe(
+                Match.tag("Ready", ({ user }) => user),
+                Match.orElse(() => Option.none()),
+              ),
           });
           const branches = {
             Loading: {
@@ -173,7 +182,10 @@ export const App = (partition: WritableSignal<Option.Option<string>>) =>
                     attrs: { href: Option.some("/"), class: Option.some("app-brand") },
                     children: ["◒ budgie"],
                   }),
-                  ThemeSelector,
+                  yield* context.he("div", {
+                    attrs: { class: Option.some("app-header-actions") },
+                    children: [ThemeSelector, AccountMenu(headerUser)],
+                  }),
                 ],
               }),
               yield* context.he("main", {

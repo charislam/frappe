@@ -3,7 +3,6 @@ import { Effect, Match, Option } from "effect";
 import type { Budget } from "~/budget/model";
 import { BudgetContent } from "./budget-content";
 import { BudgetSelection } from "./budget-selection";
-import { LogoutControls } from "./logout-controls";
 import { NewBudget } from "./new-budget";
 import type { WorkspaceOptions } from "./workspace";
 
@@ -22,14 +21,9 @@ export const BudgetPage = (
             ),
             Match.exhaustive,
           );
-          const address: string = Option.getOrElse(options.user.email, () => "Signed in");
           return yield* context.he("section", {
             attrs: { class: Option.some("budget-page") },
-            children: [
-              content,
-              yield* context.he("p", { children: [address] }),
-              LogoutControls(options.user.id),
-            ],
+            children: [content],
           });
         }),
     }),

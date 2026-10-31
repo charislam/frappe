@@ -24,6 +24,7 @@
     --letter-spacing-display: -0.055em;
     --radius-control: 0.6rem;
     --radius-card: 1.5rem;
+    --size-header-control: 2.625rem;
     --space-control: 0.75rem;
     --space-content: 1.5rem;
     --shadow-card: 0 1.5rem 5rem #27254b12;
@@ -283,11 +284,18 @@
     padding-block: 1.25rem;
     padding-inline: max(1rem, calc((100% - 72rem) / 2));
   }
+  .app-header-actions {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+  }
   .app-theme-selector {
     position: relative;
     display: grid;
     place-items: center;
     flex: none;
+    inline-size: var(--size-header-control);
+    block-size: var(--size-header-control);
     border: 1px solid var(--color-border);
     border-radius: var(--radius-control);
     color: var(--color-muted);
@@ -329,10 +337,6 @@
       opacity: 0;
       outline: none;
       cursor: pointer;
-      @media (pointer: coarse) {
-        inline-size: 2.75rem;
-        block-size: 2.75rem;
-      }
     }
     :where([data-theme-icon]) {
       grid-area: 1 / 1;
@@ -363,6 +367,71 @@
       }
       :where(option) {
         font-size: 0.875rem;
+      }
+    }
+  }
+  .app-account-menu {
+    position: relative;
+
+    :where(.app-account-menu-trigger) {
+      display: grid;
+      place-items: center;
+      inline-size: var(--size-header-control);
+      block-size: var(--size-header-control);
+      min-block-size: var(--size-header-control);
+      padding: 0;
+      color: var(--color-muted);
+      cursor: pointer;
+
+      &:where(:hover:not(:disabled)) {
+        color: var(--color-accent);
+        background: var(--color-soft);
+      }
+    }
+
+    :where(.app-account-menu-panel) {
+      position: absolute;
+      inset-block-start: calc(100% + 0.5rem);
+      inset-inline-end: 0;
+      z-index: 1;
+      inline-size: min(18rem, calc(100vw - 2rem));
+      padding: 0.875rem;
+      border: 1px solid color-mix(in srgb, var(--color-border) 55%, transparent);
+      border-radius: 1rem;
+      background: var(--color-surface);
+      box-shadow: 0 0.75rem 2rem #17152b18;
+
+      &:where([data-state="closed"]) {
+        display: none;
+      }
+    }
+
+    :where(.app-account-identity) {
+      margin: 0 0 0.625rem;
+      overflow-wrap: anywhere;
+      color: var(--color-muted);
+      font-size: var(--font-size-body);
+      font-weight: 550;
+    }
+
+    :where(.app-account-menu-controls) {
+      display: grid;
+      gap: 0.5rem;
+
+      :where(button) {
+        inline-size: 100%;
+        min-block-size: 2.75rem;
+        padding-block: 0.625rem;
+        border-color: transparent;
+        border-radius: 0.75rem;
+        color: var(--color-accent);
+        background: var(--color-soft);
+        font-size: var(--font-size-body);
+        font-weight: 600;
+
+        &:where(:hover:not(:disabled)) {
+          background: color-mix(in srgb, var(--color-soft) 72%, var(--color-accent));
+        }
       }
     }
   }
