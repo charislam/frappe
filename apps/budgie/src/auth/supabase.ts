@@ -1,11 +1,11 @@
-import { createClient } from "@supabase/supabase-js";
+import { createClient, type SupabaseClient } from "@supabase/supabase-js";
 import { Effect, Option } from "effect";
 import type { AuthDriver } from "./service";
 import { makeExecute } from "./supabase-commands";
 import { request } from "./supabase-request";
 
-export const supabaseDriver = (options: { url: string; key: string }): AuthDriver => {
-  const client = createClient(options.url, options.key, {
+export const supabaseClient = (options: { url: string; key: string }) =>
+  createClient(options.url, options.key, {
     auth: {
       flowType: "pkce",
       detectSessionInUrl: false,
@@ -13,6 +13,7 @@ export const supabaseDriver = (options: { url: string; key: string }): AuthDrive
       autoRefreshToken: true,
     },
   });
+export const supabaseDriver = (client: SupabaseClient): AuthDriver => {
   return {
     initialize: Effect.fn("Supabase.initialize")(function* () {
       const { data } = yield* request(() => client.auth.getSession());

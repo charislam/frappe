@@ -1,6 +1,6 @@
 import { Effect, Option } from "effect";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
-import { supabaseDriver } from "./supabase";
+import { supabaseDriver, supabaseClient } from "./supabase";
 
 const run = Effect.runPromise;
 
@@ -24,7 +24,7 @@ beforeEach(() => {
 });
 afterEach(() => vi.unstubAllGlobals());
 const driver = () => ({
-  driver: supabaseDriver({ url: "http://127.0.0.1:54321", key: "public-test-key" }),
+  driver: supabaseDriver(supabaseClient({ url: "http://127.0.0.1:54321", key: "public-test-key" })),
 });
 describe("Supabase boundary", () => {
   it("persists sessions without detecting authentication links", async () => {

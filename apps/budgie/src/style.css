@@ -374,10 +374,51 @@
   }
 }
 @layer page {
-  .accounts-page {
+  .budget-page {
     display: flex;
     flex-direction: column;
     gap: 1rem;
+    :where(.budget-selector) {
+      display: grid;
+      gap: 0.5rem;
+      :where(select) {
+        appearance: auto;
+        font: inherit;
+        color: var(--color-muted);
+        background: var(--color-surface);
+        border: 1px solid var(--color-border);
+        border-radius: var(--radius-control);
+        padding: 0.75rem;
+        cursor: pointer;
+        &:where(:hover:not(:disabled)) {
+          background: var(--color-soft);
+          color: var(--color-accent);
+        }
+        @supports (appearance: base-select) and selector(::picker(select)) {
+          appearance: base-select;
+          :where(&::picker(select)) {
+            appearance: base-select;
+            border: 1px solid var(--color-border);
+            border-radius: var(--radius-control);
+            color: var(--color-muted);
+            background: var(--color-surface);
+          }
+          :where(&::picker-icon) {
+            color: currentcolor;
+          }
+          :where(&::checkmark) {
+            color: var(--color-accent);
+          }
+          :where(&::picker(select) option) {
+            padding: 0.75rem;
+            &:where(:hover, :focus) {
+              color: var(--color-accent);
+              background: var(--color-soft);
+            }
+          }
+        }
+      }
+    }
   }
   .not-found-page {
     display: flex;

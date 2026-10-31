@@ -5,13 +5,17 @@ import {
   branch,
   cases,
   component,
+  provideContext,
 } from "@charismaticalli/frappe";
 import { History, navigator } from "@charismaticalli/frappe/router";
-import { Effect, Option } from "effect";
+import { Effect, Match, Option } from "effect";
+import { identity } from "~/auth/model";
 import { applyAuth } from "~/auth/partition";
 import { Auth } from "~/auth/service";
-import { Accounts } from "~/pages/accounts";
+import { Preferences } from "~/budget/preferences";
+import { Navigation } from "~/context";
 import { authBranches } from "~/pages/auth-branches";
+import { Workspace } from "~/pages/workspace";
 import { ThemeSelector } from "~/theme/selector";
 import { targetOf, urls } from "./routes";
 import { type AppEvent, type State, type View, transition } from "./transitions";
@@ -22,6 +26,7 @@ export const App = (partition: WritableSignal<Option.Option<string>>) =>
       setup: (context) =>
         Effect.gen(function* () {
           const auth = yield* Auth;
+          const preferences = yield* Preferences;
           const history = yield* History;
           const state = yield* context.signal<State>({
             initial: {
@@ -43,7 +48,10 @@ export const App = (partition: WritableSignal<Option.Option<string>>) =>
             applyAuth({
               state: auth,
               partition,
-              admit: () => navigation.dispatch({ _tag: "Auth", auth }),
+              admit: () =>
+                preferences
+                  .identify(identity(auth))
+                  .pipe(Effect.andThen(navigation.dispatch({ _tag: "Auth", auth }))),
             }),
           );
           const view = yield* context.derive({
@@ -65,15 +73,20 @@ export const App = (partition: WritableSignal<Option.Option<string>>) =>
                 }),
               ),
             },
-            ...authBranches(navigation),
-            Accounts: {
-              key: (view: Extract<View, { _tag: "Accounts" }>) => view.user.id,
+            ...authBranches(),
+            Workspace: {
+              key: (view: Extract<View, { _tag: "Workspace" }>) =>
+                `${view.user.id}:${Match.value(view.page).pipe(
+                  Match.tag("Home", "New", ({ _tag }) => _tag),
+                  Match.tag("Budget", ({ budgetId }) => `Budget:${budgetId}`),
+                  Match.exhaustive,
+                )}`,
               branch: branch<
-                Extract<View, { _tag: "Accounts" }>,
-                Signal<Extract<View, { _tag: "Accounts" }>>
+                Extract<View, { _tag: "Workspace" }>,
+                Signal<Extract<View, { _tag: "Workspace" }>>
               >()(({ inputs }) =>
                 Sync.succeed({
-                  setup: () => inputs.state.get.pipe(Effect.map(({ user }) => Accounts(user))),
+                  setup: () => inputs.state.get.pipe(Effect.map((view) => Workspace(view))),
                 }),
               ),
             },
@@ -140,7 +153,16 @@ export const App = (partition: WritableSignal<Option.Option<string>>) =>
               ),
             },
           };
-          const content = cases({ state: view, branches });
+          const routedContent = component(() =>
+            Sync.succeed({
+              setup: () => Effect.succeed(cases({ state: view, branches })),
+            }),
+          );
+          const content = provideContext({
+            key: Navigation,
+            value: navigation,
+            child: routedContent,
+          });
           return yield* context.he("div", {
             attrs: { class: Option.some("app-shell") },
             children: [

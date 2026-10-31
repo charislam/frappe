@@ -1,14 +1,13 @@
 import { Sync, component } from "@charismaticalli/frappe";
 import { Effect, Option } from "effect";
-import { type AuthNavigation } from "./auth-navigation";
 import { loginForm } from "./login-form";
 
-export const Login = (navigation: AuthNavigation) =>
+export const Login = (options: { returnTo: Option.Option<string> }) =>
   component(() =>
     Sync.succeed({
       setup: (context) =>
         Effect.gen(function* () {
-          const { form, actions } = yield* loginForm({ context, navigation });
+          const { form, actions } = yield* loginForm({ context, ...options });
           return yield* context.he("section", {
             attrs: { class: Option.some("login-page auth-content") },
             children: [

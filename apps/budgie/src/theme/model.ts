@@ -1,7 +1,7 @@
 import { Match, Schema } from "effect";
 export const Preference = Schema.Literals(["light", "dark", "system"]);
 export type Preference = typeof Preference.Type;
-export const storageKey = "budgie.theme";
+export const storageKey = "budgie.public_preferences.theme";
 export const decodePreference = (value: unknown): Preference =>
   Match.value(value).pipe(
     Match.when("light", () => "light" as const),

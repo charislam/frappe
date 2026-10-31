@@ -4,9 +4,13 @@ import {
   type ElementOutput,
   nativeNode,
 } from "@charismaticalli/frappe";
+import type { NavigationError } from "@charismaticalli/frappe/router";
 import { Cause, Data, Effect, Exit, Match, Option, Record } from "effect";
 import type { AuthError } from "~/auth/model";
+import type { DataError } from "~/data-error";
 import type { NonEmptyString } from "~/utils/non-empty-string";
+
+type FormError = AuthError | DataError | NavigationError | ReactiveError;
 
 type FormState = Data.TaggedEnum<{
   Idle: {};
@@ -50,7 +54,7 @@ export const formActions = Effect.fn("Form.actions")(function* (context: Compone
     },
     children: [status],
   });
-  const run = (work: Effect.Effect<Option.Option<NonEmptyString>, AuthError | ReactiveError>) =>
+  const run = <R>(work: Effect.Effect<Option.Option<NonEmptyString>, FormError, R>) =>
     Effect.gen(function* () {
       yield* Match.value(yield* pending.get).pipe(
         Match.when(true, () => Effect.void),
@@ -59,7 +63,7 @@ export const formActions = Effect.fn("Form.actions")(function* (context: Compone
             yield* state.set(FormState.Pending());
             yield* work.pipe(
               Effect.flatMap((message) => state.set(FormState.Succeeded({ message }))),
-              Effect.catchTag("AuthError", (failure) =>
+              Effect.catchTag(["AuthError", "DataError", "NavigationError"], (failure) =>
                 state.set(FormState.Failed({ message: failure.message })),
               ),
               Effect.onExit((exit) =>
@@ -77,14 +81,12 @@ export const formActions = Effect.fn("Form.actions")(function* (context: Compone
         ),
       );
     });
-  const submit = <K extends string>(options: {
+  const submit = <K extends string, R>(options: {
     form: ElementOutput<HTMLFormElement>;
     fields: Readonly<
       Record<K, { validate: () => Effect.Effect<Option.Option<string>, ReactiveError> }>
     >;
-    work: (
-      values: Record<K, string>,
-    ) => Effect.Effect<Option.Option<NonEmptyString>, AuthError | ReactiveError>;
+    work: (values: Record<K, string>) => Effect.Effect<Option.Option<NonEmptyString>, FormError, R>;
   }) =>
     Effect.gen(function* () {
       yield* context.subscribe(

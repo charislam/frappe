@@ -1,10 +1,13 @@
-import { type MountFailure, mounting } from "@charismaticalli/frappe";
+import { type MountFailure, mounting, provideContext } from "@charismaticalli/frappe";
 import * as Query from "@charismaticalli/frappe/query";
 import { History, browserHistory } from "@charismaticalli/frappe/router";
 import { Effect, Layer, Option } from "effect";
 import { Auth, makeAuth } from "~/auth/service";
-import { supabaseDriver } from "~/auth/supabase";
+import { supabaseClient, supabaseDriver } from "~/auth/supabase";
+import { Queries } from "~/context";
 import { App } from "./app";
+import { preferencesLayer } from "./budget/preferences";
+import { Budgets, makeBudgets } from "./budget/service";
 import { configuration } from "./config";
 
 export const bootstrap = Effect.fn("Budgie.bootstrap")(function* (
@@ -15,17 +18,20 @@ export const bootstrap = Effect.fn("Budgie.bootstrap")(function* (
     onNone: () => Effect.die(new Error("Budgie requires #app")),
     onSome: Effect.succeed,
   });
-  const auth = yield* makeAuth({ driver: supabaseDriver(config) });
+  const client = supabaseClient(config);
+  const auth = yield* makeAuth({ driver: supabaseDriver(client) });
   const app = yield* mounting({
     scope: yield* Effect.scope,
     onError,
-    resources: Layer.merge(
+    resources: Layer.mergeAll(
+      Layer.succeed(Budgets, makeBudgets(client)),
+      preferencesLayer(() => window.localStorage),
       Layer.succeed(Auth, auth),
       Layer.effect(History, browserHistory(window)),
     ),
   });
   const partition = yield* app.signal<Option.Option<string>>({ initial: Option.none() });
-  yield* Query.configure({ context: app, partition });
-  yield* app.h(root, App(partition));
+  const queries = yield* Query.configure({ context: app, partition });
+  yield* app.h(root, provideContext({ key: Queries, value: queries, child: App(partition) }));
   yield* Effect.never;
 }, Effect.scoped);
