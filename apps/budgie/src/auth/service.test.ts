@@ -142,9 +142,7 @@ describe("auth lifetime", () => {
   it("requests email codes and maps expired-code failures", async () => {
     const h = await harness();
     await run(h.auth.execute({ _tag: "RequestOtp", email: "a@example.com" }));
-    expect(h.commands).toEqual([
-      { _tag: "RequestOtp", email: "a@example.com" },
-    ]);
+    expect(h.commands).toEqual([{ _tag: "RequestOtp", email: "a@example.com" }]);
     h.failNext({ code: "otp_expired", message: "Expired" });
     expect(
       await run(

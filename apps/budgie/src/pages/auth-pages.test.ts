@@ -22,9 +22,7 @@ describe("email-code authentication pages", () => {
     h.input("email").value = "reader@example.com";
     h.button("Email me a code").click();
     await h.page("Check your email");
-    expect(h.commands).toEqual([
-      { _tag: "RequestOtp", email: "reader@example.com" },
-    ]);
+    expect(h.commands).toEqual([{ _tag: "RequestOtp", email: "reader@example.com" }]);
   });
 
   it("locks a query-provided email on verification", async () => {
@@ -121,8 +119,6 @@ describe("email-code field validation", () => {
     h.input("email").dispatchEvent(new InputEvent("input", { bubbles: true }));
     h.button("Email me a code").click();
     await h.page("Check your email");
-    expect(h.commands).toEqual([
-      { _tag: "RequestOtp", email: "reader@example.com" },
-    ]);
+    expect(h.commands).toEqual([{ _tag: "RequestOtp", email: "reader@example.com" }]);
   });
 });

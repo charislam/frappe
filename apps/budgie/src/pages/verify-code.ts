@@ -7,10 +7,7 @@ import { type AuthNavigation, AuthLink } from "./auth-navigation";
 import { field } from "./field";
 import { formActions } from "./forms";
 
-export const VerifyCode = (options: {
-  navigation: AuthNavigation;
-  email: Option.Option<string>;
-}) =>
+export const VerifyCode = (options: { navigation: AuthNavigation; email: Option.Option<string> }) =>
   component(() =>
     Sync.succeed({
       setup: (context) =>

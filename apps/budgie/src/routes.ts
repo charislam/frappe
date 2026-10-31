@@ -33,9 +33,7 @@ export const verificationDestination = (
 });
 export const destination = (tag: Destination["_tag"]): Destination =>
   Match.value(tag).pipe(
-    Match.when("VerifyCode", () =>
-      verificationDestination(Option.none()),
-    ),
+    Match.when("VerifyCode", () => verificationDestination(Option.none())),
     Match.orElse((tag) => ({ _tag: tag, params: {}, query: {}, fragment: Option.none() })),
   );
 export const targetFor = (destination: Destination): MatchedTarget<typeof urls.definitions> =>

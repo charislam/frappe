@@ -18,9 +18,7 @@ export const authBranches = (navigation: AuthNavigation) => ({
       Sync.succeed({
         setup: () =>
           inputs.state.get.pipe(
-            Effect.map((page) =>
-              VerifyCode({ navigation, email: page.email }),
-            ),
+            Effect.map((page) => VerifyCode({ navigation, email: page.email })),
           ),
       }),
     ),
