@@ -8,15 +8,7 @@ export const ExternalUser = Schema.Struct({
 });
 export const decodeUser = (value: unknown) => Schema.decodeUnknownEffect(ExternalUser)(value);
 export class AuthError extends Schema.TaggedError<AuthError>()("AuthError", {
-  kind: Schema.Literals([
-    "credentials",
-    "code",
-    "rate-limit",
-    "transport",
-    "provider",
-    "callback",
-    "other",
-  ]),
+  kind: Schema.Literals(["credentials", "code", "rate-limit", "transport", "other"]),
   message: Schema.String,
 }) {}
 export const authError = (cause: unknown): AuthError => {
@@ -37,7 +29,11 @@ export const authError = (cause: unknown): AuthError => {
       Match.value({ code, status }).pipe(
         Match.when(
           { code: "invalid_credentials" },
-          () => new AuthError({ kind: "credentials", message: "Email or password is incorrect." }),
+          () =>
+            new AuthError({
+              kind: "credentials",
+              message: "Unable to sign in. Request a new email code and try again.",
+            }),
         ),
         Match.when(
           { code: "otp_expired" },
@@ -79,16 +75,9 @@ export const identity = (state: AuthState): Option.Option<string> =>
     Match.tag("Ready", ({ user }) => Option.map(user, (user) => user.id)),
     Match.orElse(() => Option.none()),
   );
-export type Credentials = { readonly email: string; readonly password: string };
 export type Command =
-  | { readonly _tag: "Password"; readonly credentials: Credentials }
-  | { readonly _tag: "Signup"; readonly credentials: Credentials }
-  | { readonly _tag: "RequestOtp"; readonly email: string; readonly intent: "signin" | "signup" }
+  | { readonly _tag: "RequestOtp"; readonly email: string }
   | { readonly _tag: "VerifyOtp"; readonly email: string; readonly code: string }
-  | { readonly _tag: "ResendConfirmation"; readonly email: string }
-  | { readonly _tag: "Github" }
-  | { readonly _tag: "RequestRecovery"; readonly email: string }
-  | { readonly _tag: "UpdatePassword"; readonly password: string }
   | { readonly _tag: "Logout" };
 
 export const toAuthError = (cause: unknown): AuthError =>

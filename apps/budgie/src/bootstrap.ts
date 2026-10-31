@@ -15,14 +15,7 @@ export const bootstrap = Effect.fn("Budgie.bootstrap")(function* (
     onNone: () => Effect.die(new Error("Budgie requires #app")),
     onSome: Effect.succeed,
   });
-  const location = new URL(window.location.href);
-  const auth = yield* makeAuth({
-    driver: supabaseDriver({
-      ...config,
-      location,
-      cleanCallback: () => window.history.replaceState(window.history.state, "", location.pathname),
-    }),
-  });
+  const auth = yield* makeAuth({ driver: supabaseDriver(config) });
   const app = yield* mounting({
     scope: yield* Effect.scope,
     onError,

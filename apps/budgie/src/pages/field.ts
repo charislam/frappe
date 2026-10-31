@@ -2,15 +2,11 @@ import { type ComponentContext, nativeNode, occurrenceId } from "@charismaticall
 import { attach } from "@charismaticalli/frappe/validation";
 import { Effect, Match, Option, Schema } from "effect";
 
-const definition = (options: { type: "email" | "password" | "text"; name: string }) =>
+const definition = (options: { type: "email" | "text"; name: string }) =>
   Match.value(options.type).pipe(
     Match.when("email", () => ({
       schema: Schema.Trim.check(Schema.isPattern(/^[^\s@]+@[^\s@]+\.[^\s@]+$/)),
       message: "Enter a valid email address.",
-    })),
-    Match.when("password", () => ({
-      schema: Schema.String.check(Schema.isMinLength(8)),
-      message: "Use at least 8 characters for your password.",
     })),
     Match.when("text", () =>
       Match.value(options.name).pipe(
@@ -29,7 +25,7 @@ const definition = (options: { type: "email" | "password" | "text"; name: string
 export const field = Effect.fn("Form.field")(function* (options: {
   context: ComponentContext;
   label: string;
-  type: "email" | "password" | "text";
+  type: "email" | "text";
   autocomplete: string;
   name: string;
 }) {
