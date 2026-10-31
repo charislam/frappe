@@ -4,7 +4,7 @@ import { Auth } from "~/auth/service";
 import { Preferences } from "~/budget/preferences";
 import { formActions } from "./forms";
 
-export const LogoutControls = (userId: string) =>
+export const LogoutControls = () =>
   component(() =>
     Sync.succeed({
       setup: (context) =>
@@ -18,14 +18,13 @@ export const LogoutControls = (userId: string) =>
           });
           yield* context.subscribe(yield* context.events(logout, "click"), () =>
             actions.run(
-              preferences.clear.pipe(
-                Effect.andThen(auth.execute({ _tag: "Logout" })),
-                Effect.tapError(() => preferences.identify(Option.some(userId))),
-                Effect.as(Option.none()),
-              ),
+              auth
+                .execute({ _tag: "Logout" })
+                .pipe(Effect.andThen(preferences.clear), Effect.as(Option.none())),
             ),
           );
           return yield* context.he("div", {
+            attrs: { class: Option.some("app-account-menu-controls") },
             children: [logout, actions.errorOutput, actions.statusOutput],
           });
         }),

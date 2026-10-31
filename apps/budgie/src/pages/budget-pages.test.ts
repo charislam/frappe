@@ -183,12 +183,36 @@ describe("budget navigation", () => {
       fake([budget("a")]).service,
     );
     await h.page("Budget a");
+    h.button("☰").click();
     h.button("Log out").click();
     await expect.poll(() => h.commands.length).toBe(1);
     expect(localStorage.getItem(key)).toBeNull();
     expect(localStorage.getItem("budgie.preferences.other")).toBeNull();
     expect(localStorage.getItem(storageKey)).toBe("dark");
     expect(localStorage.getItem("unrelated")).toBe("keep");
+  });
+  it("shows the account menu only for authenticated workspace views", async () => {
+    const unauthenticated = await harness({ initial: "/login", auth: Option.none() });
+    await unauthenticated.page("Sign in");
+    expect(unauthenticated.root.querySelector(".app-account-menu")).toBeNull();
+
+    const authenticated = await harness(
+      { initial: "/", auth: Option.some(ready("A")) },
+      fake([budget("a")]).service,
+    );
+    await authenticated.page("Budget a");
+    const trigger = authenticated.button("☰");
+    expect(trigger.getAttribute("aria-expanded")).toBe("false");
+    expect(authenticated.root.querySelector(".app-account-identity")?.textContent).toBe(
+      "A@example.com",
+    );
+    trigger.click();
+    await expect.poll(() => trigger.getAttribute("aria-expanded")).toBe("true");
+    await expect
+      .poll(() =>
+        authenticated.root.querySelector(".app-account-menu-panel")?.getAttribute("data-state"),
+      )
+      .toBe("open");
   });
   it("creates from /new even when budgets exist, trims, invalidates and visits the result", async () => {
     const f = fake([budget("a")]);
@@ -405,6 +429,7 @@ it("allows logout during creation and ignores the retired creation result", asyn
   await run(Deferred.await(entered));
   await expect.poll(() => h.button("Create").disabled).toBe(true);
   expect(h.button("Log out").disabled).toBe(false);
+  h.button("☰").click();
   h.button("Log out").click();
   await expect.poll(() => h.commands).toEqual([{ _tag: "Logout" }]);
   await h.publish({ _tag: "Ready", user: Option.none() });
