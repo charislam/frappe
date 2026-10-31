@@ -1,5 +1,5 @@
 // @vitest-environment happy-dom
-import { Effect, Option } from "effect";
+import { Option } from "effect";
 import { afterEach, describe, expect, it } from "vitest";
 import { AuthError } from "~/auth/model";
 import { cleanupAuthPages, harness } from "./auth-page-harness.test-helper";
@@ -13,8 +13,12 @@ describe("email-code authentication pages", () => {
     expect(h.input("email").type).toBe("email");
     expect(h.root.querySelector('[name="password"]')).toBeNull();
     expect(h.button("Email me a sign-in code")).not.toBeNull();
-    expect(h.button("Continue with GitHub")).toBeNull();
-    expect(h.button("Forgot password?")).toBeNull();
+    expect(
+      Array.from(h.root.querySelectorAll("button")).some(
+        (button) => button.textContent === "Continue with GitHub",
+      ),
+    ).toBe(false);
+    expect(h.root.textContent).not.toContain("Forgot password?");
     h.input("email").value = "reader@example.com";
     h.button("Email me a sign-in code").click();
     await h.page("Check your email");
@@ -27,7 +31,11 @@ describe("email-code authentication pages", () => {
     const h = await harness({ initial: "/signup", auth: Option.none() });
     await h.page("Create your account");
     expect(h.root.querySelector('[name="password"]')).toBeNull();
-    expect(h.button("Create account")).toBeNull();
+    expect(
+      Array.from(h.root.querySelectorAll("button")).some(
+        (button) => button.textContent === "Create account",
+      ),
+    ).toBe(false);
     h.input("email").value = "new@example.com";
     h.button("Sign up with an email code").click();
     await h.page("Check your email");

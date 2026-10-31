@@ -24,11 +24,7 @@ beforeEach(() => {
     data: { session: { user: { id: "A" } } },
     error: null,
   });
-  for (const method of [
-    sdk.signInWithOtp,
-    sdk.verifyOtp,
-    sdk.signOut,
-  ])
+  for (const method of [sdk.signInWithOtp, sdk.verifyOtp, sdk.signOut])
     method.mockResolvedValue({ error: null });
 });
 afterEach(() => vi.unstubAllGlobals());
@@ -129,7 +125,9 @@ it("reports SDK response errors and rejected requests through the typed error ch
   sdk.verifyOtp.mockResolvedValue({ error: { code: "invalid_credentials", message: "Denied" } });
   expect(
     await run(
-      h.driver.execute({ _tag: "VerifyOtp", email: "a@example.com", code: "123456" }).pipe(Effect.flip),
+      h.driver
+        .execute({ _tag: "VerifyOtp", email: "a@example.com", code: "123456" })
+        .pipe(Effect.flip),
     ),
   ).toMatchObject({ kind: "code" });
   sdk.signOut.mockRejectedValue(new Error("offline"));

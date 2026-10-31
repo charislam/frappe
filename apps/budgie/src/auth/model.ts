@@ -8,13 +8,7 @@ export const ExternalUser = Schema.Struct({
 });
 export const decodeUser = (value: unknown) => Schema.decodeUnknownEffect(ExternalUser)(value);
 export class AuthError extends Schema.TaggedError<AuthError>()("AuthError", {
-  kind: Schema.Literals([
-    "code",
-    "rate-limit",
-    "transport",
-    "callback",
-    "other",
-  ]),
+  kind: Schema.Literals(["code", "rate-limit", "transport", "callback", "other"]),
   message: Schema.String,
 }) {}
 export const authError = (cause: unknown): AuthError => {

@@ -7,9 +7,7 @@ import { synchronizeSession } from "./session-sync";
 export interface AuthDriver {
   readonly initialize: () => Effect.Effect<Option.Option<unknown>, AuthError>;
   readonly observe: (receive: (event: SessionEvent) => void) => () => void;
-  readonly execute: (
-    command: Command,
-  ) => Effect.Effect<void, AuthError>;
+  readonly execute: (command: Command) => Effect.Effect<void, AuthError>;
   readonly dispose: () => Effect.Effect<void>;
 }
 export const makeAuth = Effect.fn("Auth.make")(function* (options: { driver: AuthDriver }) {
